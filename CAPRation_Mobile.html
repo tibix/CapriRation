@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CAPRation">
+<meta name="theme-color" content="#1a3a2a">
+<title>CAPRation Mobile</title>
+<style>
+:root{
+  --vert:#2d6a4f;--vert-f:#1a3a2a;--vert-c:#52b788;--vert-p:#e8f5e9;
+  --gris:#6b7280;--bord:#e5e7eb;--danger:#c0392b;--warn:#d68910;
+  --bg:#f5f7f2;--card:#fff;--r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1f2937;min-height:100dvh}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:var(--vert-f);color:#fff;
+  padding:env(safe-area-inset-top) 0 0;
+}
+.topbar-inner{display:flex;align-items:center;gap:10px;padding:.75rem 1rem}
+.topbar-logo{font-size:1.4rem}
+.topbar-title{font-size:1.1rem;font-weight:700;letter-spacing:-.02em}
+.topbar-sub{font-size:.7rem;opacity:.7;margin-top:1px}
+.topbar-status{margin-left:auto;font-size:.7rem;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.15)}
+.topbar-status.ok{background:rgba(82,183,136,.35)}
+.topbar-status.err{background:rgba(192,57,43,.35)}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--vert-f);border-top:1px solid rgba(255,255,255,.1)}
+.tab{flex:1;padding:.6rem .3rem;text-align:center;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;transition:all .15s;border-bottom:2px solid transparent}
+.tab.active{color:#fff;border-bottom-color:var(--vert-c)}
+
+/* ── SCROLL AREA ── */
+.scroll{overflow-y:auto;padding:1rem;padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:var(--r);padding:1rem;margin-bottom:.75rem;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gris);margin-bottom:.6rem}
+.lot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.lot-name{font-size:1.05rem;font-weight:700;color:var(--vert-f)}
+.lot-badge{font-size:.75rem;font-weight:600;background:var(--vert-p);color:var(--vert);padding:3px 10px;border-radius:20px}
+.lot-sub{font-size:.75rem;color:var(--gris);margin-bottom:.6rem}
+
+/* ── ALIMENTS LIST ── */
+.alim-row{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--bord)}
+.alim-row:last-child{border-bottom:none}
+.alim-num{font-size:1.1rem;font-weight:700;color:var(--vert);width:22px;text-align:center;flex-shrink:0}
+.alim-info{flex:1}
+.alim-name{font-size:.9rem;font-weight:600}
+.alim-cat{font-size:.7rem;color:var(--gris)}
+.alim-qte{text-align:right;flex-shrink:0}
+.alim-qte-val{font-size:1.15rem;font-weight:700;color:var(--vert-f);font-family:monospace}
+.alim-qte-unit{font-size:.7rem;color:var(--gris)}
+
+/* ── TOTAL ROW ── */
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem .6rem;background:var(--vert-p);border-radius:8px;margin-top:.5rem}
+.total-label{font-size:.8rem;font-weight:700;color:var(--vert-f)}
+.total-val{font-size:1rem;font-weight:700;color:var(--vert-f);font-family:monospace}
+
+/* ── PASSAGE CHIPS ── */
+.passage-chips{display:flex;gap:.4rem;margin-bottom:.7rem;flex-wrap:wrap}
+.chip{padding:.3rem .8rem;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;border:1.5px solid var(--bord);background:#fff;color:var(--gris);transition:all .15s}
+.chip.active{background:var(--vert-f);color:#fff;border-color:var(--vert-f)}
+
+/* ── REFUS FORM ── */
+.refus-form{display:flex;gap:.5rem;align-items:center;margin-top:.6rem;padding:.5rem .6rem;background:#fafafa;border-radius:8px}
+.refus-label{font-size:.8rem;color:var(--gris);flex:1}
+.refus-input{width:70px;padding:.35rem .5rem;border:1.5px solid var(--bord);border-radius:8px;font-size:.95rem;font-weight:600;text-align:center;font-family:monospace}
+.refus-input:focus{outline:none;border-color:var(--vert-c)}
+.refus-unit{font-size:.75rem;color:var(--gris)}
+.btn-save{background:var(--vert-f);color:#fff;border:none;border-radius:8px;padding:.4rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer}
+.btn-save:active{opacity:.75}
+
+/* ── STATUT DISTRIBUTION ── */
+.distrib-status{display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;border-radius:8px;font-size:.8rem;font-weight:600;margin-top:.5rem;cursor:pointer}
+.distrib-status.fait{background:#e8f5e9;color:var(--vert)}
+.distrib-status.encours{background:#fff8e1;color:var(--warn)}
+.distrib-status.todo{background:#f5f5f5;color:var(--gris)}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--vert-f);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;z-index:999}
+.login-logo{font-size:3rem;margin-bottom:.5rem}
+.login-title{font-size:1.8rem;font-weight:800;color:#fff;margin-bottom:.3rem}
+.login-sub{font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:2rem;text-align:center}
+.login-input{width:100%;padding:.9rem 1rem;border-radius:12px;border:none;font-size:1rem;margin-bottom:.75rem;background:rgba(255,255,255,.1);color:#fff}
+.login-input::placeholder{color:rgba(255,255,255,.4)}
+.login-input:focus{outline:none;background:rgba(255,255,255,.15)}
+.login-btn{width:100%;padding:.9rem;border-radius:12px;border:none;background:var(--vert-c);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .15s}
+.login-btn:active{opacity:.8}
+.login-error{color:#ff8a80;font-size:.85rem;text-align:center;margin-top:.5rem;min-height:20px}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:3rem 1rem;color:var(--gris)}
+.spinner{width:36px;height:36px;border:3px solid var(--bord);border-top-color:var(--vert);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:3rem 1rem;color:var(--gris);font-size:.9rem}
+
+/* ── BADGE CAT ── */
+.badge{font-size:.65rem;font-weight:600;padding:1px 6px;border-radius:20px}
+.b-fourr{background:#e8f5e9;color:#1b5e20}
+.b-conc{background:#e8eaf6;color:#1a237e}
+.b-comp{background:#e3f2fd;color:#0d47a1}
+.b-autre{background:#f3e5f5;color:#4a148c}
+
+/* ── SYNC BANNER ── */
+.sync-banner{background:var(--vert-p);border-left:3px solid var(--vert-c);padding:.5rem .8rem;font-size:.75rem;color:var(--vert);margin-bottom:.75rem;border-radius:0 8px 8px 0;display:flex;align-items:center;gap:.4rem}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--vert-f);color:#fff;padding:.6rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:600;z-index:500;animation:fadeInOut 2.5s forwards}
+@keyframes fadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(8px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}85%{opacity:1}100%{opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-logo">🐐</div>
+  <div class="login-title">CAPRation</div>
+  <div class="login-sub">Distribution mobile<br>Connexion avec vos identifiants CapriScan</div>
+  <input class="login-input" id="l-email" type="email" placeholder="Email" autocomplete="email">
+  <input class="login-input" id="l-pwd" type="password" placeholder="Mot de passe" autocomplete="current-password">
+  <button class="login-btn" onclick="doLogin()">Se connecter</button>
+  <div class="login-error" id="l-err"></div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;height:100dvh;display:none;flex-direction:column">
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-logo">🐐</div>
+      <div>
+        <div class="topbar-title">CAPRation</div>
+        <div class="topbar-sub">Distribution mobile</div>
+      </div>
+      <div class="topbar-status" id="sync-status">Connexion…</div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('rations')" id="tab-rations">🌾 Rations</div>
+      <div class="tab" onclick="showTab('distribution')" id="tab-distribution">🪣 Distribution</div>
+      <div class="tab" onclick="showTab('refus')" id="tab-refus">📋 Refus</div>
+    </div>
+  </div>
+
+  <div class="scroll" id="scroll-area">
+    <!-- Rations -->
+    <div id="page-rations">
+      <div class="loading"><div class="spinner"></div>Chargement des rations…</div>
+    </div>
+    <!-- Distribution -->
+    <div id="page-distribution" style="display:none">
+      <div class="loading"><div class="spinner"></div>Chargement…</div>
+    </div>
+    <!-- Refus -->
+    <div id="page-refus" style="display:none">
+      <div class="loading"><div class="spinner"></div>Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// ══════════════════════════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════════════════════════
+const FB_CONFIG = {
+  apiKey:            "AIzaSyCfnYILKnS9jF4vpxy9JZiNs9TZHfBtJzI",
+  authDomain:        "capriscan.firebaseapp.com",
+  projectId:         "capriscan",
+  storageBucket:     "capriscan.firebasestorage.app",
+  messagingSenderId: "928490915599",
+  appId:             "1:928490915599:web:6613db0af99ec2f2a7e07a"
+};
+
+import {initializeApp}    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {getFirestore,doc,getDoc,setDoc,collection,getDocs,serverTimestamp}
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const app  = initializeApp(FB_CONFIG);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let uid = null;
+let lotsData   = [];   // [{id,nom,nb,ration:[{nom,cat,qte,qteRefus}]}]
+let refusData  = {};   // {date: {lotId: {alimNom: kg}}}
+let BASE_ALIM  = {};   // {id: {nom,cat,ms,ufl,...}}
+let passCourant = 1;
+let nbPassages  = 2;
+
+// ══ AUTH ══
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    uid = user.uid;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    setSyncStatus('Synchronisation…','');
+    await chargerDonnees();
+    setSyncStatus('Synchronisé ✓','ok');
+  } else {
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('app').style.display='none';
+  }
+});
+
+window.doLogin = async()=>{
+  const email = document.getElementById('l-email').value.trim();
+  const pwd   = document.getElementById('l-pwd').value;
+  document.getElementById('l-err').textContent='';
+  try{
+    await signInWithEmailAndPassword(auth, email, pwd);
+  } catch(e){
+    document.getElementById('l-err').textContent = 'Email ou mot de passe incorrect.';
+  }
+};
+
+// ══ DONNÉES ══
+async function chargerDonnees(){
+  try{
+    // 1. Charger les lots et rations depuis Firestore (chemin CAPRation)
+    const lotDoc = await getDoc(doc(db,`users/${uid}/capration/lots`));
+    if(lotDoc.exists()){
+      lotsData = lotDoc.data().lots || [];
+    } else {
+      // Fallback : essayer de lire les noms de lots CapriScan
+      const nomDoc = await getDoc(doc(db,`users/${uid}/data/lotNoms`));
+      if(nomDoc.exists()){
+        const noms = nomDoc.data().noms||{};
+        lotsData = Object.entries(noms).map(([k,v])=>({id:+k,nom:v,nb:0,ration:[]}));
+      }
+    }
+
+    // 2. Charger les refus du jour
+    const today = todayStr();
+    const refDoc = await getDoc(doc(db,`users/${uid}/capration/refus_${today}`));
+    if(refDoc.exists()) refusData = refDoc.data()||{};
+
+    renderAll();
+  } catch(e){
+    setSyncStatus('Erreur sync','err');
+    console.error(e);
+    // Charger depuis localStorage si dispo
+    const local = localStorage.getItem('cap3_mobile_lots');
+    if(local) lotsData = JSON.parse(local);
+    renderAll();
+  }
+}
+
+// ══ TABS ══
+window.showTab = (tab)=>{
+  ['rations','distribution','refus'].forEach(t=>{
+    document.getElementById(`page-${t}`).style.display = t===tab?'':'none';
+    document.getElementById(`tab-${t}`).classList.toggle('active', t===tab);
+  });
+};
+
+// ══ RENDER ALL ══
+function renderAll(){
+  renderRations();
+  renderDistribution();
+  renderRefus();
+}
+
+// ══════════════════════════════════════════════════
+// PAGE RATIONS
+// ══════════════════════════════════════════════════
+function renderRations(){
+  const el = document.getElementById('page-rations');
+  if(!lotsData.length){
+    el.innerHTML=`<div class="empty">🌿<br>Aucune ration disponible.<br><small>Synchronisez depuis CAPRation PC</small></div>`;
+    return;
+  }
+
+  const lotsAvecRation = lotsData.filter(l=>l.ration?.length>0);
+  if(!lotsAvecRation.length){
+    el.innerHTML=`<div class="empty">🌿<br>Aucune ration configurée.<br><small>Créez des rations dans CAPRation PC</small></div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="sync-banner">🔄 Rations synchronisées depuis CAPRation PC</div>
+    ${lotsAvecRation.map(lot=>renderLotRation(lot)).join('')}`;
+}
+
+function catBadge(cat){
+  if(['Foin','Ensilage','Enrubannage','Herbe','Paille'].includes(cat)) return 'b-fourr';
+  if(cat==='Concentré') return 'b-conc';
+  if(cat==='Aliment composé') return 'b-comp';
+  return 'b-autre';
+}
+
+function renderLotRation(lot){
+  const ORDRE = {'Paille':1,'Foin':2,'Enrubannage':3,'Ensilage':4,'Herbe':5,'Aliment composé':6,'Concentré':7,'Autre':8};
+  const items = [...(lot.ration||[])].sort((a,b)=>(ORDRE[a.cat]||9)-(ORDRE[b.cat]||9));
+  const total = items.reduce((s,a)=>s+a.qte,0);
+
+  return `<div class="card">
+    <div class="lot-header">
+      <div class="lot-name">${lot.nom}</div>
+      <div class="lot-badge">${lot.nb||0} ch.</div>
+    </div>
+    <div class="lot-sub">${items.length} aliment${items.length>1?'s':''} · ${total.toFixed(2)} kg brut/tête/j</div>
+    ${items.map((a,i)=>`
+    <div class="alim-row">
+      <div class="alim-num">${i+1}</div>
+      <div class="alim-info">
+        <div class="alim-name">${a.nom}</div>
+        <div class="alim-cat"><span class="badge ${catBadge(a.cat)}">${a.cat}</span></div>
+      </div>
+      <div class="alim-qte">
+        <div class="alim-qte-val">${a.qte.toFixed(2)}</div>
+        <div class="alim-qte-unit">kg/tête</div>
+      </div>
+    </div>`).join('')}
+    <div class="total-row">
+      <div class="total-label">Total lot (${lot.nb||0} têtes)</div>
+      <div class="total-val">${((total)*(lot.nb||0)).toFixed(0)} kg/j</div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// PAGE DISTRIBUTION (ordre de chargement + passages)
+// ══════════════════════════════════════════════════
+function renderDistribution(){
+  const el = document.getElementById('page-distribution');
+  const lotsAvecRation = lotsData.filter(l=>l.ration?.length>0);
+  if(!lotsAvecRation.length){ el.innerHTML=`<div class="empty">🪣<br>Aucune ration configurée.</div>`; return; }
+
+  // Consolidation tous lots
+  const consolide = {};
+  let nbTotal = 0;
+  lotsAvecRation.forEach(lot=>{
+    const nb=lot.nb||0; nbTotal+=nb;
+    (lot.ration||[]).forEach(a=>{
+      if(!consolide[a.nom]) consolide[a.nom]={...a,qteTotal:0};
+      consolide[a.nom].qteTotal += a.qte*(nb||1);
+    });
+  });
+
+  const ORDRE = {'Paille':1,'Foin':2,'Enrubannage':3,'Ensilage':4,'Herbe':5,'Aliment composé':6,'Concentré':7,'Autre':8};
+  const COULEURS = {'Paille':'#8B6914','Foin':'#8B6914','Enrubannage':'#2d6a4f','Ensilage':'#1b5e20','Herbe':'#2d6a4f','Aliment composé':'#0d47a1','Concentré':'#4a148c','Autre':'#6b7280'};
+  const items = Object.values(consolide).sort((a,b)=>(ORDRE[a.cat]||9)-(ORDRE[b.cat]||9));
+
+  const distribStatut = JSON.parse(localStorage.getItem('cap3_distrib_statut')||'{}');
+  const today = todayStr();
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">⚙️ Passages</div>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span style="font-size:.85rem;color:var(--gris)">Nombre de passages :</span>
+        ${[1,2,3].map(n=>`<div class="chip ${nbPassages===n?'active':''}" onclick="setPassages(${n})">${n}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Ordre de chargement — ${nbTotal} animaux</div>
+      ${items.map((a,i)=>`
+      <div style="display:flex;align-items:center;gap:.7rem;padding:.55rem .4rem;border-bottom:1px solid var(--bord);${i===items.length-1?'border:none':''}">
+        <span style="font-size:1.1rem;font-weight:800;color:${COULEURS[a.cat]||'#999'};width:24px;text-align:center;flex-shrink:0">${i+1}</span>
+        <div style="flex:1">
+          <div style="font-size:.9rem;font-weight:600">${a.nom}</div>
+          <div style="font-size:.7rem;color:var(--gris)">${a.cat}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:1rem;font-weight:700;color:var(--vert-f);font-family:monospace">${(a.qteTotal/nbPassages).toFixed(0)} kg</div>
+          <div style="font-size:.65rem;color:var(--gris)">/ passage</div>
+        </div>
+      </div>`).join('')}
+    </div>
+
+    <div class="card">
+      <div class="card-title">✅ Suivi des passages — ${today}</div>
+      <div class="passage-chips" id="passage-chips">
+        ${Array.from({length:nbPassages},(_,i)=>{
+          const fait = distribStatut[today]?.[i+1];
+          return `<div class="chip ${fait?'active':''}" onclick="togglePassage(${i+1})">${fait?'✓':''} Passage ${i+1}</div>`;
+        }).join('')}
+      </div>
+      <div style="font-size:.8rem;color:var(--gris)">Appuyez sur un passage pour le marquer comme effectué.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏷️ Détail par lot</div>
+      ${lotsAvecRation.map(lot=>{
+        const total = (lot.ration||[]).reduce((s,a)=>s+a.qte,0);
+        const nb = lot.nb||0;
+        return `<div style="padding:.5rem 0;border-bottom:1px solid var(--bord)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem">
+            <span style="font-weight:600;font-size:.9rem">${lot.nom}</span>
+            <span style="font-family:monospace;font-weight:700;color:var(--vert-f)">${(total*nb/nbPassages).toFixed(0)} kg/passage</span>
+          </div>
+          <div style="font-size:.75rem;color:var(--gris)">${nb} ch. · ${total.toFixed(2)} kg/tête/j · Total jour : ${(total*nb).toFixed(0)} kg</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+window.setPassages = (n)=>{
+  nbPassages = n;
+  renderDistribution();
+};
+
+window.togglePassage = (n)=>{
+  const today = todayStr();
+  const statut = JSON.parse(localStorage.getItem('cap3_distrib_statut')||'{}');
+  if(!statut[today]) statut[today]={};
+  statut[today][n] = !statut[today][n];
+  localStorage.setItem('cap3_distrib_statut', JSON.stringify(statut));
+  showToast(statut[today][n] ? `✅ Passage ${n} effectué` : `↩️ Passage ${n} annulé`);
+  renderDistribution();
+};
+
+// ══════════════════════════════════════════════════
+// PAGE REFUS
+// ══════════════════════════════════════════════════
+function renderRefus(){
+  const el = document.getElementById('page-refus');
+  const today = todayStr();
+  const lotsAvecRation = lotsData.filter(l=>l.ration?.length>0);
+  if(!lotsAvecRation.length){ el.innerHTML=`<div class="empty">📋<br>Aucune ration configurée.</div>`; return; }
+
+  el.innerHTML = `
+    <div class="sync-banner">📅 Refus du ${today}</div>
+    ${lotsAvecRation.map(lot=>{
+      const refusLot = (refusData[lot.id])||{};
+      const totalRefus = Object.values(refusLot).reduce((s,v)=>s+(+v||0),0);
+      const totalRation = (lot.ration||[]).reduce((s,a)=>s+a.qte*(lot.nb||0),0);
+      const pctRefus = totalRation>0 ? (totalRefus/totalRation*100).toFixed(1) : 0;
+
+      return `<div class="card" id="card-lot-${lot.id}">
+        <div class="lot-header">
+          <div class="lot-name">${lot.nom}</div>
+          <div class="lot-badge">${lot.nb||0} ch.</div>
+        </div>
+        ${(lot.ration||[]).map(a=>{
+          const refusVal = refusLot[a.nom]||'';
+          return `<div class="alim-row">
+            <div class="alim-info">
+              <div class="alim-name">${a.nom}</div>
+              <div class="alim-cat" style="font-size:.7rem;color:var(--gris)">Distribué : ${(a.qte*(lot.nb||0)).toFixed(0)} kg</div>
+            </div>
+            <div class="refus-form">
+              <span class="refus-label">Refus</span>
+              <input class="refus-input" type="number" id="refus-${lot.id}-${a.nom.replace(/\s/g,'_')}"
+                value="${refusVal}" placeholder="0" min="0" step="0.5">
+              <span class="refus-unit">kg</span>
+            </div>
+          </div>`;
+        }).join('')}
+
+        ${totalRefus>0 ? `
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;padding:.4rem .6rem;background:${pctRefus>10?'#fdecea':'var(--vert-p)'};border-radius:8px;margin-top:.4rem">
+          <span style="color:var(--gris)">Total refus</span>
+          <span style="font-weight:700;color:${pctRefus>10?'var(--danger)':'var(--vert)'}">${totalRefus.toFixed(1)} kg — ${pctRefus}%</span>
+        </div>` : ''}
+
+        <button class="btn-save" style="width:100%;margin-top:.6rem;padding:.7rem" onclick="sauvegarderRefus(${lot.id})">
+          💾 Enregistrer les refus
+        </button>
+      </div>`;
+    }).join('')}`;
+}
+
+window.sauvegarderRefus = async(lotId)=>{
+  const lot = lotsData.find(l=>l.id===lotId);
+  if(!lot) return;
+  const refusLot = {};
+  (lot.ration||[]).forEach(a=>{
+    const key = `refus-${lotId}-${a.nom.replace(/\s/g,'_')}`;
+    const val = parseFloat(document.getElementById(key)?.value)||0;
+    if(val>0) refusLot[a.nom] = val;
+  });
+
+  if(!refusData[lotId]) refusData[lotId]={};
+  refusData[lotId] = refusLot;
+
+  const today = todayStr();
+  try{
+    await setDoc(doc(db,`users/${uid}/capration/refus_${today}`), refusData);
+    showToast(`✅ Refus ${lot.nom} enregistrés`);
+  } catch(e){
+    // Sauvegarder en local si pas de connexion
+    localStorage.setItem('cap3_mobile_refus_'+today, JSON.stringify(refusData));
+    showToast(`💾 Sauvegardé en local`);
+  }
+  renderRefus();
+};
+
+// ══ UTILS ══
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+
+function setSyncStatus(txt, cls){
+  const el = document.getElementById('sync-status');
+  el.textContent = txt;
+  el.className = 'topbar-status'+(cls?' '+cls:'');
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2600);
+}
+
+// ══ SYNC DEPUIS PC (lecture clé localStorage partagée via URL hash) ══
+// CAPRation PC peut encoder les lots dans l'URL pour un transfert rapide
+const hash = location.hash.slice(1);
+if(hash.startsWith('lots=')){
+  try{
+    lotsData = JSON.parse(decodeURIComponent(hash.slice(5)));
+    localStorage.setItem('cap3_mobile_lots', JSON.stringify(lotsData));
+    location.hash='';
+    renderAll();
+  } catch(e){}
+}
+</script>
+</body>
+</html>
