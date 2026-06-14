@@ -1,0 +1,3743 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAPRation – Rations Caprines</title>
+<link rel="manifest" href="manifest_pc.json">
+<meta name="theme-color" content="#2d6a4f">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw_pc.js')
+        .then(r => console.log('SW CAPRation enregistré:', r.scope))
+        .catch(e => console.warn('SW échec:', e));
+    });
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --vert:#2d6a4f;--vert-c:#52b788;--vert-p:#d8f3dc;--vert-f:#1b4332;
+  --gris:#6b7280;--gris-c:#f3f4f0;--bord:#d4d7c9;
+  --danger:#c0392b;--warn:#d68910;--ok:#2d6a4f;
+  --r:10px;--sh:0 2px 12px rgba(0,0,0,.07);
+  --sidebar-w:220px;
+  --header-h:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#eef0e9;color:#2c2c28;min-height:100vh;font-size:14px;line-height:1.6;display:flex;flex-direction:column}
+
+/* ═══════════════ LAYOUT ═══════════════ */
+.app-shell{display:flex;flex:1;min-height:100vh}
+
+/* ═══════════════ SIDEBAR ═══════════════ */
+.sidebar{
+  width:var(--sidebar-w);
+  background:var(--vert-f);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:200;
+  box-shadow:3px 0 20px rgba(0,0,0,.15);
+  overflow:hidden;
+}
+
+.sidebar-brand{
+  padding:1.4rem 1.2rem 1.1rem;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  flex-shrink:0;
+}
+.brand-icon{font-size:28px;line-height:1;margin-bottom:.3rem}
+.brand-name{font-family:'Lora',serif;font-size:1.2rem;font-weight:600;color:#fff;letter-spacing:-.01em}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-top:1px}
+
+.sidebar-nav{flex:1;padding:.8rem 0;overflow-y:auto}
+.sidebar-nav::-webkit-scrollbar{width:3px}
+.sidebar-nav::-webkit-scrollbar-track{background:transparent}
+.sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:2px}
+
+.nav-section{padding:.2rem .8rem .1rem;font-size:9.5px;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:.4rem}
+
+.nb{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:.65rem 1.2rem;
+  border:none;background:transparent;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  color:rgba(255,255,255,.65);
+  cursor:pointer;transition:all .15s;
+  text-align:left;
+  position:relative;
+}
+.nb .ni{font-size:17px;width:22px;text-align:center;flex-shrink:0}
+.nb span.nl{flex:1}
+.nb:hover{background:rgba(255,255,255,.08);color:#fff}
+.nb.active{background:rgba(255,255,255,.13);color:#fff}
+.nb.active::before{
+  content:'';position:absolute;left:0;top:20%;bottom:20%;
+  width:3px;background:var(--vert-c);border-radius:0 3px 3px 0;
+}
+
+.sidebar-footer{
+  padding:.85rem 1.2rem;
+  border-top:1px solid rgba(255,255,255,.1);
+  flex-shrink:0;
+}
+.hdr-tag{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  border-radius:7px;padding:.45rem .7rem;font-size:11.5px;
+  font-family:'DM Mono',monospace;color:rgba(255,255,255,.75);
+  display:flex;flex-direction:column;gap:3px;
+}
+.hdr-tag-label{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.4)}
+.hdr-tag-val{font-size:13px;color:#fff;font-weight:500}
+
+/* ═══════════════ MAIN CONTENT ═══════════════ */
+.main-wrap{
+  margin-left:var(--sidebar-w);
+  flex:1;display:flex;flex-direction:column;min-height:100vh;
+}
+
+.topbar{
+  background:#fff;border-bottom:1px solid var(--bord);
+  padding:.75rem 1.8rem;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 8px rgba(0,0,0,.05);
+  min-height:var(--header-h);
+}
+.topbar-title{font-family:'Lora',serif;font-size:1.05rem;font-weight:600;color:var(--vert-f)}
+.topbar-sub{font-size:11px;color:var(--gris);margin-top:1px}
+.topbar-actions{display:flex;align-items:center;gap:.6rem}
+
+main{padding:1.5rem 1.8rem;flex:1;width:100%}
+
+/* ═══════════════ PAGES ═══════════════ */
+.page{display:none}.page.active{display:block}
+
+/* ═══════════════ CARDS ═══════════════ */
+.card{background:#fff;border-radius:var(--r);border:1px solid var(--bord);padding:1.2rem 1.4rem;margin-bottom:.9rem;box-shadow:var(--sh)}
+.ct{font-family:'Lora',serif;font-size:.88rem;font-weight:600;color:var(--vert-f);margin-bottom:.9rem;padding-bottom:.45rem;border-bottom:1px solid var(--vert-p);display:flex;align-items:center;gap:7px}
+
+/* ═══════════════ GRID 2 COLONNES PC ═══════════════ */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+.two-col-3{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:1rem;align-items:start}
+.span2{grid-column:1/-1}
+
+/* ═══════════════ FORM FIELDS ═══════════════ */
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:.7rem}
+.fgr{display:flex;flex-direction:column;gap:3px}
+label{font-size:10px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.06em}
+input[type="number"],input[type="text"],select{width:100%;padding:.48rem .65rem;border:1px solid var(--bord);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;background:#fff;color:#2c2c28;transition:border-color .15s;appearance:none;-webkit-appearance:none}
+input:focus,select:focus{outline:none;border-color:var(--vert-c);box-shadow:0 0 0 3px rgba(82,183,136,.15)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:1.8rem}
+
+/* ═══════════════ BUTTONS ═══════════════ */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:.48rem 1rem;border-radius:7px;border:1px solid transparent;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-p{background:var(--vert);color:#fff;border-color:var(--vert)}.btn-p:hover{background:var(--vert-f)}
+.btn-s{background:transparent;color:var(--vert);border-color:var(--vert-c)}.btn-s:hover{background:var(--vert-p)}
+.btn-sm{padding:.25rem .55rem;font-size:11px;border-radius:5px}
+.btn-d{background:transparent;color:var(--danger);border-color:#f5b7b1}.btn-d:hover{background:#fdf2f0}
+
+/* ═══════════════ KPI ═══════════════ */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin-bottom:.9rem}
+.kpi{border-radius:9px;padding:.75rem .6rem;text-align:center;position:relative;border:1.5px solid transparent}
+.kpi.ufl {background:#e8f5e9;border-color:#a5d6a7}
+.kpi.pdin{background:#e3f2fd;border-color:#90caf9}
+.kpi.pdie{background:#ede7f6;border-color:#ce93d8}
+.kpi.mat {background:#fff8e1;border-color:#ffe082}
+.kpi.uel {background:#fce4ec;border-color:#f48fb1}
+.kv{font-family:'DM Mono',monospace;font-size:1.3rem;font-weight:500;line-height:1.1}
+.kpi.ufl  .kv{color:#1b5e20}.kpi.pdin .kv{color:#0d47a1}
+.kpi.pdie .kv{color:#4a148c}.kpi.mat  .kv{color:#bf360c}
+.kpi.uel  .kv{color:#880e4f}
+.ku{font-size:9px;font-family:'DM Mono',monospace;opacity:.7;margin-top:1px}
+.kl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:4px;opacity:.7}
+.ks{position:absolute;top:4px;right:5px;font-size:11px}
+.kb{font-size:9px;margin-top:2px;opacity:.65;font-family:'DM Mono',monospace}
+
+.mg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.55rem}
+.mc{background:var(--gris-c);border-radius:8px;padding:.65rem;text-align:center}
+.mv{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:500;color:var(--vert-f);line-height:1.2}
+.ml{font-size:9.5px;color:var(--gris);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+
+/* ═══════════════ ALERTES ═══════════════ */
+.al{padding:.55rem .85rem;border-radius:8px;font-size:12px;margin-top:.5rem;display:flex;align-items:flex-start;gap:7px}
+.al-w{background:#fef9e7;border-left:3px solid var(--warn);color:#7d6608}
+.al-ok{background:#eafaf1;border-left:3px solid var(--ok);color:var(--vert-f)}
+.al-e{background:#fdedec;border-left:3px solid var(--danger);color:#922b21}
+
+/* ═══════════════ RATION LIST ═══════════════ */
+.ration-groupe-header{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--vert-f);background:var(--vert-p);padding:.3rem .6rem;border-radius:6px;margin:.6rem 0 .2rem}
+.ration-groupe-total{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;padding:.4rem .5rem;background:#f8f9f5;border-radius:6px;font-size:11px;font-weight:600;color:var(--gris);border-top:1px solid var(--bord);margin-bottom:.4rem}
+.ration-groupe-total span:first-child{color:var(--vert-f);font-weight:700}
+
+/* ═══════════════ DRAG HANDLE ═══════════════ */
+.drag-handle:hover{color:var(--gris)}
+.rrow.drag-over{background:var(--vert-p);border-radius:6px}
+.rrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:7px;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--bord)}
+.rrow:last-child{border-bottom:none}
+.rn{font-weight:500;font-size:13.5px}
+.rd{font-size:10.5px;color:var(--gris);margin-top:2px;display:flex;gap:.45rem;flex-wrap:wrap}
+.qi{width:78px;text-align:right;font-family:'DM Mono',monospace;font-size:12.5px;padding:.3rem .45rem;border:1px solid var(--bord);border-radius:6px}
+
+/* ═══════════════ BARRES ═══════════════ */
+.bars{display:flex;flex-direction:column;gap:.65rem}
+.bh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;flex-wrap:wrap;gap:3px}
+.bn{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.bv{font-size:10.5px;color:var(--gris);font-family:'DM Mono',monospace}
+.bt{height:8px;background:var(--gris-c);border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;transition:width .35s,background .35s}
+
+/* ═══════════════ TABLE ═══════════════ */
+.tw{overflow-x:auto;border-radius:8px;border:1px solid var(--bord)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:var(--vert-p);color:var(--vert-f);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.5rem .6rem;text-align:left;white-space:nowrap}
+td{padding:.45rem .6rem;border-top:1px solid var(--bord)}
+tr:hover td{background:var(--gris-c)}
+
+/* filtre catégorie */
+.cat-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
+.cat-tab{padding:.25rem .65rem;border-radius:20px;border:1px solid var(--bord);font-size:11px;font-weight:500;cursor:pointer;background:#fff;color:var(--gris);transition:all .15s}
+.cat-tab.active{background:var(--vert-f);color:#fff;border-color:var(--vert-f)}
+
+.badge{display:inline-block;padding:2px 6px;border-radius:20px;font-size:9.5px;font-weight:600}
+.bg{background:var(--vert-p);color:var(--vert-f)}
+.bb{background:#e3f2fd;color:#0d47a1}
+.bp{background:#fce4ec;color:#880e4f}
+.bm{background:#fff8e1;color:#bf360c}
+.bo{background:#f3e5f5;color:#4a148c}
+.ba{background:#f3f4f0;color:#444}
+
+/* ═══════════════ DASHBOARD ═══════════════ */
+.dg{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.85rem}
+.dc{background:#fff;border:1px solid var(--bord);border-radius:var(--r);padding:1rem;box-shadow:var(--sh)}
+.db{font-family:'DM Mono',monospace;font-size:1.9rem;font-weight:500;color:var(--vert-f);line-height:1}
+.ds{font-size:11.5px;color:var(--gris);margin-top:4px}
+
+.rr{background:linear-gradient(135deg,var(--vert-p) 0%,#f0f7f0 100%);border:1px solid var(--vert-c);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:.85rem}
+.div{height:1px;background:var(--bord);margin:.85rem 0}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.pt{font-family:'Lora',serif;font-size:1.15rem;color:var(--vert-f);font-weight:600}
+.ps{font-size:11.5px;color:var(--gris);margin-top:1px}
+.empty{text-align:center;padding:1.8rem;color:var(--gris);font-size:13px}
+
+.add-form{background:#fefae0;border:1px dashed var(--bord);border-radius:var(--r);padding:1rem;margin-bottom:.85rem}
+
+.search-wrap{position:relative;margin-bottom:.7rem}
+.search-wrap input{padding-left:2rem}
+.search-icon{position:absolute;left:.6rem;top:50%;transform:translateY(-50%);font-size:14px;color:var(--gris);pointer-events:none}
+
+/* ═══════════════ BARRE DE LOTS ═══════════════ */
+.lot-bar{
+  background:#f8f9f5;border-bottom:1px solid var(--bord);
+  padding:.4rem 1.8rem;display:flex;align-items:center;gap:.45rem;
+  flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;
+}
+.lot-bar-label{font-size:11px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.lot-select{
+  padding:.28rem .5rem;border:1px solid var(--bord);border-radius:6px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  background:#fff;color:var(--vert-f);cursor:pointer;
+  min-width:80px;max-width:220px;flex-shrink:1;
+}
+.lot-select:focus{outline:none;border-color:var(--vert-c)}
+.lot-btn{padding:.25rem .5rem;border-radius:6px;border:1px solid var(--bord);background:#fff;font-size:12px;cursor:pointer;transition:all .13s;color:var(--gris);flex-shrink:0}
+.lot-btn:hover{background:var(--gris-c);border-color:var(--vert-c)}
+.lot-btn-add{background:var(--vert-f);color:#fff;border-color:var(--vert-f);font-weight:600}
+.lot-btn-add:hover{background:var(--vert)}
+.lot-btn-del{color:var(--danger);border-color:#f5b7b1}
+.lot-btn-del:hover{background:#fdf2f0}
+.lot-info{margin-left:auto;font-family:'DM Mono',monospace;font-size:11px;background:var(--vert-f);color:#fff;padding:.2rem .65rem;border-radius:20px;white-space:nowrap;flex-shrink:0}
+
+/* ═══════════════ TYPE ANIMAL BUTTONS ═══════════════ */
+.type-btn{
+  flex:1;padding:.5rem .4rem;border-radius:8px;border:1.5px solid var(--bord);
+  background:#fff;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:500;
+  color:var(--gris);cursor:pointer;transition:all .15s;text-align:center;
+}
+.type-btn:hover{border-color:var(--vert-c);color:var(--vert-f);background:var(--vert-p)}
+.type-btn.active{background:var(--vert-f);color:#fff;border-color:var(--vert-f)}
+.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start}
+.besoins-sticky{position:sticky;top:calc(var(--header-h) + 1rem)}
+
+/* ═══════════════ PAGE RATION : 2 COLONNES ═══════════════ */
+.ration-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem;align-items:start}
+.bilan-sticky{position:sticky;top:calc(var(--header-h) + 4rem)}
+
+/* ═══════════════ JAUGES BILAN ═══════════════ */
+.gauges-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.3rem;margin-bottom:.4rem}
+.gauges-grid-2{grid-template-columns:repeat(2,1fr);max-width:66%;margin:0 auto .4rem}
+.gauge-wrap{text-align:center;padding:.1rem}
+.gauge-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gris);margin-top:.1rem}
+.gauge-sub{font-size:9px;margin-top:1px;color:var(--gris);line-height:1.3}
+
+/* ═══════════════ IMPRESSION ═══════════════ */
+@media print{
+  .sidebar,.topbar,.lot-bar,.topbar-actions{display:none!important}
+  .main-wrap{margin-left:0!important}
+  main{padding:.5rem!important}
+  .page{display:none!important}
+  #page-distrib{display:block!important}
+  .card{break-inside:avoid;box-shadow:none!important;border:1px solid #ccc!important}
+  .distrib-card{page-break-inside:avoid}
+}
+
+/* ═══════════════ RESPONSIVE (mobile fallback) ═══════════════ */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .main-wrap{margin-left:0}
+  .param-grid,.ration-grid,.two-col,.two-col-3{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:520px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  main{padding:.8rem}
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+<!-- ═══════════════════════════════════════
+     SIDEBAR
+════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🐐</div>
+    <div class="brand-name">CAPRation</div>
+    <div class="brand-sub">Rations caprines</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">Saisie</div>
+    <button class="nb active" onclick="showPage('param')">
+      <span class="ni">⚙️</span><span class="nl">Paramètres</span>
+    </button>
+    <button class="nb" onclick="showPage('ration')">
+      <span class="ni">🌾</span><span class="nl">Ration</span>
+    </button>
+
+    <div class="nav-section">Analyse</div>
+    <button class="nb" onclick="showPage('dash')">
+      <span class="ni">📊</span><span class="nl">Dashboard</span>
+    </button>
+    <button class="nb" onclick="showPage('refus')">
+      <span class="ni">📋</span><span class="nl">Refus</span>
+    </button>
+    <button class="nb" onclick="showPage('suivi')">
+      <span class="ni">🥛</span><span class="nl">Suivi production</span>
+    </button>
+    <button class="nb" onclick="showPage('distrib')">
+      <span class="ni">🪣</span><span class="nl">Distribution</span>
+    </button>
+
+    <button class="nb" onclick="showPage('ia')">
+      <span class="ni">🤖</span><span class="nl">Aide IA</span>
+    </button>
+
+    <div class="nav-section">Données</div>
+    <button class="nb" onclick="showPage('alim')">
+      <span class="ni">🗄️</span><span class="nl">Base aliments</span>
+    </button>
+
+    <div class="nav-section">CapriScan</div>
+    <button class="nb" onclick="ouvrirImportCapriScan()">
+      <span class="ni">🔗</span><span class="nl">Gérer les lots</span>
+    </button>
+    <button class="nb" onclick="syncProductionCapriScan()">
+      <span class="ni">📈</span><span class="nl">Sync production</span>
+    </button>
+    <button class="nb" onclick="syncMobile()" title="Envoyer les rations vers le mobile">
+      <span class="ni">📱</span><span class="nl">Sync mobile</span>
+    </button>
+    <div id="cs-sync-status" style="padding:.25rem 1.2rem;min-height:18px;font-size:10px"></div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div id="cr-user-badge" style="margin-bottom:.5rem;display:none">
+      <div style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em">Connecté CAPRation</div>
+      <div id="cr-sidebar-email" style="font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <button onclick="crLogout()" style="margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">Déconnecter</button>
+    </div>
+    <div id="cs-user-badge" style="display:none;margin-bottom:.5rem">
+      <div style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em">Connecté CapriScan</div>
+      <div id="cs-user-email" style="font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <button onclick="deconnecterCapriScan()" style="margin-top:4px;font-size:10px;color:rgba(255,255,255,.4);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline">Déconnecter</button>
+    </div>
+    <div class="hdr-tag">
+      <div class="hdr-tag-label">Troupeau actif</div>
+      <div class="hdr-tag-val">🐐 <span id="hdr-nb">400</span> ch. · <span id="hdr-prod">3.5</span> L/j</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════
+     CONTENU PRINCIPAL
+════════════════════════════════════════ -->
+<div class="main-wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar" id="topbar">
+    <div>
+      <div class="topbar-title" id="topbar-title">Paramètres animal</div>
+      <div class="topbar-sub" id="topbar-sub">Paramètres par lot</div>
+    </div>
+    <div class="topbar-actions" id="topbar-actions">
+      <button class="btn btn-p" onclick="calculer()">Calculer ↗</button>
+    </div>
+  </div>
+
+  <!-- BARRE DE LOTS -->
+  <div class="lot-bar" id="lot-bar">
+    <span class="lot-bar-label">Lot actif :</span>
+    <select class="lot-select" id="lot-select" onchange="changerLot(this.value)"></select>
+    <button class="lot-btn" onclick="renommerLot()" title="Renommer">✏️</button>
+    <button class="lot-btn lot-btn-add" onclick="ajouterLot()" title="Nouveau lot">+ Lot</button>
+    <button class="lot-btn lot-btn-del" onclick="supprimerLotActif()" title="Supprimer ce lot">🗑</button>
+    <button class="lot-btn" onclick="copierRation()" title="Copier la ration vers un autre lot" style="background:#e3f2fd;border-color:#90caf9;color:#0d47a1;font-weight:600">📋 Copier ration</button>
+    <!-- Bouton multi-sélection — visible seulement sur la page Ration -->
+    <button class="lot-btn" id="btn-multiselect" onclick="ouvrirMultiSelect()" title="Appliquer ration à plusieurs lots" style="display:none;background:var(--vert-p);border-color:var(--vert-c);color:var(--vert-f);font-weight:600">⊕ Multi-lots</button>
+  </div>
+
+  <!-- MODALE MULTI-SÉLECTION LOTS -->
+  <div id="ms-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:14px;padding:1.8rem;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+        <span style="font-size:22px">⊕</span>
+        <div>
+          <div style="font-family:'Lora',serif;font-size:1.05rem;font-weight:600;color:var(--vert-f)">Appliquer à plusieurs lots</div>
+          <div style="font-size:11.5px;color:var(--gris);margin-top:1px">La ration en cours sera appliquée à tous les lots cochés</div>
+        </div>
+        <button onclick="fermerMultiSelect()" style="margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris)">✕</button>
+      </div>
+      <div id="ms-liste" style="display:flex;flex-direction:column;gap:.4rem;max-height:320px;overflow-y:auto;margin-bottom:1rem"></div>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn btn-p" style="flex:1" onclick="confirmerMultiSelect()">Appliquer la ration</button>
+        <button class="btn btn-s" onclick="fermerMultiSelect()">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE IMPORT CAPRISCAN -->
+  <div id="cs-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:14px;padding:1.8rem;width:420px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.2rem">
+        <span style="font-size:24px">🔗</span>
+        <div>
+          <div style="font-family:'Lora',serif;font-size:1.05rem;font-weight:600;color:var(--vert-f)">Importer depuis CapriScan</div>
+          <div style="font-size:11.5px;color:var(--gris);margin-top:1px">Connectez-vous avec vos identifiants CapriScan</div>
+        </div>
+        <button onclick="fermerImportCapriScan()" style="margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:var(--gris)">✕</button>
+      </div>
+
+      <div id="cs-modal-login">
+        <div style="display:flex;flex-direction:column;gap:.65rem">
+          <div class="fgr"><label>Email</label><input type="email" id="cs-email" placeholder="votre@email.com"></div>
+          <div class="fgr"><label>Mot de passe</label><input type="password" id="cs-password" placeholder="••••••••"></div>
+        </div>
+        <div id="cs-error" style="display:none;margin-top:.7rem;padding:.5rem .8rem;background:#fdedec;border-left:3px solid var(--danger);border-radius:6px;font-size:12px;color:#922b21"></div>
+        <div style="display:flex;gap:.5rem;margin-top:1rem">
+          <button class="btn btn-p" style="flex:1" onclick="connecterCapriScan()">Se connecter &amp; importer</button>
+          <button class="btn btn-s" onclick="fermerImportCapriScan()">Annuler</button>
+        </div>
+      </div>
+
+      <div id="cs-modal-result" style="display:none">
+        <div id="cs-lots-liste" style="display:flex;flex-direction:column;gap:.45rem;max-height:280px;overflow-y:auto;margin-bottom:1rem"></div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-p" style="flex:1" onclick="confirmerImportLots()">Importer les nouveaux lots</button>
+          <button class="btn btn-s" onclick="syncCapriScan({silencieux:false}).then(()=>afficherModalResultat())" title="Rafraîchir depuis CapriScan">🔄</button>
+          <button class="btn btn-s" onclick="fermerImportCapriScan()">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+
+  <!-- ══ PAGE PARAMÈTRES ══ -->
+  <div id="page-param" class="page active">
+    <div class="param-grid">
+
+      <!-- COLONNE GAUCHE : saisie -->
+      <div>
+        <div class="card">
+          <div class="ct">🐐 Animal &amp; production</div>
+
+          <!-- Sélecteur type animal — boutons radio visuels -->
+          <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+            <button id="btn-chevre"    class="type-btn active" onclick="setType('chevre')">🐐 Chèvre</button>
+            <button id="btn-chevrette" class="type-btn"        onclick="setType('chevrette')">🐑 Chevrette</button>
+            <button id="btn-bouc"      class="type-btn"        onclick="setType('bouc')">♂ Bouc</button>
+          </div>
+
+          <!-- Primipare / Multipare — visible seulement pour chèvre -->
+          <div id="row-parite" style="display:flex;gap:.5rem;margin-bottom:1rem">
+            <button id="btn-multipare" class="type-btn active" onclick="setParite('multipare')">Multipare</button>
+            <button id="btn-primipare" class="type-btn"        onclick="setParite('primipare')">Primipare (1ère lact.)</button>
+          </div>
+
+          <div class="fg">
+            <div class="fgr" id="row-race"><label>Race</label>
+              <select id="race" onchange="onRaceChange();calculer()">
+                <option value="alpine" selected>Alpine</option>
+                <option value="saanen">Saanen</option>
+                <option value="poitevine">Poitevine</option>
+                <option value="rove">Rove</option>
+                <option value="pyrenéenne">Pyrénéenne</option>
+                <option value="angora">Angora</option>
+              </select></div>
+            <div class="fgr"><label>Poids vif (kg)</label>
+              <input type="number" id="poids" value="80" min="5" max="250" step=".5" oninput="calculer()"></div>
+            <div class="fgr" id="row-nec"><label>NEC</label>
+              <select id="nec" onchange="calculer()">
+                <option value="1">NEC 1 – Très maigre</option>
+                <option value="2">NEC 2 – Maigre</option>
+                <option value="3" selected>NEC 3 – Correct</option>
+                <option value="4">NEC 4 – Gras</option>
+                <option value="5">NEC 5 – Obèse</option>
+              </select></div>
+            <div class="fgr" id="row-age-chevrette" style="display:none"><label>Âge (mois)</label>
+              <input type="number" id="age_chevrette" value="6" min="2" max="18" step="1" oninput="calculer()"></div>
+            <div class="fgr"><label id="lbl-stade">Stade physiologique</label>
+              <select id="stade" onchange="calculer()">
+                <option value="lac_debut" selected>Début de lactation (0-2 mois)</option>
+                <option value="lac_pleine">Pleine lactation (2-6 mois)</option>
+                <option value="lac_fin">Fin de lactation (6 mois+)</option>
+                <option value="gest_debut">Gestation début (1-3 mois)</option>
+                <option value="gest_fin">Gestation fin (4-5 mois)</option>
+                <option value="entretien">Entretien</option>
+              </select></div>
+            <div class="fgr" id="row-prod"><label>Production visée (L/j)</label>
+              <input type="number" id="prod" value="3.5" min="0" max="12" step=".1" oninput="calculer()"></div>
+            <div class="fgr" id="row-tb"><label>TB lait (g/kg)</label>
+              <input type="number" id="tb" value="38" min="25" max="60" step=".5" oninput="calculer()"></div>
+            <div class="fgr" id="row-tp"><label>TP lait (g/kg)</label>
+              <input type="number" id="tp" value="32" min="20" max="50" step=".5" oninput="calculer()"></div>
+            <div class="fgr"><label id="lbl-nb">Nombre de chèvres</label>
+              <input type="number" id="nb" value="400" min="1" max="9999" oninput="calculer()"></div>
+            <div class="fgr"><label>Température bâtiment (°C)</label>
+              <input type="number" id="temp" value="18" min="-10" max="45" oninput="calculer()"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ct">🏥 Santé du troupeau</div>
+          <div class="fg">
+            <div class="fgr"><label>Paratuberculose</label>
+              <select id="paratb" onchange="calculer()">
+                <option value="0" selected>Aucune</option>
+                <option value="1">Infection modérée</option>
+                <option value="2">Infection sévère</option>
+              </select></div>
+            <div class="fgr"><label>CAEV</label>
+              <select id="caev" onchange="calculer()">
+                <option value="0" selected>Aucune</option>
+                <option value="1">Arthrite modérée</option>
+                <option value="2">Arthrite sévère</option>
+                <option value="3">Encéphalite</option>
+              </select></div>
+            <div class="fgr"><label>Type distribution</label>
+              <select id="distrib" onchange="calculer()">
+                <option value="tmr">Ration mélangée (TMR)</option>
+                <option value="sep">Ration séparée</option>
+                <option value="pat">Pâturage + complément</option>
+              </select></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE : besoins calculés -->
+      <div class="besoins-sticky">
+        <div class="card">
+          <div class="ct">📐 Besoins — 5 indicateurs clés</div>
+          <div class="kpi-row" id="kpi-b"></div>
+          <div class="div"></div>
+          <div style="font-family:'Lora',serif;font-size:.82rem;font-weight:600;color:var(--vert-f);margin-bottom:.7rem">Capacité d'ingestion &amp; minéraux</div>
+          <div class="mg" id="mg-ci"></div>
+          <div id="al-param"></div>
+          <div style="margin-top:.9rem">
+            <button class="btn btn-s" onclick="showPage('ration')">Composer la ration →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /param-grid -->
+  </div><!-- /page-param -->
+
+  <!-- ══ PAGE RATION ══ -->
+  <div id="page-ration" class="page">
+
+    <!-- Bandeau lots sélectionnés -->
+    <div id="ration-lots-actifs" style="display:none;margin-bottom:.7rem;padding:.5rem .9rem;background:var(--vert-p);border:1px solid var(--vert-c);border-radius:8px;font-size:12px;color:var(--vert-f);display:flex;align-items:center;gap:.7rem;flex-wrap:wrap">
+      <span style="font-weight:600">📦 Ration appliquée à :</span>
+      <span id="ration-lots-tags"></span>
+      <button onclick="reinitMultiSelect()" style="margin-left:auto;background:none;border:none;font-size:11px;color:var(--gris);cursor:pointer;text-decoration:underline">Revenir à un seul lot</button>
+    </div>
+
+    <div class="ration-grid">
+
+      <!-- COLONNE GAUCHE : liste des aliments dans la ration -->
+      <div>
+        <div class="rr" id="rr-strip"></div>
+        <div class="card">
+          <div class="ct">🌾 Aliments dans la ration
+            <span style="margin-left:auto;display:flex;gap:.4rem">
+              <button class="btn btn-sm" onclick="ajusterRation()" title="Ajuste les quantités proportionnellement selon les refus du jour (objectif 6-10%)" style="background:#fff3e0;border-color:#f9ca24;color:#b7791f">⚖️ Ajuster selon refus</button>
+              <button class="btn btn-s btn-sm" onclick="showPage('alim')">+ Ajouter un aliment</button>
+            </span>
+          </div>
+          <div id="ration-list"></div>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE : bilan collant -->
+      <div class="bilan-sticky">
+        <div class="card">
+          <div class="ct">⚖️ Bilan de la ration</div>
+          <div id="bilan-gauges"></div>
+          <div class="div"></div>
+          <div id="bilan-cout"></div>
+        </div>
+      </div>
+
+    </div><!-- /ration-grid -->
+
+    <!-- ALERTES PLEINE LARGEUR -->
+    <div class="card" id="bilan-al-card" style="display:none;margin-top:.7rem">
+      <div class="ct">⚠️ Alertes</div>
+      <div id="bilan-al" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.4rem"></div>
+    </div>
+
+    <!-- BILAN PAR LOT (multi-sélection) -->
+    <div id="bilan-perlot" style="display:none;margin-top:.7rem"></div>
+  </div><!-- /page-ration -->
+
+  <!-- ══ PAGE DISTRIBUTION ══ -->
+  <div id="page-distrib" class="page">
+    <div id="distrib-content"></div>
+  </div>
+
+  <!-- ══ PAGE SUIVI PRODUCTION ══ -->
+  <div id="page-refus" class="page"></div>
+  <div id="page-suivi" class="page">
+    <div id="suivi-content"></div>
+  </div>
+
+  <!-- ══ PAGE CALCUL BOL ══ -->
+
+
+  <!-- ══ PAGE AIDE IA ══ -->
+  <div id="page-ia" class="page">
+    <div id="ia-content"></div>
+  </div>
+
+  <!-- ══ PAGE DASHBOARD ══ -->
+  <div id="page-dash" class="page">
+    <div class="kpi-row" id="dash-kpi"></div>
+    <div class="dg" id="dash-g"></div>
+  </div>
+
+  <!-- ══ PAGE ALIMENTS ══ -->
+  <div id="page-alim" class="page">
+
+    <div class="add-form" id="add-form" style="display:none">
+      <input type="hidden" id="al-edit-id" value="">
+      <div style="font-size:12.5px;font-weight:600;color:#8b5e3c;margin-bottom:.6rem">Nouvel aliment personnalisé</div>
+      <div class="fg">
+        <div class="fgr"><label>Nom</label><input type="text" id="al-nom" placeholder="ex: Foin luzerne"></div>
+        <div class="fgr"><label>Catégorie</label>
+          <select id="al-cat">
+            <option>Concentré</option><option>Aliment composé</option><option>Ensilage</option>
+            <option>Enrubannage</option><option>Foin</option><option>Herbe</option>
+            <option>Paille</option><option>Autre</option>
+          </select></div>
+        <div class="fgr"><label>MS (%)</label><input type="number" id="al-ms" placeholder="87" min="0" max="100" step=".1"></div>
+        <div class="fgr"><label>UFL / kg MS</label><input type="number" id="al-ufl" placeholder="0.82" step=".01"></div>
+        <div class="fgr"><label>PDIN (g/kg MS)</label><input type="number" id="al-pdin" placeholder="80"></div>
+        <div class="fgr"><label>PDIE (g/kg MS)</label><input type="number" id="al-pdie" placeholder="75"></div>
+        <div class="fgr"><label>MAT %</label><input type="number" id="al-mat" placeholder="12.5" step=".1"></div>
+        <div class="fgr"><label>UEL / kg MS</label><input type="number" id="al-uel" placeholder="1.0" step=".01"></div>
+        <div class="fgr"><label>Amidon (%)</label><input type="number" id="al-ami" placeholder="0" step=".1"></div>
+        <div class="fgr"><label>Ca (g/kg MS)</label><input type="number" id="al-ca" placeholder="5" step=".1"></div>
+        <div class="fgr"><label>P (g/kg MS)</label><input type="number" id="al-p" placeholder="3" step=".1"></div>
+        <div class="fgr"><label>Prix (€/T brut)</label><input type="number" id="al-prix" placeholder="200" step="1"></div>
+      </div>
+      <div style="margin-top:.75rem;display:flex;gap:.5rem">
+        <button class="btn btn-p btn-sm" id="al-submit-btn" onclick="soumettreAliment()">Enregistrer</button>
+        <button class="btn btn-s btn-sm" onclick="toggleAF()">Annuler</button>
+      </div>
+    </div>
+
+    <div class="cat-tabs" id="cat-tabs"></div>
+
+    <div class="search-wrap" style="position:relative;width:33%;min-width:220px">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="al-search" placeholder="Rechercher un aliment…" oninput="renderAliments();document.getElementById('al-clear').style.display=this.value?'flex':'none'" style="padding-right:28px">
+      <button id="al-clear" onclick="document.getElementById('al-search').value='';renderAliments();this.style.display='none'" style="display:none;position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gris);font-size:14px;width:20px;height:20px;align-items:center;justify-content:center;border-radius:50%;padding:0;line-height:1" title="Effacer">✕</button>
+    </div>
+
+    <div class="card" style="padding:0">
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Aliment</th><th>Cat.</th><th>MS%</th>
+            <th style="color:#1b5e20">UFL</th>
+            <th style="color:#0d47a1">PDIN</th>
+            <th style="color:#4a148c">PDIE</th>
+            <th style="color:#bf360c">MAT%</th>
+            <th style="color:#880e4f">UEL</th>
+            <th>Amidon%</th><th>Ca g</th><th>P g</th>
+            <th>€/T</th><th>Ration</th><th></th>
+          </tr></thead>
+          <tbody id="al-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /page-alim -->
+
+  </main>
+</div><!-- /main-wrap -->
+</div><!-- /app-shell -->
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// BASE ALIMENTS
+// ══════════════════════════════════════════════════════════════
+// ── UEL fallback par catégorie (quand non renseigné dans la base) ──
+const UEL_DEFAUT_CAT = {
+  'Foin':1.05, 'Paille':1.30, 'Herbe':1.08, 'Ensilage':1.10,
+  'Concentré':0.65, 'Aliment composé':0.72, 'Autre':0,
+};
+function getUEL(a){ return a.uel ?? UEL_DEFAUT_CAT[a.cat] ?? 0.70; }
+
+const BASE = [
+  // CONCENTRÉS
+  {id:1,  nom:'Avoine',                      cat:'Concentré', ms:87, ufl:.87,  pdin:66,  pdie:90,  mat:10.0, uel:0.45, ami:.35,  ca:1.4, p:3.4,  prix:null},
+  {id:2,  nom:'Blé tendre',                  cat:'Concentré', ms:87, ufl:1.23, pdin:87,  pdie:109, mat:12.6, uel:0.6, ami:.693, ca:null,p:null, prix:null},
+  {id:3,  nom:'Colza graine',                cat:'Concentré', ms:92, ufl:1.50, pdin:163, pdie:93,  mat:23.5, uel:0.55, ami:.02,  ca:4.2, p:7.7,  prix:null},
+  {id:4,  nom:'Féverole',                    cat:'Concentré', ms:87, ufl:1.17, pdin:210, pdie:119, mat:31.1, uel:0.6, ami:.38,  ca:1.2, p:4.8,  prix:null},
+  {id:5,  nom:'Maïs grain humide',           cat:'Concentré', ms:30, ufl:1.38, pdin:67,  pdie:106, mat:8.8,  uel:0.6, ami:.97,  ca:null,p:null, prix:null},
+  {id:6,  nom:'Lentille fourragère',         cat:'Concentré', ms:87, ufl:1.15, pdin:195, pdie:125, mat:29.0, uel:0.62, ami:.42,  ca:null,p:null, prix:null},
+  {id:7,  nom:'Lin (graine)',                cat:'Concentré', ms:92, ufl:1.71, pdin:145, pdie:77,  mat:22.5, uel:0.52, ami:.06,  ca:3.0, p:4.3,  prix:null},
+  {id:8,  nom:'Lupin blanc',                 cat:'Concentré', ms:88, ufl:1.43, pdin:237, pdie:119, mat:38.0, uel:0.55, ami:.07,  ca:2.8, p:3.8,  prix:null},
+  {id:9,  nom:'Lupin bleu',                  cat:'Concentré', ms:90, ufl:1.31, pdin:217, pdie:137, mat:33.3, uel:0.55, ami:.05,  ca:.3,  p:3.5,  prix:null},
+  {id:10, nom:'Maïs grain',                  cat:'Concentré', ms:86, ufl:1.29, pdin:74,  pdie:97,  mat:8.8,  uel:0.6, ami:.74,  ca:null,p:null, prix:270},
+  {id:11, nom:'Méteil',                      cat:'Concentré', ms:89, ufl:.92,  pdin:116, pdie:108, mat:16.8, uel:0.65, ami:.30,  ca:.8,  p:3.9,  prix:null},
+  {id:12, nom:'Orge',                        cat:'Concentré', ms:87, ufl:1.11, pdin:77,  pdie:100, mat:11.3, uel:0.65, ami:.513, ca:1.2, p:4.4,  prix:.60},
+  {id:13, nom:'Pois',                        cat:'Concentré', ms:87, ufl:1.21, pdin:147, pdie:96,  mat:23.3, uel:0.63, ami:.513, ca:2.3, p:3.5,  prix:null},
+  {id:14, nom:'Seigle',                      cat:'Concentré', ms:87, ufl:1.19, pdin:64,  pdie:95,  mat:9.8,  uel:0.65, ami:.62,  ca:3.3, p:6.2,  prix:null},
+  {id:15, nom:'Soja toasté',                 cat:'Concentré', ms:89, ufl:1.52, pdin:274, pdie:179, mat:40.4, uel:0.5, ami:.058, ca:.3,  p:3.5,  prix:null},
+  {id:16, nom:'Sorgho',                      cat:'Concentré', ms:88, ufl:1.21, pdin:75,  pdie:97,  mat:10.6, uel:0.62, ami:.74,  ca:2.7, p:5.7,  prix:null},
+  {id:17, nom:'Tournesol (graine)',           cat:'Concentré', ms:93, ufl:1.69, pdin:96,  pdie:35,  mat:16.0, uel:0.52, ami:.013, ca:null,p:null, prix:null},
+  {id:18, nom:'Triticale',                   cat:'Concentré', ms:87, ufl:1.18, pdin:72,  pdie:96,  mat:11.5, uel:0.65, ami:.68,  ca:5.5, p:4.9,  prix:null},
+  {id:19, nom:'Vesce commune',               cat:'Concentré', ms:87, ufl:1.19, pdin:193, pdie:144, mat:28.3, uel:0.62, ami:.425, ca:null,p:null, prix:null},
+  // ALIMENTS COMPOSÉS
+  {id:20, nom:'Pulpe de betterave',          cat:'Aliment composé', ms:89, ufl:1.04, pdin:64,  pdie:108, mat:8.9,  uel:0.75, ami:.01,  ca:null,p:null, prix:null},
+  {id:21, nom:'Luzerne déshydratée',         cat:'Aliment composé', ms:90, ufl:.82,  pdin:178, pdie:134, mat:26.4, uel:0.7, ami:.029, ca:1.4, p:11.,  prix:null},
+  {id:22, nom:'Tourteau de colza',           cat:'Aliment composé', ms:89, ufl:.98,  pdin:248, pdie:156, mat:38.1, uel:0.6, ami:.063, ca:null,p:null, prix:null},
+  {id:23, nom:'Tourteau de soja',            cat:'Aliment composé', ms:88, ufl:1.28, pdin:405, pdie:276, mat:55.2, uel:0.55, ami:.063, ca:null,p:null, prix:650},
+  {id:24, nom:'Tourteau de tournesol',       cat:'Aliment composé', ms:89, ufl:.69,  pdin:198, pdie:109, mat:30.7, uel:0.62, ami:.037, ca:null,p:null, prix:null},
+  {id:25, nom:'Croissance chevrette 17%',    cat:'Aliment composé', ms:94, ufl:.95,  pdin:120, pdie:105, mat:17.0, uel:0.72, ami:.32,  ca:8.4, p:5.0,  prix:null},
+  {id:26, nom:'Chèvre Laitière 22% LDT',    cat:'Aliment composé', ms:94, ufl:.95,  pdin:155, pdie:145, mat:22.0, uel:0.72, ami:.25,  ca:null,p:null, prix:500},
+  {id:27, nom:'EURINAT NRJ 12%',            cat:'Aliment composé', ms:94, ufl:.98,  pdin:85,  pdie:95,  mat:12.0, uel:0.72, ami:.50,  ca:8.8, p:5.1,  prix:330},
+  {id:28, nom:'Correcteur azoté EURINAT',   cat:'Aliment composé', ms:94, ufl:1.08, pdin:270, pdie:190, mat:28.0, uel:0.6, ami:.055, ca:6.4, p:6.0,  prix:460},
+  {id:29, nom:'Maïs épis',                  cat:'Aliment composé', ms:55, ufl:1.08, pdin:60,  pdie:98,  mat:8.3,  uel:0.7, ami:.97,  ca:null,p:null, prix:270},
+  // ENSILAGE — aliments supplémentaires INRA 2007
+  {id:30, nom:'Ens RGA précoce préfané déb',  cat:'Ensilage', ms:33, ufl:.89, pdin:90,  pdie:73,  mat:14.5, uel:1.05, ami:null, ca:null,p:null, prix:null},
+  {id:69, nom:'Ens maïs tige et épi',         cat:'Ensilage', ms:32, ufl:.87, pdin:57,  pdie:75,  mat:7.8,  uel:1.02, ami:.30,  ca:null,p:null, prix:null},
+  {id:70, nom:'Ens luzerne préfané',          cat:'Ensilage', ms:35, ufl:.78, pdin:101, pdie:80,  mat:17.2, uel:1.08, ami:null, ca:null,p:null, prix:null},
+  {id:71, nom:'Ens trèfle violet',            cat:'Ensilage', ms:30, ufl:.82, pdin:110, pdie:85,  mat:17.5, uel:1.06, ami:null, ca:null,p:null, prix:null},
+  {id:72, nom:'Ens sorgho',                   cat:'Ensilage', ms:25, ufl:.78, pdin:52,  pdie:67,  mat:7.5,  uel:1.10, ami:.25,  ca:null,p:null, prix:null},
+  // ENRUBANNAGE
+  {id:31, nom:'Enrubannage Méteil',          cat:'Enrubannage', ms:50, ufl:.76, pdin:99,  pdie:58,  mat:16.4, uel:1.16, ami:null, ca:.8,  p:1.3,  prix:120},
+  {id:32, nom:'Enr RGI',                     cat:'Enrubannage', ms:55, ufl:.77, pdin:72,  pdie:78,  mat:11.5, uel:1.06, ami:null, ca:1.8, p:1.6,  prix:null},
+  {id:33, nom:'Enr Prairie naturelle',       cat:'Enrubannage', ms:73, ufl:.66, pdin:65,  pdie:70,  mat:10.2, uel:1.15, ami:null, ca:null,p:null, prix:null},
+  {id:34, nom:'Enr luzerne',                cat:'Enrubannage', ms:72, ufl:.98, pdin:70,  pdie:89,  mat:10.9, uel:1.11, ami:null, ca:null,p:null, prix:120},
+  // FOIN
+  {id:35, nom:'Foin Luzerne + analyse',      cat:'Foin', ms:84, ufl:.68, pdin:113, pdie:86,  mat:17.6, uel:1.02, ami:null, ca:null,p:null, prix:270},
+  {id:36, nom:'Foin Luzerne - analyse',      cat:'Foin', ms:92, ufl:.61, pdin:41,  pdie:58,  mat:7.1,  uel:1.14, ami:null, ca:null,p:null, prix:270},
+  {id:37, nom:'Foin PP + analyse',           cat:'Foin', ms:90, ufl:.70, pdin:59,  pdie:72,  mat:9.5,  uel:1.08, ami:null, ca:null,p:null, prix:80},
+  {id:38, nom:'Foin PP - analyse',           cat:'Foin', ms:90, ufl:.61, pdin:42,  pdie:61,  mat:6.7,  uel:1.15, ami:null, ca:null,p:null, prix:80},
+  {id:39, nom:'Foin RGA C2 repousse fané',   cat:'Foin', ms:85, ufl:.66, pdin:68,  pdie:75,  mat:10.9, uel:1.0, ami:null, ca:null,p:null, prix:null},
+  {id:40, nom:'Foin PP C2 repousse feuillu', cat:'Foin', ms:85, ufl:.79, pdin:86,  pdie:83,  mat:14.8, uel:1.02, ami:null, ca:null,p:null, prix:null},
+  {id:41, nom:'Rumiplus18',                  cat:'Foin', ms:90, ufl:.62, pdin:106, pdie:93,  mat:16.0, uel:0.95, ami:null, ca:null,p:null, prix:272},
+  // HERBE
+  {id:42, nom:'Avoine Affouragement',        cat:'Herbe', ms:21, ufl:.84, pdin:64,  pdie:78,  mat:10.2, uel:1.05, ami:null, ca:null,p:null, prix:null},
+  {id:43, nom:'Blé Affouragement',           cat:'Herbe', ms:17, ufl:.81, pdin:90,  pdie:84,  mat:14.3, uel:1.05, ami:null, ca:null,p:null, prix:null},
+  {id:44, nom:'Brome Affouragement',         cat:'Herbe', ms:21, ufl:.84, pdin:73,  pdie:81,  mat:11.6, uel:1.04, ami:null, ca:null,p:null, prix:null},
+  {id:45, nom:'Chicorée feuillue Affoura.',  cat:'Herbe', ms:15, ufl:.97, pdin:173, pdie:116, mat:27.5, uel:1.0, ami:null, ca:null,p:null, prix:null},
+  {id:46, nom:'Choux fourrager Affoura.',    cat:'Herbe', ms:12, ufl:1.03,pdin:107, pdie:99,  mat:17.1, uel:.98,  ami:null, ca:null,p:null, prix:null},
+  {id:47, nom:'Colza fourrager Affoura.',    cat:'Herbe', ms:9,  ufl:.96, pdin:107, pdie:95,  mat:17.1, uel:1.00, ami:null, ca:null,p:null, prix:null},
+  {id:48, nom:'Fléole Affouragement',        cat:'Herbe', ms:16, ufl:.99, pdin:127, pdie:103, mat:20.2, uel:.95,  ami:null, ca:null,p:null, prix:null},
+  {id:49, nom:'Lotier corniculer Affoura.',  cat:'Herbe', ms:11, ufl:.82, pdin:138, pdie:98,  mat:22.1, uel:1.05, ami:null, ca:null,p:null, prix:null},
+  {id:50, nom:'Lupin Affouragement',         cat:'Herbe', ms:16, ufl:.93, pdin:128, pdie:103, mat:20.3, uel:1.14, ami:null, ca:null,p:null, prix:null},
+  {id:51, nom:'Luzerne Affouragement',       cat:'Herbe', ms:89, ufl:.69, pdin:106, pdie:93,  mat:18.0, uel:.96,  ami:null, ca:null,p:null, prix:272},
+  {id:52, nom:'Orge Affouragement',          cat:'Herbe', ms:31, ufl:.72, pdin:54,  pdie:68,  mat:8.6,  uel:1.03, ami:null, ca:null,p:null, prix:40},
+  {id:53, nom:'Plantain fourrager Affoura.', cat:'Herbe', ms:15, ufl:.98, pdin:91,  pdie:91,  mat:14.6, uel:1.0, ami:null, ca:null,p:null, prix:null},
+  {id:54, nom:'Sainfoin Affouragement',      cat:'Herbe', ms:13, ufl:1.00,pdin:116, pdie:98,  mat:18.4, uel:.87,  ami:null, ca:null,p:null, prix:null},
+  {id:55, nom:'Seigle fourrager Affoura.',   cat:'Herbe', ms:23, ufl:.68, pdin:60,  pdie:69,  mat:9.5,  uel:1.08, ami:null, ca:null,p:null, prix:null},
+  {id:56, nom:'Sorgho fourrager Affoura.',   cat:'Herbe', ms:15, ufl:.81, pdin:119, pdie:93,  mat:19.0, uel:1.02, ami:null, ca:null,p:null, prix:null},
+  // PAILLE
+  {id:57, nom:"Paille d'avoine",             cat:'Paille', ms:88, ufl:.50, pdin:20, pdie:48, mat:3.2, uel:1.55, ami:null, ca:null,p:null, prix:null},
+  {id:58, nom:'Paille de blé',               cat:'Paille', ms:90, ufl:.50, pdin:24, pdie:51, mat:3.9, uel:1.3,  ami:null, ca:null,p:null, prix:null},
+  {id:59, nom:'Paille de féverole',          cat:'Paille', ms:87, ufl:.45, pdin:61, pdie:51, mat:4.9, uel:1.17, ami:null, ca:null,p:null, prix:null},
+  {id:60, nom:"Paille d'orge",               cat:'Paille', ms:88, ufl:.44, pdin:24, pdie:46, mat:3.8, uel:1.60, ami:null, ca:null,p:null, prix:null},
+  {id:61, nom:'Paille de graminées fourr.',  cat:'Paille', ms:88, ufl:.50, pdin:53, pdie:53, mat:8.4, uel:1.54, ami:null, ca:null,p:null, prix:null},
+  // AUTRES — suppléments et additifs
+  {id:62, nom:'Minéral',                     cat:'Autre', ms:99, ufl:null, pdin:null,pdie:null,mat:null, uel:null, ami:null, ca:null,p:null, prix:980},
+  {id:63, nom:'Meliq 25',                    cat:'Autre', ms:48, ufl:null, pdin:null,pdie:null,mat:25.0, uel:null, ami:null, ca:null,p:null, prix:350},
+  {id:64, nom:'Bicarbonate',                 cat:'Autre', ms:99, ufl:null, pdin:null,pdie:null,mat:null, uel:null, ami:null, ca:null,p:null, prix:null},
+  {id:65, nom:'Eau',                         cat:'Autre', ms:0,  ufl:null, pdin:null,pdie:null,mat:null, uel:null, ami:null, ca:null,p:null, prix:null},
+  {id:66, nom:'Mélasse de canne',            cat:'Autre', ms:73, ufl:.91, pdin:32,  pdie:68,  mat:6.0,  uel:0.0, ami:null, ca:7.4, p:.7,  prix:491},
+  {id:67, nom:'Mélasse de betterave',        cat:'Autre', ms:73, ufl:1.03,pdin:84,  pdie:71,  mat:15.0, uel:0.0, ami:null, ca:3.7, p:.3,  prix:null},
+  {id:68, nom:'Propylène glycol',            cat:'Autre', ms:100,ufl:2.02,pdin:null,pdie:null,mat:null, uel:0.0, ami:null, ca:null,p:null, prix:1200},
+  // Coproduits et compléments INRA 2007
+  {id:73, nom:'Son de blé',                  cat:'Aliment composé', ms:88, ufl:.82, pdin:109, pdie:118, mat:15.5, uel:0.8, ami:.18,  ca:1.3, p:11.5, prix:null},
+  {id:74, nom:'Son de maïs',                 cat:'Aliment composé', ms:88, ufl:.90, pdin:80,  pdie:100, mat:9.0,  uel:0.75, ami:.20,  ca:.3,  p:3.0,  prix:null},
+  {id:75, nom:'Drêches de brasserie séchées',cat:'Aliment composé', ms:91, ufl:.92, pdin:215, pdie:161, mat:26.0, uel:0.75, ami:.01,  ca:3.5, p:5.5,  prix:null},
+  {id:76, nom:'Corn gluten feed',            cat:'Aliment composé', ms:88, ufl:.96, pdin:146, pdie:144, mat:21.0, uel:0.72, ami:.15,  ca:.6,  p:8.5,  prix:null},
+  {id:77, nom:'Gluten de maïs',              cat:'Aliment composé', ms:90, ufl:1.28,pdin:362, pdie:254, mat:44.0, uel:0.55, ami:.01,  ca:.2,  p:4.0,  prix:null},
+  {id:78, nom:'Tourteau de lin',             cat:'Aliment composé', ms:90, ufl:.99, pdin:222, pdie:149, mat:31.5, uel:0.62, ami:.04,  ca:3.8, p:7.8,  prix:null},
+  {id:79, nom:'Tourteau de palmiste',        cat:'Aliment composé', ms:90, ufl:.89, pdin:122, pdie:125, mat:16.5, uel:0.7, ami:.02,  ca:.7,  p:6.2,  prix:null},
+  {id:80, nom:'Pulpe de betterave pressée',  cat:'Aliment composé', ms:22, ufl:.92, pdin:52,  pdie:89,  mat:9.0,  uel:1.10, ami:.01,  ca:null,p:null, prix:null},
+  {id:81, nom:'Pulpe agrumes séchée',        cat:'Aliment composé', ms:90, ufl:.96, pdin:53,  pdie:88,  mat:7.0,  uel:0.78, ami:.01,  ca:17., p:1.4,  prix:null},
+  {id:82, nom:'Luzerne déshydratée 17%',     cat:'Aliment composé', ms:90, ufl:.75, pdin:148, pdie:118, mat:17.0, uel:.96,  ami:.02,  ca:14., p:2.4,  prix:null},
+  {id:83, nom:'Graine de coton',             cat:'Concentré', ms:92, ufl:1.32,pdin:133, pdie:82,  mat:20.5, uel:0.52, ami:.01,  ca:1.5, p:5.8,  prix:null},
+  {id:84, nom:'Graine de soja',              cat:'Concentré', ms:89, ufl:1.47,pdin:221, pdie:145, mat:37.0, uel:0.5, ami:.06,  ca:2.8, p:6.2,  prix:null},
+  {id:85, nom:'Blé noir (sarrasin)',         cat:'Concentré', ms:87, ufl:1.05,pdin:83,  pdie:97,  mat:11.5, uel:0.65, ami:.58,  ca:.9,  p:3.3,  prix:null},
+  {id:86, nom:'Pois fourrager',              cat:'Concentré', ms:87, ufl:1.18,pdin:138, pdie:90,  mat:21.5, uel:0.63, ami:.47,  ca:1.0, p:3.8,  prix:null},
+  {id:87, nom:'Gesse (vesce de Hongrie)',    cat:'Concentré', ms:87, ufl:1.10,pdin:168, pdie:118, mat:25.0, uel:0.63, ami:.35,  ca:null,p:null, prix:null},
+  // FOURRAGES supplémentaires
+  {id:88, nom:'Foin luzerne 3 coupes',       cat:'Foin', ms:88, ufl:.75, pdin:130, pdie:100, mat:20.0, uel:.98,  ami:null, ca:13., p:2.8,  prix:280},
+  {id:89, nom:'Foin trèfle violet',          cat:'Foin', ms:86, ufl:.77, pdin:115, pdie:92,  mat:18.5, uel:1.02, ami:null, ca:9.5, p:2.5,  prix:null},
+  {id:90, nom:'Foin de ray-grass hybride',   cat:'Foin', ms:87, ufl:.68, pdin:72,  pdie:75,  mat:11.5, uel:1.06, ami:null, ca:4.5, p:2.8,  prix:null},
+  {id:91, nom:'Foin de fétuque',             cat:'Foin', ms:87, ufl:.64, pdin:58,  pdie:65,  mat:9.5,  uel:1.12, ami:null, ca:4.2, p:2.5,  prix:null},
+  {id:92, nom:'Regain prairie naturelle',    cat:'Foin', ms:85, ufl:.72, pdin:78,  pdie:78,  mat:13.0, uel:1.05, ami:null, ca:null,p:null, prix:null},
+  {id:93, nom:'Foin de sulla',               cat:'Foin', ms:88, ufl:.70, pdin:102, pdie:84,  mat:16.5, uel:1.00, ami:null, ca:11., p:2.2,  prix:null},
+  // PAILLES supplémentaires
+  {id:94, nom:'Paille de triticale',         cat:'Paille', ms:88, ufl:.48, pdin:22, pdie:47, mat:3.5, uel:1.50, ami:null, ca:null,p:null, prix:null},
+  {id:95, nom:'Paille de seigle',            cat:'Paille', ms:88, ufl:.45, pdin:20, pdie:44, mat:3.2, uel:1.58, ami:null, ca:null,p:null, prix:null},
+  {id:96, nom:'Paille de riz',               cat:'Paille', ms:90, ufl:.37, pdin:18, pdie:38, mat:3.8, uel:1.80, ami:null, ca:null,p:null, prix:null},
+];
+
+let userAliments = JSON.parse(localStorage.getItem('cap3_user') || '[]');
+let nextId = 500;
+function allAliments(){
+  // Les userAliments avec _override:true écrasent l'aliment de la BASE
+  const overrides = new Map(userAliments.filter(a=>a._override).map(a=>[a.id,a]));
+  const userNormaux = userAliments.filter(a=>!a._override);
+  const userIds = new Set(userNormaux.map(a=>a.id));
+  return [
+    ...BASE.filter(a=>!userIds.has(a.id)).map(a=>overrides.has(a.id)?{...a,...overrides.get(a.id)}:a),
+    ...userNormaux
+  ];
+}
+function saveUser(){ localStorage.setItem('cap3_user', JSON.stringify(userAliments)); }
+
+const CATS = ['Tous','Concentré','Aliment composé','Ensilage','Enrubannage','Foin','Herbe','Paille','Autre'];
+let catFilter = 'Tous';
+
+// ══════════════════════════════════════════════════
+// SYSTÈME DE LOTS
+// ══════════════════════════════════════════════════
+// Structure lot : { id, nom, typeAnimal, params:{poids,nec,stade,prod,tb,tp,nb,temp,paratb,caev,distrib}, ration:{id:qte} }
+function defaultLot(id, nom){
+  return {
+    id, nom,
+    typeAnimal: 'chevre',
+    params: { poids:80, nec:3, stade:'lac_debut', prod:3.5, tb:38, tp:32, nb:400, temp:18, paratb:0, caev:0, distrib:'tmr' },
+    ration: {}
+  };
+}
+
+let lots = JSON.parse(localStorage.getItem('cap3_lots') || 'null');
+if(!lots || !lots.length){
+  lots = [defaultLot(1, 'Lot 1')];
+}
+// Garantir que chaque lot a bien un objet ration (migration lots anciens)
+lots.forEach(l => { if(!l.ration || typeof l.ration !== 'object') l.ration = {}; });
+
+// Migration : si une ration existait dans l'ancien système cap3_ration, l'injecter dans le lot actif
+const _ancienneRation = localStorage.getItem('cap3_ration');
+if(_ancienneRation){
+  try{
+    const r = JSON.parse(_ancienneRation);
+    if(Object.keys(r).length > 0 && Object.keys(lots[0].ration).length === 0){
+      lots[0].ration = r;
+    }
+  }catch(e){}
+  localStorage.removeItem('cap3_ration'); // nettoyer l'ancienne clé
+}
+
+let lotActifId = +localStorage.getItem('cap3_lot_actif') || lots[0].id;
+let nextLotId  = Math.max(...lots.map(l=>l.id)) + 1;
+
+function lotActif(){ return lots.find(l=>l.id===lotActifId) || lots[0]; }
+function saveLots(){ localStorage.setItem('cap3_lots', JSON.stringify(lots)); localStorage.setItem('cap3_lot_actif', lotActifId); }
+
+function getRation(){
+  const lot = lotActif();
+  if(!lot.ration || typeof lot.ration !== 'object') lot.ration = {};
+  return lot.ration;
+}
+function saveRation(){ saveLots(); }
+
+function ajouterLot(){
+  const nom = prompt('Nom du nouveau lot :', 'Lot '+(lots.length+1));
+  if(!nom) return;
+  const nouveau = defaultLot(nextLotId++, nom.trim());
+  lots.push(nouveau);
+  lotActifId = nouveau.id;
+  saveLots();
+  renderLotSelector();
+  chargerLotDansFormulaire();
+  calculer();
+}
+
+function supprimerLotActif(){
+  if(lots.length<=1){ alert('Impossible de supprimer le dernier lot.'); return; }
+  if(!confirm('Supprimer "'+lotActif().nom+'" et sa ration ?')) return;
+  lots = lots.filter(l=>l.id!==lotActifId);
+  lotActifId = lots[0].id;
+  saveLots();
+  renderLotSelector();
+  chargerLotDansFormulaire();
+  calculer();
+}
+
+function renommerLot(){
+  const nom = prompt('Nouveau nom :', lotActif().nom);
+  if(!nom) return;
+  lotActif().nom = nom.trim();
+  saveLots();
+  renderLotSelector();
+}
+
+function changerLot(id){
+  sauvegarderFormulaireDansLot();
+  lotActifId = +id;
+  lotsRationIds = []; // reset multi-sélection
+  saveLots();
+  renderLotSelector();
+  chargerLotDansFormulaire();
+  calculer();
+  // Réinitialiser les pages qui dépendent du lot
+  if(document.getElementById('page-ration').classList.contains('active')) renderRation();
+  if(document.getElementById('page-dash').classList.contains('active'))   renderDash();
+  if(document.getElementById('page-suivi').classList.contains('active'))  renderSuivi();
+  if(document.getElementById('page-ia').classList.contains('active'))     renderIA();
+}
+
+function renderLotSelector(){
+  const lot = lotActif();
+  document.getElementById('lot-select').innerHTML = lots.map(l=>{
+    const nb = l.params?.nb || 0;
+    const nbTxt = nb > 0 ? ` — ${nb} ch.` : '';
+    return `<option value="${l.id}" ${l.id===lotActifId?'selected':''}>${l.nom}${nbTxt}</option>`;
+  }).join('');
+  const el = document.getElementById('lot-badge'); if(el) el.textContent = lot.nom;
+}
+
+function sauvegarderFormulaireDansLot(){
+  const lot = lotActif();
+  lot.typeAnimal = typeAnimal;
+  lot.parite     = parite;
+  lot.params = {
+    poids:   +document.getElementById('poids').value||75,
+    nec:     +document.getElementById('nec').value||3,
+    stade:   document.getElementById('stade').value,
+    prod:    +document.getElementById('prod').value||3.5,
+    tb:      +document.getElementById('tb').value||38,
+    tp:      +document.getElementById('tp').value||32,
+    nb:      +document.getElementById('nb').value||400,
+    temp:    +document.getElementById('temp').value||16,
+    paratb:  +document.getElementById('paratb').value||0,
+    caev:    +document.getElementById('caev').value||0,
+    distrib: document.getElementById('distrib').value,
+  };
+  saveLots();
+}
+
+function chargerLotDansFormulaire(){
+  const lot = lotActif();
+  const p = lot.params;
+
+  // Changer le type sans déclencher calculer() (on le fera après)
+  typeAnimal = lot.typeAnimal || 'chevre';
+  parite     = lot.parite     || 'multipare';
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+typeAnimal).classList.add('active');
+  // Parité
+  document.getElementById('row-parite').style.display = typeAnimal==='chevre' ? 'flex' : 'none';
+  document.getElementById('btn-multipare').classList.toggle('active', parite==='multipare');
+  document.getElementById('btn-primipare').classList.toggle('active', parite==='primipare');
+
+  // Adapter les stades disponibles
+  const stades = {chevre:STADES_CHEVRE, chevrette:STADES_CHEVRETTE, bouc:STADES_BOUC}[typeAnimal];
+  const sel = document.getElementById('stade');
+  sel.innerHTML = stades.map(s=>`<option value="${s.v}">${s.l}</option>`).join('');
+
+  // Remplir les champs
+  document.getElementById('poids').value  = p.poids??75;
+  document.getElementById('nec').value    = p.nec??2;
+  document.getElementById('stade').value  = p.stade||stades[0].v;
+  document.getElementById('prod').value   = p.prod??3.5;
+  document.getElementById('tb').value     = p.tb??38;
+  document.getElementById('tp').value     = p.tp??32;
+  document.getElementById('nb').value     = p.nb??400;
+  document.getElementById('temp').value   = p.temp??16;
+  document.getElementById('paratb').value = p.paratb??0;
+  document.getElementById('caev').value   = p.caev??1;
+  document.getElementById('distrib').value= p.distrib||'tmr';
+
+  // Visibilité des champs selon type
+  const lait = typeAnimal==='chevre';
+  ['row-prod','row-tb','row-tp'].forEach(id=>{ document.getElementById(id).style.display=lait?'':'none'; });
+  document.getElementById('row-nec').style.display          = typeAnimal==='chevrette'?'none':'';
+  document.getElementById('row-age-chevrette').style.display= typeAnimal==='chevrette'?'':'none';
+  document.getElementById('lbl-nb').textContent = {chevre:'Nombre de chèvres',chevrette:'Nombre de chevrettes',bouc:'Nombre de boucs'}[typeAnimal];
+}
+
+// ══════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════
+const PAGE_META = {
+  refus:   { title:'Suivi des refus',    sub:'Historique et analyse par lot',  actions:'' },
+  param:   { title:'Paramètres par lot',     sub:'',                      actions:'' },
+  ration:  { title:'Composition de ration', sub:'',                                         actions:'' },
+  dash:    { title:'Tableau de bord',       sub:'Synthèse troupeau',                        actions:'' },
+  distrib: { title:'Distribution au bol',   sub:'Quantités par lot et par aliment',          actions:'<button class="btn btn-s btn-sm" onclick="imprimerDistrib()">🖨 Imprimer</button>' },
+  suivi:   { title:'Suivi de production',      sub:'Production réelle vs permise par lot',     actions:'<button class="btn btn-s btn-sm" onclick="importerDepuisCapriScan()">📥 Import CapriScan</button>' },
+  ia:      { title:'Aide IA à la composition', sub:'Suggestions pour optimiser la ration',  actions:'' },
+  alim:    { title:'Base aliments',         sub:'UFL · PDIN · PDIE · MAT · UEL · Amidon',   actions:'<button class="btn btn-p btn-sm" onclick="toggleAF()">+ Ajouter</button> <button class="btn btn-s btn-sm" onclick="reinitMasques()" id="btn-masques" style="display:none">🔄 Réafficher masqués</button>' },
+};
+
+function showPage(id){
+  // Sauvegarder avant de quitter les params
+  if(document.getElementById('page-param').classList.contains('active')){
+    sauvegarderFormulaireDansLot();
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nb').forEach(b=>{
+    if(b.getAttribute('onclick')==="showPage('"+id+"')") b.classList.add('active');
+  });
+  const m=PAGE_META[id]||{};
+  document.getElementById('topbar-title').textContent = m.title||'';
+  document.getElementById('topbar-sub').textContent   = m.sub||'';
+  document.getElementById('topbar-actions').innerHTML = m.actions||'';
+  // Afficher/masquer la barre de lots (pas sur la page aliments)
+  document.getElementById('lot-bar').style.display = id==='alim' ? 'none' : 'flex';
+
+  // Afficher/masquer bouton multi-lots
+  document.getElementById('btn-multiselect').style.display = id==='ration' ? '' : 'none';
+
+  if(id==='ration')  renderRation();
+  if(id==='dash')    renderDash();
+  if(id==='suivi')   renderSuivi();
+  if(id==='distrib') renderDistrib();
+  if(id==='refus')   renderRefusPC();
+  if(id==='ia')      renderIA();
+  if(id==='alim')    renderAliments();
+}
+
+// ══════════════════════════════════════════════════
+// TYPE ANIMAL
+// ══════════════════════════════════════════════════
+let typeAnimal = 'chevre'; // 'chevre' | 'chevrette' | 'bouc'
+let parite     = 'multipare'; // 'multipare' | 'primipare'
+
+function setParite(p){
+  parite = p;
+  document.getElementById('btn-multipare').classList.toggle('active', p==='multipare');
+  document.getElementById('btn-primipare').classList.toggle('active', p==='primipare');
+  calculer();
+}
+
+// ── Races caprines ──
+const RACES_CHEVRE = {
+  alpine:      { label:'Alpine',       kLait:1.00, poidsRef:60, tbRef:38, tpRef:32 },
+  saanen:      { label:'Saanen',       kLait:1.08, poidsRef:65, tbRef:34, tpRef:29 },
+  poitevine:   { label:'Poitevine',    kLait:0.95, poidsRef:55, tbRef:40, tpRef:33 },
+  rove:        { label:'Rove',         kLait:0.85, poidsRef:50, tbRef:42, tpRef:34 },
+  'pyrenéenne':{ label:'Pyrénéenne',   kLait:0.90, poidsRef:45, tbRef:43, tpRef:35 },
+  angora:      { label:'Angora (fibre)',kLait:0.00, poidsRef:40, tbRef:38, tpRef:32 },
+};
+function onRaceChange(){
+  if(typeAnimal!=='chevre') return;
+  const r = RACES_CHEVRE[document.getElementById('race').value] || RACES_CHEVRE.alpine;
+  document.getElementById('poids').value = r.poidsRef;
+  document.getElementById('tb').value    = r.tbRef;
+  document.getElementById('tp').value    = r.tpRef;
+  // Angora : pas de production laitière
+  const isAngora = document.getElementById('race').value === 'angora';
+  ['row-prod','row-tb','row-tp'].forEach(id => {
+    document.getElementById(id).style.display = isAngora ? 'none' : '';
+  });
+}
+function getRace(){
+  const el = document.getElementById('race');
+  return (el && typeAnimal==='chevre') ? (RACES_CHEVRE[el.value] || RACES_CHEVRE.alpine) : null;
+}
+
+const STADES_CHEVRE = [
+  {v:'lac_debut',    l:'Début de lactation (0-2 mois)'},
+  {v:'lac_pleine',   l:'Pleine lactation (2-6 mois)', sel:true},
+  {v:'lac_fin',      l:'Fin de lactation (6 mois+)'},
+  {v:'gest_debut',   l:'Gestation début (1-3 mois)'},
+  {v:'gest_fin',     l:'Gestation fin (4-5 mois)'},
+  {v:'entretien',    l:'Entretien'},
+];
+const STADES_CHEVRETTE = [
+  {v:'croiss_pre',   l:'Croissance (2-6 mois)', sel:true},
+  {v:'croiss_post',  l:'Croissance (7-12 mois)'},
+  {v:'gest_1ere',    l:'1ère gestation'},
+];
+const STADES_BOUC = [
+  {v:'entretien',    l:'Entretien (hors lutte)', sel:true},
+  {v:'lutte',        l:'Période de lutte'},
+];
+
+function setType(t){
+  typeAnimal = t;
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+t).classList.add('active');
+
+  const lait = t==='chevre';
+  ['row-prod','row-tb','row-tp'].forEach(id=>{ document.getElementById(id).style.display=lait?'':'none'; });
+  document.getElementById('row-parite').style.display          = t==='chevre' ? 'flex' : 'none';
+  document.getElementById('row-nec').style.display             = t==='chevrette' ? 'none' : '';
+  document.getElementById('row-age-chevrette').style.display   = t==='chevrette' ? '' : 'none';
+  if(t!=='chevre'){
+    parite = 'multipare';
+    document.getElementById('btn-multipare').classList.add('active');
+    document.getElementById('btn-primipare').classList.remove('active');
+  }
+
+  document.getElementById('row-race').style.display = t==='chevre' ? '' : 'none';
+  const poidsDefaut = {chevre:75, chevrette:30, bouc:90}[t];
+  document.getElementById('poids').value = poidsDefaut;
+  document.getElementById('lbl-nb').textContent = {chevre:'Nombre de chèvres',chevrette:'Nombre de chevrettes',bouc:'Nombre de boucs'}[t];
+
+  const stades = {chevre:STADES_CHEVRE, chevrette:STADES_CHEVRETTE, bouc:STADES_BOUC}[t];
+  const sel = document.getElementById('stade');
+  sel.innerHTML = stades.map(s=>`<option value="${s.v}"${s.sel?' selected':''}>${s.l}</option>`).join('');
+
+  calculer();
+}
+
+// ══════════════════════════════════════════════════
+// BESOINS
+// ══════════════════════════════════════════════════
+let B = {};
+
+function calculer(){
+  const poids  = +document.getElementById('poids').value||75;
+  const nec    = +document.getElementById('nec').value||3;
+  const stade  = document.getElementById('stade').value;
+  const prod   = typeAnimal==='chevre' ? (+document.getElementById('prod').value||3.5) : 0;
+  const tb     = typeAnimal==='chevre' ? (+document.getElementById('tb').value||38)    : 0;
+  const tp     = typeAnimal==='chevre' ? (+document.getElementById('tp').value||32)    : 0;
+  const nb     = +document.getElementById('nb').value||400;
+  const temp   = +document.getElementById('temp').value||16;
+  const paratb = +document.getElementById('paratb').value||0;
+  const caev   = +document.getElementById('caev').value||0;
+
+  const kNEC   = typeAnimal==='chevrette' ? 1.0 : ([1.20,1.10,1.00,0.95,0.90][nec-1]||1.0);
+  // Température : coefficients calés sur l'Excel
+  let kTemp=1.0, zoneT='Confort';
+  if     (temp<5)            { kTemp=0.80; zoneT='Froid extrême'; }
+  else if(temp<8)            { kTemp=0.88; zoneT='Froid sévère'; }
+  else if(temp<12)           { kTemp=0.95; zoneT='Froid léger'; }
+  else if(temp<=18)          { kTemp=1.00; zoneT='Confort'; }
+  else if(temp<=22)          { kTemp=0.97; zoneT='Chaleur légère'; }
+  else if(temp<=26)          { kTemp=0.90; zoneT='Chaleur modérée'; }
+  else if(temp<=30)          { kTemp=0.80; zoneT='Chaleur sévère'; }
+  else                       { kTemp=0.70; zoneT='Chaleur extrême'; }
+
+  // ParaTB : deux coefficients distincts énergie / protéines (calés sur Excel B30/B31)
+  const kAbsE =[1.00, 0.80, 0.70][paratb]; // absorption énergie
+  const kAbsP =[1.00, 0.75, 0.65][paratb]; // absorption protéines
+  const kMajP =[1.00, 1.15, 1.25][paratb]; // majoration besoins entretien
+  const kCAEV =[1.00, 0.80, 0.65, 0.60][caev];
+  const p75=Math.pow(poids,.75);
+
+  let uflFinal, pdinFinal, pdieFinal, matC, ciTot, uelMax, caT, pT;
+
+  if(typeAnimal==='chevre'){
+    // ── CHÈVRE ──
+    // Primipare : encore en croissance → majoration entretien +20% UFL, +15% PDIN/PDIE
+    // + capacité d'ingestion réduite de ~10% (rumen moins développé)
+    const kPrim = parite==='primipare' ? 1.20 : 1.0;
+    const kPrimP= parite==='primipare' ? 1.15 : 1.0;
+    const kPrimCI=parite==='primipare' ? 0.90 : 1.0;
+
+    const uflEnt=0.044*p75*kPrim;
+    const kStUFL={entretien:1,gest_debut:1.05,gest_fin:1.20,lac_debut:1,lac_pleine:1,lac_fin:1}[stade]||1;
+    const uflParL=0.071*(tb/1000)+0.053*(tp/1000)+0.020;
+    const uflGest=stade==='gest_fin'?.35*uflEnt:stade==='gest_debut'?.10*uflEnt:0;
+    const kRace = getRace()?.kLait ?? 1.0; // correction potentiel laitier par race
+    uflFinal=((uflEnt*kStUFL+prod*uflParL*kRace+uflGest)*kNEC*kTemp);
+    pdinFinal=((2.50*p75*kPrimP)+(prod*45*(tp/32)*kRace));
+    pdieFinal=((2.80*p75*kPrimP)+(prod*50*(tp/32)*kRace));
+    matC=14.0;
+    if(['gest_fin','entretien'].includes(stade))matC=11.5;
+    else if(stade==='gest_debut') matC=12.5;
+    else if(stade==='lac_debut')  matC=16.5;
+    else if(stade==='lac_pleine') matC=prod<2.5?14:prod<4?15.5:16.5;
+    else if(stade==='lac_fin')    matC=13.5;
+    const kStCI={entretien:1,gest_debut:1.05,gest_fin:.85,lac_debut:1.15,lac_pleine:1.20,lac_fin:1.10}[stade]||1;
+    ciTot=poids*0.026*kStCI*kPrimCI;
+    uelMax=ciTot*1.05;
+    caT=(0.47*poids*kPrim*kMajP+prod*1.8)/kAbsP;
+    pT =(0.31*poids*kMajP+prod*1.1)/kAbsP;
+
+  } else if(typeAnimal==='chevrette'){
+    // ── CHEVRETTE EN CROISSANCE ──
+    // Gain de poids cible (GMQ g/j) selon stade
+    const gmq = stade==='croiss_pre' ? 150 : stade==='croiss_post' ? 100 : 80; // g/j
+    const gmqKg = gmq/1000;
+    // UFL entretien + croissance (INRA caprins)
+    const uflEnt  = 0.044*p75;
+    const uflCroit= 4.5*gmqKg; // ~4.5 UFL/kg de gain
+    uflFinal = (uflEnt + uflCroit) * kTemp;
+    // PDIN/PDIE : entretien + synthèse tissulaire
+    pdinFinal = 2.50*p75 + gmq*0.30; // 300 g PDIN par kg gain
+    pdieFinal = 2.80*p75 + gmq*0.35;
+    matC = stade==='gest_1ere' ? 13.0 : 15.0; // chevrette en croissance = MAT élevée
+    ciTot = poids*0.030; // CI légèrement supérieure à l'adulte / kg PV
+    uelMax = ciTot*1.05;
+    caT = (0.60*poids + gmq*0.015); // Ca croissance osseuse
+    pT  = (0.35*poids + gmq*0.010);
+
+  } else {
+    // ── BOUC ──
+    const uflEnt = 0.044*p75;
+    const kLutte = stade==='lutte' ? 1.30 : 1.0; // +30% pendant la lutte
+    uflFinal  = uflEnt * kLutte * kMajP * kTemp / kAbsE;
+    pdinFinal = (2.50*p75 * (stade==='lutte'?1.20:1.0) * kMajP)/(kAbsP*kCAEV);
+    pdieFinal = (2.80*p75 * (stade==='lutte'?1.20:1.0) * kMajP)/(kAbsP*kCAEV);
+    matC      = stade==='lutte' ? 13.0 : 11.5;
+    ciTot     = poids*0.022;
+    uelMax    = ciTot*1.05;
+    caT = (0.47*poids*kMajP)/kAbsP;
+    pT  = (0.31*poids*kMajP)/kAbsP;
+  }
+
+  B={uflFinal,pdinFinal,pdieFinal,matC,uelMax,ciTot,caT,pT,
+     kTemp,kAbsP,kAbsE,kMajP,kCAEV,zoneT,prod,nb,poids,stade,typeAnimal,parite};
+
+  // Sauvegarder les params dans le lot actif
+  sauvegarderFormulaireDansLot();
+
+  renderKPI('kpi-b',null);
+  renderCI();
+  renderAl();
+  document.getElementById('hdr-nb').textContent=Math.round(nb);
+  document.getElementById('hdr-prod').textContent=typeAnimal==='chevre'?prod.toFixed(1):'—';
+  const elb = document.getElementById('lot-badge'); if(elb) elb.textContent=lotActif().nom;
+}
+
+function fmt(v,decimals=2){
+  if(v==null||isNaN(v)) return '—';
+  return v>10?Math.round(v).toString():v.toFixed(decimals);
+}
+
+function renderKPI(elId, ap){
+  function mk(cls,val,besoin,unit,lbl,low,high,bc){
+    const display=val==null?'—':(val>10?Math.round(val):val.toFixed(2));
+    let st='', bb='';
+    if(ap && val!=null && besoin>0){
+      const pct=val/besoin*100;
+      st=`<span class="ks">${pct<low?'🔴':pct>high?'🟡':'✅'}</span>`;
+      bb=`<div class="kb" style="color:${bc}">/ ${fmt(besoin)} besoin</div>`;
+    }
+    return `<div class="kpi ${cls}">${st}
+      <div class="kv">${display}</div>
+      <div class="ku">${unit}</div>
+      <div class="kl">${lbl}</div>
+      ${bb}
+    </div>`;
+  }
+  const b=B, v=ap||{ufl:b.uflFinal,pdin:b.pdinFinal,pdie:b.pdieFinal,mat:b.matC,uel:b.uelMax};
+  document.getElementById(elId).innerHTML=
+    mk('ufl', v.ufl,  b.uflFinal,  'UFL/j',   'UFL',  85,115,'#1b5e20')+
+    mk('pdin',v.pdin, b.pdinFinal, 'g PDIN/j','PDIN', 85,120,'#0d47a1')+
+    mk('pdie',v.pdie, b.pdieFinal, 'g PDIE/j','PDIE', 85,120,'#4a148c')+
+    mk('mat', v.mat,  b.matC,      '% MAT',   'MAT',  88,112,'#bf360c')+
+    mk('uel', v.uel,  b.uelMax,    'UEL/j',   'UEL',  0, 100,'#880e4f');
+}
+
+function renderCI(){
+  const b=B;
+  let gmqHtml='';
+  if(b.typeAnimal==='chevrette'){
+    const stade=document.getElementById('stade').value;
+    const gmq=stade==='croiss_pre'?150:stade==='croiss_post'?100:80;
+    gmqHtml=`<div class="mc" style="background:#fff8e1;border:1px solid #ffe082">
+      <div class="mv" style="color:#bf360c">${gmq}</div>
+      <div class="ml">g/j GMQ cible</div>
+    </div>`;
+  }
+  document.getElementById('mg-ci').innerHTML=`
+    <div class="mc"><div class="mv">${b.ciTot.toFixed(2)}</div><div class="ml">kg MS/j CI</div></div>
+    <div class="mc"><div class="mv">${b.uelMax.toFixed(2)}</div><div class="ml">UEL max</div></div>
+    <div class="mc"><div class="mv">${b.caT.toFixed(1)}</div><div class="ml">g Ca/j besoin</div></div>
+    <div class="mc"><div class="mv">${b.pT.toFixed(1)}</div><div class="ml">g P/j besoin</div></div>
+    ${gmqHtml}
+    <div class="mc" style="background:var(--vert-p)"><div class="mv" style="font-size:.85rem">${b.zoneT}</div><div class="ml">Thermique</div></div>
+  `;
+}
+
+function renderAl(){
+  const b=B; let h='';
+  if(b.kAbsP<1) h+=`<div class="al al-w">⚠️ ParaTB : absorption ×${b.kAbsP.toFixed(2)}, besoins ×${b.kMajP.toFixed(2)}.</div>`;
+  if(b.kCAEV<1) h+=`<div class="al al-w">⚠️ CAEV : efficacité protéique ×${b.kCAEV.toFixed(2)}.</div>`;
+  if(b.kTemp!==1)h+=`<div class="al al-w">🌡️ "${b.zoneT}" — correction UFL ×${b.kTemp.toFixed(2)}.</div>`;
+  // Alertes spécifiques par type
+  if(b.typeAnimal==='chevrette'){
+    h+=`<div class="al al-ok">🐑 Ration calculée avec besoin de croissance (entretien + GMQ). MAT cible élevée (${b.matC}%).</div>`;
+  } else if(b.typeAnimal==='chevre' && b.parite==='primipare'){
+    h+=`<div class="al al-w">🌱 Primipare : entretien UFL +20%, protéines +15%, CI réduite −10% (rumen en développement).</div>`;
+  } else if(b.typeAnimal==='bouc'){
+    if(b.stade==='lutte') h+=`<div class="al al-w">♂ Période de lutte : besoins UFL +30%, protéines +20%. Surveiller l'appétit (CI réduite).</div>`;
+    else h+=`<div class="al al-ok">♂ Bouc hors lutte : ration d'entretien. Éviter la suralimentation en concentrés.</div>`;
+  }
+  document.getElementById('al-param').innerHTML=h;
+}
+
+// ══════════════════════════════════════════════════
+// CALCUL APPORTS
+// ══════════════════════════════════════════════════
+function calcAp(){
+  const al=allAliments();
+  const ration=getRation();
+  let ms=0,ufl=0,pdin=0,pdie=0,matG=0,uel=0,ca=0,p=0,prix=0,ami=0,items=[];
+  Object.entries(ration).forEach(([sid,qte])=>{
+    if(!qte||qte<=0) return;
+    const a=al.find(x=>x.id===+sid);
+    if(!a) return;
+    const msA=qte*(a.ms||0)/100;
+    ms+=msA; ufl+=msA*(a.ufl||0); pdin+=msA*(a.pdin||0);
+    pdie+=msA*(a.pdie||0); matG+=msA*(a.mat||0)*10;
+    uel+=msA*getUEL(a); ca+=msA*(a.ca||0); p+=msA*(a.p||0);
+    ami+=msA*(a.ami||0); // amidon% pondéré
+    prix+=qte*(a.prix||0)/1000;
+    items.push({...a,qte,msA});
+  });
+  const mat  = ms>0 ? matG/ms/10 : 0;
+  // Calcul des totaux nécessaires pour GLUF4
+  let msConc=0, msFourr=0, amiMoy=0;
+  items.forEach(a=>{
+    const FOURR=['Foin','Ensilage','Enrubannage','Herbe','Paille'];
+    if(FOURR.includes(a.cat)) msFourr+=a.msA;
+    else if(a.cat!=='Autre')  msConc +=a.msA;
+    amiMoy += a.msA*(a.ami||0); // J31 = SOMME(kg MS × amidon%)
+  });
+  // GLUF4 = (J31 × C31 + C21 × 0.065) / (C13 × 0.3)
+  // J31=amiMoy, C31=ms total, C21=ms concentrés, C13=ms fourrages
+  const gluf4 = msFourr>0 ? (amiMoy*ms + msConc*0.065) / (msFourr*0.3) : 0;
+  const mprc   = ufl>0 ? pdin/ufl : 0;
+  const mpic   = ufl>0 ? pdie/ufl : 0;
+  const maf4   = ufl>0 ? uel/ufl : 0;
+  const mgr    = p>0   ? ca/p    : 0;
+
+  // Production permise (facteur limitant UFL / PDIN / PDIE)
+  // Utilise les paramètres du lot actif via B
+  const _pv   = B.poids||75;
+  const _kN   = B.kNEC||1;
+  const _kA   = B.kAbsP||1;
+  const _kAE  = B.kAbsE||1;
+  const _kMaj = B.kMajP||1;
+  const _kCAEV= B.kCAEV||1;
+  const _p75  = Math.pow(_pv, 0.75);
+
+  // ── Production permise THÉORIQUE (chèvre saine — sans pathologies) ──
+  const prodUFL_s  = ufl>0 ? (ufl  - 0.0365*_p75) / 0.41 : 0;
+  const prodPDIN_s = pdin>0? (pdin - 2.5*_p75)    / 47   : 0;
+  const prodPDIE_s = pdie>0? (pdie - 2.5*_p75)    / 42   : 0;
+  const prodPermise_saine = Math.max(0, Math.min(prodUFL_s, prodPDIN_s, prodPDIE_s));
+  const facteur_saine = prodUFL_s<=prodPDIN_s && prodUFL_s<=prodPDIE_s ? 'UFL' : prodPDIN_s<=prodPDIE_s ? 'PDIN' : 'PDIE';
+
+  // ── Production permise RÉELLE (avec ParaTB + CAEV) ──
+  const prodUFL  = ufl>0 ? ((ufl * _kAE  - 0.0365 * _p75 * _kMaj) / 0.41) * _kCAEV : 0;
+  const prodPDIN = pdin>0? ((pdin * _kA  - 2.5    * _p75 * _kMaj) / 47)   * _kCAEV : 0;
+  const prodPDIE = pdie>0? ((pdie * _kA  - 2.5    * _p75 * _kMaj) / 42)   * _kCAEV : 0;
+  const prodPermise = Math.max(0, Math.min(prodUFL, prodPDIN, prodPDIE));
+  const facteurLimitant = prodUFL<=prodPDIN && prodUFL<=prodPDIE ? 'UFL' : prodPDIN<=prodPDIE ? 'PDIN' : 'PDIE';
+
+  // ── Perte par pathologie (pour affichage) ──
+  // ParaTB seul (sans CAEV) — pour isoler sa contribution
+  const prodUFL_paraTB  = ufl>0 ? ((ufl * _kAE  - 0.0365 * _p75 * _kMaj) / 0.41) : 0;
+  const prodPDIN_paraTB = pdin>0? ((pdin * _kA  - 2.5    * _p75 * _kMaj) / 47)   : 0;
+  const prodPDIE_paraTB = pdie>0? ((pdie * _kA  - 2.5    * _p75 * _kMaj) / 42)   : 0;
+  const prodPermise_paraTB = Math.max(0, Math.min(prodUFL_paraTB, prodPDIN_paraTB, prodPDIE_paraTB));
+  const perteParaTB = (_kAE<1||_kA<1) ? Math.max(0, prodPermise_saine - prodPermise_paraTB) : 0;
+  const perteCAEV   = _kCAEV<1        ? Math.max(0, prodPermise_paraTB - prodPermise)        : 0;
+
+  return {ufl,pdin,pdie,mat,uel,ms,ca,p,ami,prix,items,gluf4,mprc,mpic,maf4,mgr,
+          prodUFL,prodPDIN,prodPDIE,prodPermise,facteurLimitant,
+          prodPermise_saine,facteur_saine,prodUFL_s,prodPDIN_s,prodPDIE_s,
+          perteParaTB,perteCAEV};
+}
+
+// ══════════════════════════════════════════════════
+// PAGE RATION
+// ══════════════════════════════════════════════════
+async function ajusterRation(){
+  if(!B.uflFinal){ calculer(); return; }
+  const items=itemsOrdonnes(getRation(),allAliments());
+  if(!items.length){ alert('Aucun aliment dans la ration.'); return; }
+
+  const CIBLE_REFUS = 0.08; // 8% cible centrale
+
+  // Essayer de charger les refus du jour depuis Firebase
+  let facteurRefus = 1.0;
+  let refusInfo = '';
+  try{
+    const today = new Date().toISOString().split('T')[0];
+    const refDoc = await getDoc(doc(db,`users/${currentUser.uid}/capration/refus_${today}`));
+    if(refDoc.exists()){
+      const refusData = refDoc.data()||{};
+      const lotId = lotActif().id;
+      const refusLot = refusData[lotId];
+      if(refusLot && refusLot.pct!=null){
+        const pct = parseFloat(refusLot.pct)/100;
+        if(pct>=0.06 && pct<=0.10){
+          // Dans la cible — pas d'ajustement
+          alert(`✅ Refus du jour : ${(pct*100).toFixed(1)}% — dans l'objectif (6-10%). Aucun ajustement nécessaire.`);
+          return;
+        }
+        // Facteur : (1 - refus_actuel) / (1 - cible)
+        facteurRefus = (1-pct)/(1-CIBLE_REFUS);
+        refusInfo = `Refus : ${(pct*100).toFixed(1)}% → facteur ${facteurRefus.toFixed(3)}`;
+      }
+    }
+  } catch(e){
+    // Pas de Firebase ou pas de refus — ajustement aux besoins UFL seulement
+  }
+
+  // Si pas de refus dispo : ajustement aux besoins UFL
+  let facteur = facteurRefus;
+  if(facteur===1.0){
+    let uflActuel=0;
+    items.forEach(({aliment:a,qte})=>{ uflActuel+=qte*(a.ms/100)*(a.ufl||0); });
+    if(uflActuel<=0){ alert('Impossible : aucun apport UFL dans la ration.'); return; }
+    facteur = B.uflFinal/uflActuel;
+    if(Math.abs(facteur-1)<0.01){ alert('La ration couvre déjà exactement les besoins UFL.'); return; }
+    refusInfo = 'Ajustement UFL (pas de refus enregistrés aujourd\'hui)';
+  }
+
+  // Appliquer proportionnellement
+  const r=getRation();
+  items.forEach(({aliment:a,qte})=>{
+    r[a.id]=Math.round(qte*facteur*100)/100;
+  });
+  saveRation();
+  renderRation();
+
+  const sens=facteur>1?'augmentées':'réduites';
+  const pct=Math.abs(Math.round((facteur-1)*100));
+  showToast(`⚖️ Quantités ${sens} de ${pct}% — ${refusInfo}`);
+}
+
+function renderRation(){
+  if(!B.uflFinal) calculer();
+  const b=B;
+
+  renderBandeauLots();
+
+  // Calculer nb total (lot actif + lots sélectionnés)
+  const ids = lotsRationIds.length ? lotsRationIds : [lotActifId];
+  const nbTotal = ids.reduce((s,id)=>{const l=lots.find(x=>x.id===id);return s+(l?.params?.nb||0);},0)||b.nb;
+  document.getElementById('rr-strip').innerHTML=`
+    <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--vert-f);letter-spacing:.06em;margin-bottom:.4rem">Besoins à couvrir${getRace() ? ` <span style="font-weight:400;font-size:9px;background:var(--vert-c);color:#fff;border-radius:3px;padding:1px 6px;text-transform:none;letter-spacing:0;margin-left:.3rem">${getRace().label}</span>` : ''}</div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:12.5px">
+      <span>UFL : <b>${b.uflFinal.toFixed(2)}</b></span>
+      <span>PDIN : <b>${Math.round(b.pdinFinal)} g</b></span>
+      <span>PDIE : <b>${Math.round(b.pdieFinal)} g</b></span>
+      <span>MAT cible : <b>${b.matC.toFixed(1)} %</b></span>
+      <span>UEL max : <b>${b.uelMax.toFixed(2)}</b></span>
+      <span>CI max : <b>${b.ciTot.toFixed(2)} kg MS</b></span>
+    </div>`;
+
+  const items=itemsOrdonnes(getRation(), allAliments());
+  if(!items.length){
+    document.getElementById('ration-list').innerHTML=`
+      <div class="empty">🌿<br>Aucun aliment dans la ration.<br>
+      <button class="btn btn-s" style="margin-top:.75rem" onclick="showPage('alim')">Ouvrir la base →</button></div>`;
+    ['bilan-gauges','bilan-cout','bilan-al'].forEach(i=>{ const e=document.getElementById(i); if(e) e.innerHTML=''; });
+    document.getElementById('bilan-perlot').style.display='none';
+    return;
+  }
+
+  // Grouper par famille
+  const GROUPES = [
+    { label:'🌿 Fourrages', key:'Fourrages', cats:['Foin','Ensilage','Enrubannage','Herbe','Paille'] },
+    { label:'🌾 Concentrés', key:'Concentres', cats:['Concentré','Aliment composé'] },
+    { label:'➕ Autres', key:'Autres', cats:['Autre'] },
+  ];
+
+  let h='';
+  let auMoinsUnGroupe = false;
+
+  GROUPES.forEach(grp=>{
+    const gItems = items.filter(a=>grp.cats.includes(a.cat));
+    if(!gItems.length) return;
+    auMoinsUnGroupe = true;
+
+    // Totaux du groupe
+    let gMs=0,gUfl=0,gPdin=0,gPdie=0,gUel=0,gQte=0;
+    gItems.forEach(a=>{
+      const qte = getRation()[a.id]||0;
+      const msA = qte*(a.ms||0)/100;
+      gMs+=msA; gUfl+=msA*(a.ufl||0); gPdin+=msA*(a.pdin||0);
+      gPdie+=msA*(a.pdie||0); gUel+=msA*getUEL(a); gQte+=qte;
+    });
+
+    h+=`<div class="ration-groupe-header">${grp.label}</div>`;
+
+    gItems.forEach(a=>{
+      const qte=getRation()[a.id]||0;
+      const msKg=(qte*(a.ms||0)/100).toFixed(2);
+      h+=`<div class="rrow" draggable="true" data-id="${a.id}"
+        ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dragDrop(event)" ondragend="dragEnd(event)">
+        <span class="drag-handle">⠿</span>
+        <div>
+          <div class="rn">${a.nom}</div>
+          <div class="rd">
+            <span class="badge ${catBadge(a.cat)}">${a.cat}</span>
+            ${a.ufl!=null?`<span>UFL <b>${a.ufl}</b></span>`:''}
+            ${a.pdin!=null?`<span>PDIN <b>${a.pdin}</b></span>`:''}
+            ${a.pdie!=null?`<span>PDIE <b>${a.pdie}</b></span>`:''}
+            ${a.mat!=null?`<span>MAT <b>${a.mat}%</b></span>`:''}
+            ${a.uel!=null?`<span>UEL <b>${a.uel}</b></span>`:''}
+            ${a.ms>0?`<span style="color:var(--vert)">→ ${msKg} kg MS</span>`:`<span style="color:var(--gris);font-style:italic">eau / sans MS</span>`}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="number" class="qi" value="${qte}" min="0" max="50" step=".05"
+            onchange="setQte(${a.id},this.value)">
+          <span style="font-size:10px;color:var(--gris)">kg brut</span>
+        </div>
+        <button class="btn btn-d btn-sm" onclick="removeRation(${a.id})">✕</button>
+        <button class="btn btn-sm" title="Voir la fiche dans Base aliments" onclick="showPage('alim');setTimeout(()=>{const el=document.getElementById('al-search');if(el){el.value='${a.nom.replace(/'/g,"\\'").replace(/"/g,'&quot;')}';const cl=document.getElementById('al-clear');if(cl)cl.style.display='flex';renderAliments();}},80)" style="font-size:10px;padding:3px 6px;opacity:.7">🔍</button>
+      </div>`;
+    });
+
+    // Ligne total du groupe
+    h+=`<div class="ration-groupe-total" id="total-groupe-${grp.key}">
+      <span>Total ${grp.label}</span>
+      <span>${gQte.toFixed(2)} kg brut</span>
+      <span>${gMs.toFixed(2)} kg MS</span>
+      <span style="color:#1b5e20">UFL ${isNaN(gUfl)?'—':gUfl.toFixed(2)}</span>
+      <span style="color:#0d47a1">PDIN ${isNaN(gPdin)?'—':Math.round(gPdin)}</span>
+      <span style="color:#4a148c">PDIE ${isNaN(gPdie)?'—':Math.round(gPdie)}</span>
+      ${gUel>0?`<span style="color:#880e4f">UEL ${gUel.toFixed(2)}</span>`:''}
+    </div>`;
+  });
+
+  document.getElementById('ration-list').innerHTML=h;
+  renderBilan();
+}
+
+function setQte(id,v){
+  const q=parseFloat(v)||0;
+  const r=getRation();
+  if(q<=0) delete r[id]; else r[id]=q;
+  saveRation();
+  renderBilan();
+  // Mettre à jour les totaux de groupe sans recréer toute la liste
+  majTotauxGroupes();
+}
+
+function majTotauxGroupes(){
+  const al = allAliments();
+  const GROUPES = [
+    { label:'🌿 Fourrages', key:'Fourrages', cats:['Foin','Ensilage','Enrubannage','Herbe','Paille'] },
+    { label:'🌾 Concentrés', key:'Concentres', cats:['Concentré','Aliment composé'] },
+    { label:'➕ Autres', key:'Autres', cats:['Autre'] },
+  ];
+  GROUPES.forEach(grp=>{
+    const el = document.getElementById(`total-groupe-${grp.key}`);
+    if(!el) return;
+    const items = al.filter(a=>grp.cats.includes(a.cat)&&(getRation()[a.id]||0)>0);
+    let gMs=0,gUfl=0,gPdin=0,gPdie=0,gUel=0,gQte=0;
+    items.forEach(a=>{
+      const qte=getRation()[a.id]||0;
+      const msA=qte*(a.ms||0)/100;
+      gMs+=msA; gUfl+=msA*(a.ufl||0); gPdin+=msA*(a.pdin||0);
+      gPdie+=msA*(a.pdie||0); gUel+=msA*getUEL(a); gQte+=qte;
+    });
+    el.innerHTML=`
+      <span>Total ${grp.label}</span>
+      <span>${gQte.toFixed(2)} kg brut</span>
+      <span>${gMs.toFixed(2)} kg MS</span>
+      <span style="color:#1b5e20">UFL ${isNaN(gUfl)?'—':gUfl.toFixed(2)}</span>
+      <span style="color:#0d47a1">PDIN ${isNaN(gPdin)?'—':Math.round(gPdin)}</span>
+      <span style="color:#4a148c">PDIE ${isNaN(gPdie)?'—':Math.round(gPdie)}</span>
+      ${gUel>0?`<span style="color:#880e4f">UEL ${gUel.toFixed(2)}</span>`:''}`;
+  });
+}
+function removeRation(id){
+  delete getRation()[id]; saveRation(); renderRation();
+}
+
+function renderBilan(){
+  const b=B, ap=calcAp();
+  if(!ap.items.length){
+    ['bilan-gauges','bilan-cout','bilan-al'].forEach(i=>document.getElementById(i).innerHTML='');
+    return;
+  }
+
+  // ── Jauges semi-circulaires ────────────────────────────────────────────
+  function gauge(lbl, val, bes, unit, decimals, lowPct, highPct, couleurBase){
+    const pct    = bes>0 ? val/bes*100 : 0;
+    const clamp  = Math.min(pct, 160); // cap à 160% pour l'affichage
+    const col    = pct<lowPct ? '#c0392b' : pct>highPct ? '#d68910' : '#2d6a4f';
+    const icon   = pct<lowPct ? '▼' : pct>highPct ? '▲' : '✓';
+    const stat   = pct<lowPct ? 'Déficit' : pct>highPct ? 'Excès' : 'OK';
+
+    const R = 28, cx = 50, cy = 32;
+    // Demi-cercle : de 180° (gauche) à 0° (droite) en passant par le haut
+    // pct limité à 160% max pour éviter de dépasser
+    const fillDeg = Math.min(clamp/100, 1.5) * 180;
+
+    function polarToXY(angleDeg){
+      const rad = angleDeg * Math.PI / 180;
+      return { x: cx + R*Math.cos(rad), y: cy - R*Math.sin(rad) };
+    }
+
+    // Arc fond : 180° → 0° (demi-cercle complet)
+    const s0 = polarToXY(180), e0 = polarToXY(0);
+    // Arc rempli : 180° → (180° - fillDeg)
+    const sf = polarToXY(180), ef = polarToXY(180 - fillDeg);
+    const lg = fillDeg > 180 ? 1 : 0;
+
+    const valDisplay = decimals===0 ? Math.round(val) : val.toFixed(decimals);
+    const besDisplay = decimals===0 ? Math.round(bes) : bes.toFixed(decimals);
+
+    return `<div class="gauge-wrap">
+      <svg viewBox="-2 0 104 42" style="width:100%;display:block">
+        <path d="M ${s0.x.toFixed(2)} ${s0.y.toFixed(2)} A ${R} ${R} 0 0 1 ${e0.x.toFixed(2)} ${e0.y.toFixed(2)}"
+          fill="none" stroke="#e8eae4" stroke-width="8" stroke-linecap="butt"/>
+        <path d="M ${sf.x.toFixed(2)} ${sf.y.toFixed(2)} A ${R} ${R} 0 ${lg} 1 ${ef.x.toFixed(2)} ${ef.y.toFixed(2)}"
+          fill="none" stroke="${col}" stroke-width="8" stroke-linecap="butt"/>
+        <text x="${cx}" y="${cy-10}" text-anchor="middle"
+          font-family="DM Mono,monospace" font-size="13" font-weight="700" fill="${col}">${valDisplay}</text>
+        <text x="${cx}" y="${cy-1}" text-anchor="middle"
+          font-family="DM Sans,sans-serif" font-size="6.5" fill="#9ca3af">${unit}</text>
+        <text x="${cx}" y="${cy+9}" text-anchor="middle"
+          font-family="DM Mono,monospace" font-size="7" fill="${col}" font-weight="700">${icon} ${Math.round(pct)}%</text>
+      </svg>
+      <div class="gauge-label">${lbl}</div>
+      <div class="gauge-sub" style="color:${col}">${stat} · <span style="color:var(--gris)">${besDisplay} ${unit}</span></div>
+    </div>`;
+  }
+
+  // Jauge qualitative : val doit être dans [optMin, optMax]
+  function gaugeAbs(lbl, val, unit, decimals, optMin, optMax, desc){
+    if(!val || isNaN(val)) val=0;
+    const col = val<optMin ? '#c0392b' : val>optMax ? '#d68910' : '#2d6a4f';
+    const icon = val<optMin ? '▼' : val>optMax ? '▲' : '✓';
+    const stat = val<optMin ? 'Bas' : val>optMax ? 'Élevé' : 'OK';
+    // Arc : on représente val sur une plage 0 → optMax*1.5
+    const plageMax = optMax * 1.6;
+    const pct = Math.min(val/plageMax*100, 100);
+
+    const R=24, cx=50, cy=28;
+    function polarToXY(angleDeg){ const rad=angleDeg*Math.PI/180; return {x:cx+R*Math.cos(rad),y:cy-R*Math.sin(rad)}; }
+    const s=polarToXY(180), e=polarToXY(180-pct/100*180), lg=pct>100?1:0;
+    const valDisplay = decimals===0?Math.round(val):val.toFixed(decimals);
+
+    // Marques zone optimale
+    const angMin = 180-(optMin/plageMax)*180;
+    const angMax = 180-(optMax/plageMax)*180;
+    const mMin=polarToXY(angMin), mMax=polarToXY(angMax);
+    const mMinIn={x:cx+(R-5)*Math.cos(angMin*Math.PI/180),y:cy-(R-5)*Math.sin(angMin*Math.PI/180)};
+    const mMaxIn={x:cx+(R-5)*Math.cos(angMax*Math.PI/180),y:cy-(R-5)*Math.sin(angMax*Math.PI/180)};
+
+    return `<div class="gauge-wrap">
+      <svg viewBox="-2 0 104 36" style="width:100%;display:block">
+        <path d="M ${cx-R} ${cy} A ${R} ${R} 0 0 1 ${cx+R} ${cy}"
+          fill="none" stroke="#e8eae4" stroke-width="7" stroke-linecap="butt"/>
+        <path d="M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${R} ${R} 0 ${lg} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}"
+          fill="none" stroke="${col}" stroke-width="7" stroke-linecap="butt"/>
+        <line x1="${mMin.x.toFixed(1)}" y1="${mMin.y.toFixed(1)}" x2="${mMinIn.x.toFixed(1)}" y2="${mMinIn.y.toFixed(1)}" stroke="#2d6a4f" stroke-width="1.5"/>
+        <line x1="${mMax.x.toFixed(1)}" y1="${mMax.y.toFixed(1)}" x2="${mMaxIn.x.toFixed(1)}" y2="${mMaxIn.y.toFixed(1)}" stroke="#2d6a4f" stroke-width="1.5"/>
+        <text x="${cx}" y="${cy-8}" text-anchor="middle"
+          font-family="DM Mono,monospace" font-size="12" font-weight="700" fill="${col}">${valDisplay}</text>
+        <text x="${cx}" y="${cy+1}" text-anchor="middle"
+          font-family="DM Sans,sans-serif" font-size="6" fill="#9ca3af">${unit}</text>
+      </svg>
+      <div class="gauge-label">${lbl}</div>
+      <div class="gauge-sub" style="color:${col}">${desc}<br><span style="color:var(--gris)">cible ${optMin}–${optMax} ${unit}</span></div>
+    </div>`;
+  }
+
+  // Jauges : apports bruts vs besoins sans coefficients sanitaires
+  // Les pathologies n'impactent que le bloc production permise
+  const kAE = b.kAbsE||1, kAP = b.kAbsP||1, kCAEV = b.kCAEV||1;
+
+  document.getElementById('bilan-gauges').innerHTML =
+    `<div class="gauges-grid">
+      ${gauge('UFL',   ap.ufl,  b.uflFinal,  'UFL/j', 2, 85,115,'#2d6a4f')}
+      ${gauge('PDIN',  ap.pdin, b.pdinFinal, 'g/j',   0, 85,120,'#0d47a1')}
+      ${gauge('PDIE',  ap.pdie, b.pdieFinal, 'g/j',   0, 85,120,'#4a148c')}
+    </div>
+    <div class="gauges-grid gauges-grid-2">
+      ${gauge('MAT',        ap.mat,  b.matC,    '%',   1, 88,112,'#bf360c')}
+      ${gauge('UEL / CI',   ap.uel,  b.uelMax,  'UEL', 2,  0,100,'#880e4f')}
+    </div>
+    <div class="div" style="margin:.3rem 0"></div>
+    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gris);margin-bottom:.2rem">Indicateurs qualitatifs</div>
+    <div class="gauges-grid">
+      ${gaugeAbs('GLUF4',  ap.gluf4, 'g ami/UFL', 1, 2.5, 3.5, 'Acidogène')}
+      ${gaugeAbs('MPRc',   ap.mprc,  'g PDIN/UFL',0, 80,  100, 'Protéines ruminales')}
+      ${gaugeAbs('MPIc',   ap.mpic,  'g PDIE/UFL',0, 80,  100, 'Protéines intestinales')}
+    </div>`;
+
+  document.getElementById('bilan-cout').innerHTML=`
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:12.5px;color:var(--gris);margin-bottom:.5rem">
+      <span>MS : <b style="color:var(--vert-f)">${ap.ms.toFixed(2)} kg/j</b></span>
+      <span>Coût/ch/j : <b style="color:var(--vert-f)">${ap.prix.toFixed(3)} €</b></span>
+      <span>Troupeau/j : <b style="color:var(--vert-f)">${(ap.prix*b.nb).toFixed(0)} €</b></span>
+      <span>Mensuel : <b style="color:var(--vert-f)">${(ap.prix*b.nb*30).toFixed(0)} €</b></span>
+    </div>
+    ${b.typeAnimal==='chevre' ? `
+    <div style="background:var(--vert-p);border:1px solid var(--vert-c);border-radius:10px;padding:1.1rem 1.2rem;margin-top:.4rem">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gris);margin-bottom:.8rem">🌿 Production permise</div>
+      <div style="display:flex;gap:.75rem">
+        <div style="flex:1;background:#fff;border-radius:8px;padding:.9rem 1rem;border:1px solid var(--bord)">
+          <div style="font-size:12px;color:var(--gris);margin-bottom:.5rem;font-weight:600">🐐 Chèvre saine</div>
+          <div style="font-family:'DM Mono',monospace;font-size:1.9rem;font-weight:700;color:${ap.prodPermise_saine>=(b.prod||0)?'var(--vert-f)':'#d68910'};margin-bottom:.6rem;line-height:1">${ap.prodPermise_saine.toFixed(2)} <span style="font-size:.9rem;font-weight:400;color:var(--gris)">L/j</span></div>
+          <div style="font-size:12px;color:#555;line-height:2">Facteur limitant : <b style="color:#d68910">${ap.facteur_saine}</b><br><span style="color:#888">UFL→${ap.prodUFL_s.toFixed(2)}L &nbsp; PDIN→${ap.prodPDIN_s.toFixed(2)}L &nbsp; PDIE→${ap.prodPDIE_s.toFixed(2)}L</span></div>
+        </div>
+        <div style="flex:1;background:${(b.kAbsE<1||b.kAbsP<1||b.kCAEV<1)?'#fef9e7':'#fff'};border-radius:8px;padding:.9rem 1rem;border:1px solid ${(b.kAbsE<1||b.kAbsP<1||b.kCAEV<1)?'#f9ca24':'var(--bord)'}">
+          <div style="font-size:12px;color:var(--gris);margin-bottom:.5rem;font-weight:600">🩺 Avec pathologies</div>
+          <div style="font-family:'DM Mono',monospace;font-size:1.9rem;font-weight:700;color:${ap.prodPermise>=(b.prod||0)?'var(--vert-f)':'#c0392b'};margin-bottom:.6rem;line-height:1">${ap.prodPermise.toFixed(2)} <span style="font-size:.9rem;font-weight:400;color:var(--gris)">L/j</span></div>
+          <div style="font-size:12px;color:#c0392b;font-weight:600;line-height:2">▼ Perte : ${(ap.prodPermise_saine - ap.prodPermise).toFixed(2)} L/j vs saine</div>
+          <div style="font-size:12px;color:#888;margin-top:.2rem">${[b.kAbsE<1||b.kAbsP<1?`ParaTB −${ap.perteParaTB.toFixed(2)} L`:null, b.kCAEV<1?`CAEV −${ap.perteCAEV.toFixed(2)} L`:null].filter(Boolean).join(' · ')}</div>
+        </div>
+      </div>
+    </div>` : ''}
+  `;
+
+  let al='';
+  const rU=ap.ufl/b.uflFinal,rD=ap.pdin/b.pdinFinal,rE=ap.pdie/b.pdieFinal,rL=ap.uel/b.uelMax;
+  if(rU<.85) al+=`<div class="al al-e">❌ Déficit UFL (${Math.round(rU*100)}%) — augmenter concentrés énergétiques.</div>`;
+  if(rD<.85) al+=`<div class="al al-e">❌ Déficit PDIN (${Math.round(rD*100)}%) — azote dégradable insuffisant.</div>`;
+  if(rE<.85) al+=`<div class="al al-e">❌ Déficit PDIE (${Math.round(rE*100)}%) — énergie microbienne insuffisante.</div>`;
+  if(rL>1.05)al+=`<div class="al al-w">⚠️ UEL > capacité (${Math.round(rL*100)}%) — risque sous-ingestion.</div>`;
+  if(ap.mat<b.matC*.90) al+=`<div class="al al-w">⚠️ MAT bas : ${ap.mat.toFixed(1)}% vs cible ${b.matC.toFixed(1)}%.</div>`;
+  if(ap.mat>b.matC*1.15)al+=`<div class="al al-w">⚠️ MAT élevé : ${ap.mat.toFixed(1)}% — excès azoté possible.</div>`;
+  if(ap.pdin<ap.pdie*.95)al+=`<div class="al al-w">⚡ PDIN &lt; PDIE — l'azote est facteur limitant.</div>`;
+  if(ap.ca>0 && ap.p>0){
+    const rCaP=ap.ca/ap.p;
+    if(rCaP<1.5||rCaP>3)
+      al+=`<div class="al al-e">❌ Ca/P ration = ${rCaP.toFixed(2)} hors norme (idéal 1.5–2.5) — ajuster minéraux.</div>`;
+    else
+      al+=`<div class="al al-ok">✅ Ca/P ration = ${rCaP.toFixed(2)} — correct.</div>`;
+  }
+  if(!al) al=`<div class="al al-ok">✅ Ration bien équilibrée sur les 5 indicateurs.</div>`;
+  document.getElementById('bilan-al').innerHTML=al;
+  document.getElementById('bilan-al-card').style.display='none'; // alertes masquées
+  renderBilanParLot(ap);
+}
+
+// ══════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════
+function renderDash(){
+  if(!B.uflFinal) calculer();
+  const b=B, ap=calcAp();
+  renderKPI('dash-kpi', ap.items.length?ap:null);
+
+  const cT=(ap.prix*b.nb).toFixed(0);
+  const rU=ap.ufl/b.uflFinal, rL=ap.uel/b.uelMax;
+
+  document.getElementById('dash-g').innerHTML=`
+    <div class="dc">
+      <div style="font-size:9.5px;text-transform:uppercase;color:var(--gris);letter-spacing:.05em;margin-bottom:6px">Troupeau</div>
+      <div class="db">${Math.round(b.nb)}</div>
+      <div class="ds">chèvres · ${b.prod.toFixed(1)} L/j/ch.</div>
+      <div style="margin-top:.6rem;font-size:12px;color:var(--gris)">Production : <b style="color:var(--vert-f)">${(b.prod*b.nb).toFixed(0)} L/j</b></div>
+      <div style="font-size:11px;color:var(--gris)">${b.poids} kg · ${b.zoneT}</div>
+    </div>
+    <div class="dc">
+      <div style="font-size:9.5px;text-transform:uppercase;color:var(--gris);letter-spacing:.05em;margin-bottom:6px">Coût ration / jour</div>
+      <div class="db">${cT} €</div>
+      <div class="ds">${ap.prix.toFixed(3)} €/ch. · ${Math.round(b.nb)} chèvres</div>
+      <div style="margin-top:.6rem;font-size:12px;color:var(--gris)">Mensuel : <b style="color:var(--vert-f)">${(ap.prix*b.nb*30).toFixed(0)} €</b></div>
+    </div>
+    <div class="dc">
+      <div style="font-size:9.5px;text-transform:uppercase;color:var(--gris);letter-spacing:.05em;margin-bottom:6px">Bilan UFL</div>
+      <div class="db" style="font-size:1.55rem">${ap.ufl.toFixed(2)} <span style="font-size:.85rem;color:var(--gris)">/ ${b.uflFinal.toFixed(2)}</span></div>
+      <div class="ds">apporté / besoin</div>
+      <div style="margin-top:.5rem;height:7px;background:var(--gris-c);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(100,rU*100)}%;background:${rU<.85?'#c0392b':rU>1.15?'#d68910':'#2d6a4f'};border-radius:4px;transition:width .3s"></div>
+      </div>
+      <div style="font-size:10.5px;color:var(--gris);margin-top:2px">${Math.round(rU*100)}% couvert</div>
+    </div>
+    <div class="dc">
+      <div style="font-size:9.5px;text-transform:uppercase;color:var(--gris);letter-spacing:.05em;margin-bottom:6px">Encombrement UEL</div>
+      <div class="db" style="font-size:1.55rem">${ap.uel.toFixed(2)} <span style="font-size:.85rem;color:var(--gris)">/ ${b.uelMax.toFixed(2)}</span></div>
+      <div class="ds">ration / capacité max</div>
+      <div style="margin-top:.5rem;height:7px;background:var(--gris-c);border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(100,rL*100)}%;background:${rL>1.05?'#c0392b':'#2d6a4f'};border-radius:4px"></div>
+      </div>
+      <div style="font-size:10.5px;color:var(--gris);margin-top:2px">${Math.round(rL*100)}% CI occupé</div>
+    </div>
+    <div class="dc" style="grid-column:1/-1">
+      <div style="font-size:9.5px;text-transform:uppercase;color:var(--gris);letter-spacing:.05em;margin-bottom:.6rem">Détail ration (${ap.items.length} aliment${ap.items.length>1?'s':''})</div>
+      ${ap.items.length===0?'<p style="color:var(--gris);font-size:12px">Aucun aliment dans la ration.</p>'
+        :`<div class="tw"><table>
+          <thead><tr>
+            <th>Aliment</th><th>kg brut</th><th>kg MS</th>
+            <th style="color:#1b5e20">UFL</th>
+            <th style="color:#0d47a1">PDIN</th>
+            <th style="color:#4a148c">PDIE</th>
+            <th style="color:#bf360c">MAT%</th>
+            <th style="color:#880e4f">UEL</th>
+            <th>Amidon%</th><th>€/j</th>
+          </tr></thead>
+          <tbody>${ap.items.map(a=>{
+            const ms=a.qte*(a.ms||0)/100;
+            return `<tr>
+              <td style="font-weight:500">${a.nom}</td>
+              <td>${a.qte.toFixed(2)}</td><td>${ms.toFixed(2)}</td>
+              <td>${a.ufl!=null?(ms*a.ufl).toFixed(2):'—'}</td>
+              <td>${a.pdin!=null?Math.round(ms*a.pdin):'—'}</td>
+              <td>${a.pdie!=null?Math.round(ms*a.pdie):'—'}</td>
+              <td>${a.mat!=null?a.mat:'—'}</td>
+              <td>${a.uel!=null?(ms*a.uel).toFixed(2):'—'}</td>
+              <td>${a.ami!=null?a.ami:'—'}</td>
+              <td>${((a.prix||0)*a.qte/1000).toFixed(2)}</td>
+            </tr>`;}).join('')}
+          <tr style="font-weight:700;background:var(--vert-p)">
+            <td>TOTAL</td><td>—</td>
+            <td>${ap.ms.toFixed(2)}</td>
+            <td>${ap.ufl.toFixed(2)}</td>
+            <td>${Math.round(ap.pdin)}</td>
+            <td>${Math.round(ap.pdie)}</td>
+            <td>${ap.mat.toFixed(1)}%</td>
+            <td>${ap.uel.toFixed(2)}</td>
+            <td>—</td>
+            <td>${ap.prix.toFixed(2)}</td>
+          </tr></tbody></table></div>`
+      }
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// PAGE DISTRIBUTION
+// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// PAGE CALCUL BOL
+// ══════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════
+// PAGE AIDE IA — Analyse locale par règles
+// ══════════════════════════════════════════════════
+function renderIA(){
+  if(!B.uflFinal) calculer();
+  const ap = calcAp();
+
+  if(!ap.items.length){
+    document.getElementById('ia-content').innerHTML =
+      `<div class="empty" style="margin-top:3rem">🤖<br>Aucun aliment dans la ration.<br>
+      <button class="btn btn-s" style="margin-top:.75rem" onclick="showPage('ration')">Composer une ration →</button></div>`;
+    return;
+  }
+
+  const b = B;
+  const rU = ap.ufl/b.uflFinal;
+  const rD = ap.pdin/b.pdinFinal;
+  const rE = ap.pdie/b.pdieFinal;
+  const rM = ap.mat/b.matC;
+  const rL = ap.uel/b.uelMax;
+  const al = allAliments();
+
+  // ── Analyser les déficits et excès ──────────────
+  const problemes = [];
+  const ajustements = [];
+
+  // Trouver les aliments les plus intéressants pour chaque correction
+  function meilleurPourUFL(){ return ap.items.filter(a=>a.ufl).sort((a,b2)=>b2.ufl-a.ufl)[0]; }
+  function meilleurPourPDIN(){ return ap.items.filter(a=>a.pdin).sort((a,b2)=>b2.pdin-a.pdin)[0]; }
+  function plusGrosFourrage(){ return ap.items.filter(a=>['Foin','Enrubannage','Ensilage','Herbe','Paille'].includes(a.cat)).sort((a,b2)=>getRation()[b2.id]-getRation()[a.id])[0]; }
+  function plusGrosConcetre(){ return ap.items.filter(a=>['Concentré','Aliment composé'].includes(a.cat)).sort((a,b2)=>getRation()[b2.id]-getRation()[a.id])[0]; }
+
+  // UFL
+  if(rU < 0.85){
+    const manque = b.uflFinal - ap.ufl;
+    const candidat = meilleurPourUFL();
+    const augm = candidat ? +(getRation()[candidat.id] + manque/candidat.ufl * 100/(candidat.ms||87)).toFixed(2) : null;
+    problemes.push({
+      type:'deficit', indicateur:'UFL', severite: rU<0.70?'critique':'modere',
+      description:`Déficit énergétique de ${Math.round((1-rU)*100)}% — la ration ne couvre pas les besoins d'entretien + production.`,
+      action: candidat ? `Augmenter ${candidat.nom} de ${getRation()[candidat.id].toFixed(2)} → ${augm} kg/j (+${(augm-getRation()[candidat.id]).toFixed(2)} kg)` : 'Ajouter un aliment énergétique (maïs, pulpe betterave)'
+    });
+    if(candidat && augm) ajustements.push({aliment:candidat, actuel:getRation()[candidat.id], suggere:augm, raison:`Compenser déficit UFL (${Math.round((1-rU)*100)}%)`});
+  } else if(rU > 1.20){
+    const candidat = meilleurPourUFL();
+    const reduc = candidat ? +(getRation()[candidat.id] * 1.1/rU).toFixed(2) : null;
+    problemes.push({
+      type:'exces', indicateur:'UFL', severite:'mineur',
+      description:`Excès énergétique de ${Math.round((rU-1)*100)}% — gaspillage et risque d'engraissement.`,
+      action: candidat ? `Réduire ${candidat.nom} de ${getRation()[candidat.id].toFixed(2)} → ${reduc} kg/j` : 'Réduire les concentrés énergétiques'
+    });
+    if(candidat && reduc) ajustements.push({aliment:candidat, actuel:getRation()[candidat.id], suggere:reduc, raison:`Réduire excès UFL (${Math.round((rU-1)*100)}%)`});
+  }
+
+  // PDIN
+  if(rD < 0.85){
+    const manque = b.pdinFinal - ap.pdin;
+    const candidat = meilleurPourPDIN();
+    const augm = candidat ? +(getRation()[candidat.id] + manque/candidat.pdin * 100/(candidat.ms||87)).toFixed(2) : null;
+    problemes.push({
+      type:'deficit', indicateur:'PDIN', severite: rD<0.70?'critique':'modere',
+      description:`Déficit en azote dégradable de ${Math.round((1-rD)*100)}% — les microbes du rumen manquent d'azote.`,
+      action: candidat ? `Augmenter ${candidat.nom} de ${getRation()[candidat.id].toFixed(2)} → ${augm} kg/j` : 'Ajouter tourteau de soja ou correcteur azoté'
+    });
+    if(candidat && augm) ajustements.push({aliment:candidat, actuel:getRation()[candidat.id], suggere:augm, raison:`Corriger déficit PDIN (${Math.round((1-rD)*100)}%)`});
+  }
+
+  // PDIE
+  if(rE < 0.85){
+    problemes.push({
+      type:'deficit', indicateur:'PDIE', severite: rE<0.70?'critique':'modere',
+      description:`Déficit en protéines intestinales de ${Math.round((1-rE)*100)}% — production laitière limitée.`,
+      action: rD>rE ? 'PDIE < PDIN : manque d\'énergie fermentescible, augmenter les glucides dégradables (pulpe betterave, mélasse)' : 'Ajouter des protéines by-pass (tourteau de colza, soja toasté)'
+    });
+  }
+
+  // MAT
+  if(rM < 0.88){
+    problemes.push({
+      type:'deficit', indicateur:'MAT', severite:'mineur',
+      description:`MAT ${ap.mat.toFixed(1)}% sous la cible ${b.matC.toFixed(1)}% — ration trop pauvre en azote total.`,
+      action: 'Augmenter les fourrages de qualité ou ajouter un correcteur azoté'
+    });
+  } else if(rM > 1.15){
+    const candidat = plusGrosConcetre();
+    problemes.push({
+      type:'exces', indicateur:'MAT', severite:'mineur',
+      description:`MAT ${ap.mat.toFixed(1)}% au-dessus de la cible ${b.matC.toFixed(1)}% — excès azoté, coût inutile et charge rénale.`,
+      action: candidat ? `Réduire légèrement ${candidat.nom}` : 'Réduire les aliments azotés'
+    });
+  }
+
+  // UEL
+  if(rL > 1.05){
+    const candidat = plusGrosFourrage();
+    const reduc = candidat ? +(getRation()[candidat.id]*0.9).toFixed(2) : null;
+    problemes.push({
+      type:'exces', indicateur:'UEL', severite:'modere',
+      description:`Encombrement ${Math.round(rL*100)}% de la CI — risque de sous-ingestion, les chèvres ne pourront pas tout manger.`,
+      action: candidat ? `Réduire ${candidat.nom} de ${getRation()[candidat.id].toFixed(2)} → ${reduc} kg/j` : 'Réduire les fourrages encombrants'
+    });
+    if(candidat && reduc) ajustements.push({aliment:candidat, actuel:getRation()[candidat.id], suggere:reduc, raison:`Réduire encombrement UEL (${Math.round(rL*100)}% CI)`});
+  }
+
+  // GLUF4
+  if(ap.gluf4 > 3.5){
+    const candidat = ap.items.filter(a=>['Concentré','Aliment composé'].includes(a.cat) && (a.ami||0)>0.5).sort((a,b2)=>b2.ami-a.ami)[0];
+    const reduc = candidat ? +(getRation()[candidat.id]*0.85).toFixed(2) : null;
+    problemes.push({
+      type:'exces', indicateur:'GLUF4', severite:'modere',
+      description:`Risque acidogène élevé (${ap.gluf4.toFixed(1)}) — trop d'amidon par rapport aux fourrages.`,
+      action: candidat ? `Réduire ${candidat.nom} de ${getRation()[candidat.id].toFixed(2)} → ${reduc} kg ou augmenter les fourrages` : 'Augmenter la part de fourrages dans la ration'
+    });
+    if(candidat && reduc) ajustements.push({aliment:candidat, actuel:getRation()[candidat.id], suggere:reduc, raison:`Réduire risque acidose GLUF4 (${ap.gluf4.toFixed(1)} > 3.5)`});
+  } else if(ap.gluf4 < 2.5 && ap.items.length>1){
+    problemes.push({
+      type:'deficit', indicateur:'GLUF4', severite:'mineur',
+      description:`Ration trop fibreuse (GLUF4 ${ap.gluf4.toFixed(1)}) — fermentation ruminale insuffisante.`,
+      action: 'Augmenter légèrement les concentrés énergétiques ou ajouter de la pulpe de betterave'
+    });
+  }
+
+  // Production permise vs visée
+  if(ap.prodPermise !== undefined && b.prod > 0){
+    const ecart = ap.prodPermise - b.prod;
+    if(ecart < -0.3){
+      problemes.push({
+        type:'deficit', indicateur:'Production', severite:'critique',
+        description:`Production permise ${ap.prodPermise.toFixed(2)} L < objectif ${b.prod} L — la ration ne supporte pas la production visée.`,
+        action: `Facteur limitant : ${ap.facteurLimitant}. Corriger en priorité cet indicateur.`
+      });
+    }
+  }
+
+  // ── Construire le rendu ──────────────────────────
+  const nbProblemes = problemes.length;
+  const bilan = nbProblemes===0
+    ? 'Ration bien équilibrée sur tous les indicateurs.'
+    : nbProblemes<=2
+    ? `${nbProblemes} point${nbProblemes>1?'s':''} à ajuster — ration globalement correcte.`
+    : `${nbProblemes} déséquilibres détectés — ajustements recommandés.`;
+
+  const pointsForts = [];
+  if(rU>=0.85&&rU<=1.20) pointsForts.push(`UFL couverts à ${Math.round(rU*100)}%`);
+  if(rD>=0.85&&rD<=1.20) pointsForts.push(`PDIN couverts à ${Math.round(rD*100)}%`);
+  if(rE>=0.85&&rE<=1.20) pointsForts.push(`PDIE couverts à ${Math.round(rE*100)}%`);
+  if(rM>=0.88&&rM<=1.15) pointsForts.push(`MAT ${ap.mat.toFixed(1)}% dans la cible`);
+  if(rL<=1.0) pointsForts.push(`UEL à ${Math.round(rL*100)}% de la CI — pas de risque de sous-ingestion`);
+  if(ap.gluf4>=2.5&&ap.gluf4<=3.5) pointsForts.push(`GLUF4 ${ap.gluf4.toFixed(1)} — équilibre fourrage/concentrés optimal`);
+
+  let html = `
+  <div class="card" style="max-width:900px">
+    <div class="ct">🤖 Analyse de la ration — ${lotActif().nom}</div>
+
+    <div style="margin-bottom:1rem;padding:.7rem 1rem;background:${nbProblemes===0?'var(--vert-p)':nbProblemes<=2?'#fff8e1':'#fdedec'};border-radius:8px;font-size:13px;color:var(--vert-f)">
+      ${nbProblemes===0?'✅':'⚠️'} <b>${bilan}</b>
+    </div>`;
+
+  if(pointsForts.length){
+    html += `<div style="margin-bottom:.8rem">
+      <div class="nav-section" style="padding:0;margin-bottom:.4rem">✅ Points forts</div>
+      <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+        ${pointsForts.map(p=>`<span style="background:var(--vert-p);border:1px solid var(--vert-c);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--vert-f)">${p}</span>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  if(problemes.length){
+    html += `<div style="margin-bottom:.8rem">
+      <div class="nav-section" style="padding:0;margin-bottom:.4rem">⚠️ Points à corriger</div>
+      ${problemes.map(p=>{
+        const cls = p.severite==='critique'?'al-e':p.severite==='modere'?'al-w':'';
+        const bg  = p.severite==='critique'?'#fdedec':p.severite==='modere'?'#fef9e7':'#f3f4f0';
+        const ico = p.type==='deficit'?'▼':'▲';
+        return `<div class="al ${cls}" style="margin-bottom:.4rem;background:${bg}">
+          <div><b>${ico} ${p.indicateur}</b> — ${p.description}</div>
+          <div style="margin-top:3px;font-size:11.5px;opacity:.85">→ ${p.action}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  if(ajustements.length){
+    html += `<div style="margin-bottom:.8rem">
+      <div class="nav-section" style="padding:0;margin-bottom:.4rem">🔧 Ajustements suggérés</div>
+      <div class="tw"><table>
+        <thead><tr><th>Aliment</th><th style="text-align:right">Actuel</th><th style="text-align:right">Suggéré</th><th>Raison</th></tr></thead>
+        <tbody>
+          ${ajustements.map(a=>{
+            const diff = a.suggere-a.actuel;
+            const col = diff>0?'var(--vert-f)':'#c0392b';
+            return `<tr>
+              <td style="font-weight:500">${a.aliment.nom}</td>
+              <td style="text-align:right;font-family:'DM Mono',monospace">${a.actuel.toFixed(2)} kg</td>
+              <td style="text-align:right;font-family:'DM Mono',monospace;font-weight:700;color:${col}">
+                ${a.suggere.toFixed(2)} kg
+                <span style="font-size:10px">(${diff>0?'+':''}${diff.toFixed(2)})</span>
+              </td>
+              <td style="font-size:11.5px;color:var(--gris)">${a.raison}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <button class="btn btn-p" style="margin-top:.7rem" onclick="appliquerAjustementsLocaux()">✅ Appliquer ces ajustements</button>
+    </div>`;
+
+    // Stocker les ajustements pour le bouton
+    window._ajustementsIA = ajustements;
+  }
+
+  if(nbProblemes===0){
+    html += `<div class="al al-ok">💡 Ration équilibrée. Pour augmenter la production permise, le facteur limitant est <b>${ap.facteurLimitant||'UFL'}</b> — optimisez cet indicateur en priorité.</div>`;
+  }
+
+  html += '</div>';
+  document.getElementById('ia-content').innerHTML = html;
+}
+
+function appliquerAjustementsLocaux(){
+  if(!window._ajustementsIA?.length) return;
+  if(!confirm('Appliquer les ajustements suggérés ?')) return;
+  window._ajustementsIA.forEach(aj=>{
+    if(aj.aliment?.id) getRation()[aj.aliment.id] = aj.suggere;
+  });
+  saveRation();
+  showPage('ration');
+}
+
+function appliquerAjustements(ajustements){
+  appliquerAjustementsLocaux();
+}
+
+// ══════════════════════════════════════════════════
+// SYNC MOBILE — Envoie les rations vers Firebase
+// ══════════════════════════════════════════════════
+async function syncMobile(){
+  if(!_csUser){ alert('Connectez-vous d\'abord à CapriScan.'); return; }
+  setSyncStatus('sync');
+
+  // Construire la liste des lots avec leurs rations
+  const al = allAliments();
+  const ORDRE = {'Paille':1,'Foin':2,'Enrubannage':3,'Ensilage':4,'Herbe':5,'Aliment composé':6,'Concentré':7,'Autre':8};
+
+  const lotsExport = lots.map(lot=>{
+    const items = itemsOrdonnes(lot.ration||{}, al)
+      .filter(a=>(lot.ration||{})[a.id]>0)
+      .sort((a,b)=>(ORDRE[a.cat]||9)-(ORDRE[b.cat]||9))
+      .map(a=>({
+        nom:  a.nom,
+        cat:  a.cat,
+        qte:  (lot.ration||{})[a.id]||0,
+        ufl:  a.ufl,
+        pdin: a.pdin,
+        ms:   a.ms
+      }));
+    return {
+      id:   lot.id,
+      nom:  lot.nom,
+      nb:   lot.params?.nb||0,
+      typeAnimal: lot.typeAnimal||'chevre',
+      stade: lot.params?.stade||'',
+      ration: items
+    };
+  });
+
+  try {
+    // Sauvegarder dans Firestore sous users/{uid}/capration/lots
+    const {doc, setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    await setDoc(doc(_csDb, `users/${_csUser.uid}/capration/lots`), {
+      lots: lotsExport,
+      updatedAt: new Date().toISOString(),
+      nbLots: lotsExport.length
+    });
+    setSyncStatus('ok', lotsExport.length);
+    // Toast
+    const t=document.createElement('div');
+    t.style.cssText='position:fixed;bottom:1rem;right:1rem;background:var(--vert-f);color:#fff;padding:.6rem 1.2rem;border-radius:8px;font-size:12px;z-index:999';
+    t.textContent=`📱 ${lotsExport.length} lot(s) synchronisé(s) vers le mobile`;
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(),3000);
+  } catch(e){
+    setSyncStatus('error');
+    alert('Erreur sync : '+e.message);
+  }
+}
+// ══════════════════════════════════════════════════
+async function syncProductionCapriScan(){
+  if(!_csUser){
+    alert('Connectez-vous d\'abord à CapriScan (Gérer les lots).');
+    return;
+  }
+  setSyncStatus('sync');
+  try {
+    // Lire les sessions de traite depuis Firestore pour calculer production réelle
+    const snap = await window._csGetDocs(`users/${_csUser.uid}/sessions`);
+    if(snap.empty){ setSyncStatus('idle'); alert('Aucune session de traite trouvée dans CapriScan.'); return; }
+
+    // Agréger les 7 derniers jours par lot
+    const maintenant = Date.now();
+    const sept_jours = 7 * 24 * 3600 * 1000;
+    const prodParLot = {}; // {lotKey: {total, count}}
+
+    snap.forEach(d=>{
+      const s = d.data();
+      if(!s.date || (maintenant - s.date) > sept_jours) return;
+      // Production par animal avec son lot
+      if(s.animals){
+        Object.entries(s.animals).forEach(([id, data])=>{
+          // Chercher le lot de cet animal dans les lots CAPRation
+          // Pour l'instant on agrège tout en production globale
+        });
+      }
+      // Production totale de la session
+      if(s.totalProd && s.lotId){
+        const k = String(s.lotId);
+        if(!prodParLot[k]) prodParLot[k]={total:0,count:0};
+        prodParLot[k].total += s.totalProd;
+        prodParLot[k].count++;
+      }
+    });
+
+    // Mettre à jour les lots avec la production réelle
+    let maj=0;
+    lots.forEach(lot=>{
+      if(!lot.csKey) return;
+      const pd = prodParLot[lot.csKey];
+      if(!pd||!pd.count) return;
+      const prodMoy = pd.total/pd.count;
+      lot.prodReelle = +prodMoy.toFixed(2);
+      maj++;
+    });
+
+    saveLots();
+    setSyncStatus('ok', maj);
+
+    if(maj>0){
+      alert(`✅ Production réelle mise à jour pour ${maj} lot${maj>1?'s':''}.`);
+      // Rafraîchir si on est sur le dashboard
+      if(document.getElementById('page-dash').classList.contains('active')) renderDash();
+    } else {
+      // Pas de données de sessions structurées — on propose la saisie manuelle
+      const prod = prompt('Production réelle moyenne du lot actif (L/j/chèvre) ?');
+      if(prod && !isNaN(+prod)){
+        lotActif().prodReelle = +prod;
+        saveLots();
+        setSyncStatus('ok', 1);
+      }
+    }
+  } catch(e){
+    setSyncStatus('error');
+    // Fallback : saisie manuelle
+    const prod = prompt(`Erreur sync. Saisissez manuellement la production réelle (L/j) du lot "${lotActif().nom}" :`);
+    if(prod && !isNaN(+prod)){
+      lotActif().prodReelle = +prod;
+      saveLots();
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════
+// SUIVI DE PRODUCTION
+// ══════════════════════════════════════════════════
+// Structure : { lotId, date (YYYY-MM-DD), matin, soir, total, source }
+let productionLog = JSON.parse(localStorage.getItem('cap3_prod')||'[]');
+function saveProd(){ localStorage.setItem('cap3_prod', JSON.stringify(productionLog)); }
+
+function ajouterProduction(lotId, date, matin, soir, source='manuel'){
+  const total = (+matin||0) + (+soir||0);
+  // Mettre à jour si entrée existante pour ce lot+date
+  const idx = productionLog.findIndex(e=>e.lotId===lotId && e.date===date);
+  if(idx>=0) productionLog[idx] = {lotId,date,matin:+matin||0,soir:+soir||0,total,source};
+  else productionLog.push({lotId,date,matin:+matin||0,soir:+soir||0,total,source});
+  saveProd();
+}
+
+function supprimerProduction(lotId, date){
+  productionLog = productionLog.filter(e=>!(e.lotId===lotId&&e.date===date));
+  saveProd();
+  renderSuivi();
+}
+
+function getProductionLot(lotId){
+  return productionLog.filter(e=>e.lotId===lotId).sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+// ══════════════════════════════════════════════════
+// PAGE REFUS
+// ══════════════════════════════════════════════════
+let refusPCData = {}; // {date: {lotId: {kg, pct}}}
+let refusPCCharge = false;
+
+async function chargerRefusPC(){
+  if(!currentUser) return;
+  const uid = currentUser.uid;
+  refusPCData = {};
+  const dates = [];
+  for(let i=0;i<14;i++){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    dates.push(d.toISOString().split('T')[0]);
+  }
+  for(const date of dates){
+    try{
+      const snap = await getDoc(doc(db,`users/${uid}/capration/refus_${date}`));
+      if(snap.exists()) refusPCData[date] = snap.data()||{};
+    } catch(e){}
+  }
+  refusPCCharge = true;
+  renderRefusPC();
+}
+
+function statutRefus(pct){
+  const p=parseFloat(pct)||0;
+  if(p===0)  return {col:'#9e9e9e',bg:'#f5f5f5',label:'—'};
+  if(p<6)    return {col:'#c0392b',bg:'#fdecea',label:'Trop faible'};
+  if(p<=10)  return {col:'#27ae60',bg:'#e8f5e9',label:'Optimal'};
+  if(p<=15)  return {col:'#d68910',bg:'#fff3e0',label:'Élevé'};
+  return      {col:'#c0392b',bg:'#fdecea',label:'Trop élevé'};
+}
+
+function barreRefus(pct, maxPct=20){
+  const p=Math.min(parseFloat(pct)||0, maxPct);
+  const w=Math.round(p/maxPct*100);
+  const {col}=statutRefus(pct);
+  // Bande cible 6-10%
+  const cib1=Math.round(6/maxPct*100), cib2=Math.round(10/maxPct*100);
+  return `<div style="position:relative;height:18px;background:#f3f4f6;border-radius:4px;overflow:hidden">
+    <div style="position:absolute;left:${cib1}%;width:${cib2-cib1}%;height:100%;background:#bbf7d0;opacity:.5"></div>
+    <div style="height:100%;width:${w}%;background:${col};border-radius:4px;transition:width .3s"></div>
+    <span style="position:absolute;right:4px;top:0;font-size:10px;line-height:18px;color:#555;font-family:'DM Mono',monospace;font-weight:600">${p>0?p.toFixed(1)+'%':'—'}</span>
+  </div>`;
+}
+
+function sparklinePC(histo, lotId){
+  const dates = Object.keys(histo).sort().slice(-14);
+  if(!dates.length) return '<span style="color:var(--gris);font-size:.75rem">Pas de données</span>';
+  const maxH=60, maxPct=20, barW=18, gap=4;
+  const totalW = dates.length*(barW+gap);
+  const bars = dates.map((date,i)=>{
+    const d = histo[date]?.[lotId];
+    const pct = parseFloat(d?.pct)||0;
+    const h = Math.max(pct/maxPct*maxH, pct>0?2:0);
+    const {col} = statutRefus(pct);
+    const label = date.slice(5); // MM-DD
+    return `<g transform="translate(${i*(barW+gap)},0)">
+      <rect x="0" y="${maxH-h}" width="${barW}" height="${h}" fill="${col}" rx="2"/>
+      <text x="${barW/2}" y="${maxH+12}" text-anchor="middle" font-size="7" fill="#9ca3af">${label}</text>
+      ${pct>0?`<text x="${barW/2}" y="${maxH-h-3}" text-anchor="middle" font-size="7" fill="${col}" font-weight="600">${pct.toFixed(0)}</text>`:''}
+    </g>`;
+  }).join('');
+  // Bande cible
+  const y1=maxH-6/maxPct*maxH, y2=maxH-10/maxPct*maxH;
+  return `<svg viewBox="0 0 ${totalW} ${maxH+16}" style="width:100%;max-width:${totalW}px;overflow:visible">
+    <rect x="0" y="${y2}" width="${totalW}" height="${y1-y2}" fill="#bbf7d0" opacity=".4" rx="2"/>
+    ${bars}
+  </svg>`;
+}
+
+function renderRefusPC(){
+  const el = document.getElementById('page-refus');
+  if(!el) return;
+
+  if(!refusPCCharge){
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--gris)"><div style="font-size:2rem">⏳</div><div style="margin-top:.5rem">Chargement des refus…</div></div>';
+    chargerRefusPC();
+    return;
+  }
+
+  const lotsDisp = lots.filter(l=>{
+    const items = Object.keys(l.ration||{}).filter(id=>(l.ration[id]||0)>0);
+    return items.length>0;
+  });
+
+  // Dates disponibles triées décroissant
+  const dates = Object.keys(refusPCData).sort().reverse();
+  const today = new Date().toISOString().split('T')[0];
+
+  if(!dates.length){
+    el.innerHTML = `<div class="card" style="padding:2rem;text-align:center;color:var(--gris)">
+      <div style="font-size:2.5rem;margin-bottom:.5rem">📋</div>
+      <div style="font-weight:600;margin-bottom:.3rem">Aucun refus enregistré</div>
+      <div style="font-size:.82rem">Les refus se saisissent depuis l'appli mobile CAPRation.</div>
+    </div>`;
+    return;
+  }
+
+  // Résumé du jour
+  const todayData = refusPCData[today]||{};
+  const resumeJour = lotsDisp.map(lot=>{
+    const r = todayData[lot.id];
+    const pct = r?.pct??null;
+    const kg  = r?.kg??null;
+    const totalRation = Object.entries(lot.ration||{}).reduce((s,[id,qte])=>{
+      return s + (qte||0);
+    },0) * (lot.params?.nb||0);
+    const {col,bg,label} = statutRefus(pct);
+    return `<div style="background:${bg};border-radius:10px;padding:.8rem 1rem;border:1px solid ${col}30">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+        <span style="font-weight:700;font-size:.9rem">${lot.nom}</span>
+        <span style="font-size:.7rem;background:${col};color:#fff;border-radius:4px;padding:1px 7px;font-weight:600">${label}</span>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:800;color:${col};margin-bottom:.4rem">
+        ${pct!=null?parseFloat(pct).toFixed(1)+'%':'—'}
+        ${kg!=null?`<span style="font-size:.8rem;font-weight:400;color:var(--gris)"> (${parseFloat(kg).toFixed(1)} kg)</span>`:''}
+      </div>
+      ${pct!=null?barreRefus(pct):'<div style="font-size:.72rem;color:var(--gris)">Non saisi aujourd\'hui</div>'}
+    </div>`;
+  }).join('');
+
+  // Tableau historique
+  const lignes = dates.slice(0,14).map(date=>{
+    const isToday = date===today;
+    const dayLabel = isToday ? 'Aujourd\'hui' : new Date(date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+    const cells = lotsDisp.map(lot=>{
+      const r = (refusPCData[date]||{})[lot.id];
+      const pct = r?.pct??null;
+      const kg  = r?.kg??null;
+      const {col,bg} = statutRefus(pct);
+      return `<td style="text-align:center;padding:.4rem .5rem">
+        ${pct!=null?`<div style="background:${bg};border-radius:6px;padding:3px 8px;display:inline-block">
+          <span style="font-family:'DM Mono',monospace;font-size:.85rem;font-weight:700;color:${col}">${parseFloat(pct).toFixed(1)}%</span>
+          <span style="font-size:.65rem;color:var(--gris);display:block;margin-top:-1px">${parseFloat(kg||0).toFixed(1)} kg</span>
+        </div>`:'<span style="color:#d1d5db;font-size:.8rem">—</span>'}
+      </td>`;
+    }).join('');
+    return `<tr style="${isToday?'background:#fffbeb;font-weight:600':''}">
+      <td style="padding:.4rem .6rem;font-size:.82rem;white-space:nowrap;color:${isToday?'var(--brun)':'var(--txt)'}">${dayLabel}</td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin-bottom:1rem">
+      ${resumeJour}
+    </div>
+
+    ${lotsDisp.map(lot=>`
+    <div class="card" style="margin-bottom:.75rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+        <div class="ct" style="margin:0">📊 ${lot.nom} — Historique 14 jours</div>
+        ${(()=>{
+          const pcts=dates.map(d=>parseFloat((refusPCData[d]||{})[lot.id]?.pct)||0).filter(p=>p>0);
+          const moy=pcts.length?(pcts.reduce((a,b)=>a+b,0)/pcts.length).toFixed(1):null;
+          const {col,label}=statutRefus(moy);
+          return moy?`<span style="font-size:.75rem;font-weight:600;color:${col}">Moy. ${moy}% — ${label}</span>`:'';
+        })()}
+      </div>
+      <div style="margin-bottom:.5rem">${sparklinePC(refusPCData, lot.id)}</div>
+      <div style="display:flex;gap:.75rem;font-size:.68rem;color:var(--gris)">
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:#c0392b;border-radius:2px;display:inline-block"></span>&lt;6% trop faible</span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:#27ae60;border-radius:2px;display:inline-block"></span>6-10% optimal</span>
+        <span style="display:flex;align-items:center;gap:3px"><span style="width:10px;height:10px;background:#d68910;border-radius:2px;display:inline-block"></span>&gt;10% élevé</span>
+      </div>
+    </div>`).join('')}
+
+    <div class="card">
+      <div class="ct">📅 Tableau récapitulatif</div>
+      <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:.78rem">
+        <thead><tr style="background:#f9fafb">
+          <th style="padding:.4rem .6rem;text-align:left;font-size:.68rem;color:var(--gris);border-bottom:2px solid var(--bord)">Date</th>
+          ${lotsDisp.map(lot=>`<th style="padding:.4rem .5rem;text-align:center;font-size:.68rem;color:var(--gris);border-bottom:2px solid var(--bord)">${lot.nom}</th>`).join('')}
+        </tr></thead>
+        <tbody>${lignes}</tbody>
+      </table></div>
+      <div style="margin-top:.5rem;font-size:.7rem;color:var(--gris)">Données saisies depuis l'appli mobile CAPRation · <button onclick="refusPCCharge=false;renderRefusPC()" class="btn btn-sm" style="font-size:.68rem;padding:2px 7px">🔄 Actualiser</button></div>
+    </div>`;
+}
+
+function renderSuivi(){
+  if(!B.uflFinal) calculer();
+  const today = new Date().toISOString().split('T')[0];
+
+  let html = `
+  <div class="two-col" style="gap:1rem;align-items:start">
+
+    <!-- COLONNE GAUCHE : saisie -->
+    <div>
+      <div class="card">
+        <div class="ct">🥛 Saisie de production</div>
+
+        <!-- Saisie par lot -->
+        <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--gris);letter-spacing:.06em;margin-bottom:.5rem">Par lot</div>
+        <div class="fg" style="margin-bottom:.7rem">
+          <div class="fgr">
+            <label>Lot</label>
+            <select id="suivi-lot" onchange="majHistoriqueSuivi()">
+              ${lots.map(l=>`<option value="${l.id}" ${l.id===lotActifId?'selected':''}>${l.nom} (${l.params?.nb||0} ch.)</option>`).join('')}
+            </select>
+          </div>
+          <div class="fgr">
+            <label>Date</label>
+            <input type="date" id="suivi-date" value="${today}">
+          </div>
+          <div class="fgr">
+            <label>Traite matin (L)</label>
+            <input type="number" id="suivi-matin" placeholder="0" min="0" step="0.1">
+          </div>
+          <div class="fgr">
+            <label>Traite soir (L)</label>
+            <input type="number" id="suivi-soir" placeholder="0" min="0" step="0.1">
+          </div>
+        </div>
+        <button class="btn btn-p btn-sm" onclick="saisirProductionLot()">Enregistrer</button>
+
+        <div class="div" style="margin:.8rem 0"></div>
+
+        <!-- Saisie globale troupeau -->
+        <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--gris);letter-spacing:.06em;margin-bottom:.5rem">Global troupeau</div>
+        <div style="font-size:11px;color:var(--gris);margin-bottom:.5rem;padding:.35rem .6rem;background:#f8f9f5;border-radius:6px">
+          Répartition automatique sur les lots chèvres en lactation :
+          <b style="color:var(--vert-f)">
+            ${lots.filter(l=>l.typeAnimal==='chevre'&&['lac_debut','lac_pleine','lac_fin'].includes(l.params?.stade)&&(l.params?.nb||0)>0)
+              .map(l=>`${l.nom} (${l.params.nb})`).join(', ') || 'Aucun lot laitier trouvé'}
+          </b>
+        </div>
+        <div class="fg" style="margin-bottom:.7rem">
+          <div class="fgr">
+            <label>Date</label>
+            <input type="date" id="suivi-date-g" value="${today}">
+          </div>
+          <div class="fgr">
+            <label>Total matin (L)</label>
+            <input type="number" id="suivi-matin-g" placeholder="0" min="0" step="1">
+          </div>
+          <div class="fgr">
+            <label>Total soir (L)</label>
+            <input type="number" id="suivi-soir-g" placeholder="0" min="0" step="1">
+          </div>
+        </div>
+        <button class="btn btn-s btn-sm" onclick="saisirProductionGlobal()">Enregistrer global</button>
+      </div>
+
+      <!-- Historique lot sélectionné -->
+      <div class="card" style="margin-top:.8rem">
+        <div class="ct">📋 Historique — <span id="suivi-historique-nom">${lots.find(l=>l.id===lotActifId)?.nom||''}</span>
+          <span style="margin-left:auto;font-size:11px;color:var(--gris);font-weight:400">depuis le début de la ration</span>
+        </div>
+        <div id="suivi-historique-content">${renderHistoriqueLot(lotActifId)}</div>
+      </div>
+    </div>
+
+    <!-- COLONNE DROITE : analyse -->
+    <div>
+      ${renderAnalyseProduction()}
+    </div>
+
+  </div>`;
+
+  document.getElementById('suivi-content').innerHTML = html;
+}
+
+function majHistoriqueSuivi(){
+  const lotId = +document.getElementById('suivi-lot')?.value;
+  const lot = lots.find(l=>l.id===lotId);
+  const nom = document.getElementById('suivi-historique-nom');
+  const content = document.getElementById('suivi-historique-content');
+  if(nom) nom.textContent = lot?.nom||'';
+  if(content) content.innerHTML = renderHistoriqueLot(lotId);
+}
+
+function saisirProductionLot(){
+  const lotId = +document.getElementById('suivi-lot').value;
+  const date  = document.getElementById('suivi-date').value;
+  const matin = document.getElementById('suivi-matin').value;
+  const soir  = document.getElementById('suivi-soir').value;
+  if(!date||(!matin&&!soir)){ alert('Saisissez au moins une valeur.'); return; }
+  ajouterProduction(lotId, date, matin, soir);
+  document.getElementById('suivi-matin').value='';
+  document.getElementById('suivi-soir').value='';
+  majHistoriqueSuivi();
+  // Rafraîchir l'analyse à droite
+  const analyse = document.querySelector('#suivi-content .two-col > div:last-child');
+  if(analyse) analyse.innerHTML = renderAnalyseProduction();
+}
+
+function saisirProductionGlobal(){
+  const date  = document.getElementById('suivi-date-g').value;
+  const matin = +document.getElementById('suivi-matin-g').value||0;
+  const soir  = +document.getElementById('suivi-soir-g').value||0;
+  if(!date||(matin+soir)<=0){ alert('Saisissez au moins une valeur.'); return; }
+
+  // Répartir uniquement sur les lots de chèvres en lactation
+  const STADES_LAIT = ['lac_debut','lac_pleine','lac_fin'];
+  const lotsLait = lots.filter(l=>
+    l.typeAnimal==='chevre' &&
+    STADES_LAIT.includes(l.params?.stade) &&
+    (l.params?.nb||0)>0
+  );
+
+  if(!lotsLait.length){
+    alert('Aucun lot de chèvres en lactation trouvé.\nVérifiez les paramètres (type=Chèvre, stade=Lactation).');
+    return;
+  }
+
+  const nbTotal = lotsLait.reduce((s,l)=>s+(l.params?.nb||0),0);
+  lotsLait.forEach(l=>{
+    const ratio = (l.params.nb||0)/nbTotal;
+    const nb = l.params.nb||1;
+    ajouterProduction(l.id, date, (matin*ratio/nb).toFixed(2), (soir*ratio/nb).toFixed(2), 'global');
+  });
+
+  document.getElementById('suivi-matin-g').value='';
+  document.getElementById('suivi-soir-g').value='';
+
+  const lotsNoms = lotsLait.map(l=>l.nom).join(', ');
+  renderSuivi();
+  // Petit feedback
+  const msg = document.createElement('div');
+  msg.style.cssText='position:fixed;bottom:1rem;right:1rem;background:var(--vert-f);color:#fff;padding:.6rem 1rem;border-radius:8px;font-size:12px;z-index:999';
+  msg.textContent=`✅ Réparti sur ${lotsLait.length} lot(s) laitier(s) : ${lotsNoms}`;
+  document.body.appendChild(msg);
+  setTimeout(()=>msg.remove(), 3500);
+}
+
+function renderHistoriqueLot(lotId){
+  const entries = getProductionLot(lotId).slice(-14).reverse(); // 14 derniers jours
+  if(!entries.length) return `<div class="empty" style="padding:1rem">Aucune donnée enregistrée.</div>`;
+
+  return `<div class="tw"><table>
+    <thead><tr>
+      <th>Date</th><th style="text-align:right">Matin L</th><th style="text-align:right">Soir L</th>
+      <th style="text-align:right;color:var(--vert-f)">Total L/j</th>
+      <th style="text-align:right">L/ch./j</th><th>Source</th><th></th>
+    </tr></thead>
+    <tbody>
+      ${entries.map(e=>{
+        const lot = lots.find(l=>l.id===e.lotId);
+        const nb  = lot?.params?.nb||1;
+        const pch = (e.total/nb).toFixed(2);
+        const ap  = calcApForLot(lot);
+        const permise = ap?.prodPermise||0;
+        const col = permise>0 ? (e.total/nb>=permise*0.95?'var(--vert-f)':e.total/nb>=permise*0.80?'#d68910':'#c0392b') : 'var(--gris)';
+        return `<tr>
+          <td style="font-family:'DM Mono',monospace;font-size:11px">${e.date}</td>
+          <td style="text-align:right;font-family:'DM Mono',monospace">${e.matin||'—'}</td>
+          <td style="text-align:right;font-family:'DM Mono',monospace">${e.soir||'—'}</td>
+          <td style="text-align:right;font-family:'DM Mono',monospace;font-weight:700;color:var(--vert-f)">${e.total.toFixed(1)}</td>
+          <td style="text-align:right;font-family:'DM Mono',monospace;color:${col};font-weight:600">${pch}</td>
+          <td style="font-size:10px;color:var(--gris)">${e.source==='capriscan'?'📱 CS':e.source==='global'?'🌐 global':'✏️'}</td>
+          <td><button onclick="supprimerProduction(${e.lotId},'${e.date}')" class="btn btn-d btn-sm" style="padding:1px 5px;font-size:10px">✕</button></td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+function calcApForLot(lot){
+  if(!lot) return null;
+  const al = allAliments();
+  const r = lot.ration||{};
+  let ms=0,ufl=0,pdin=0,pdie=0,uel=0,ami=0,msConc=0,msFourr=0;
+  Object.entries(r).forEach(([sid,qte])=>{
+    const a=al.find(x=>x.id===+sid); if(!a||!qte) return;
+    const msA=qte*(a.ms||0)/100;
+    ms+=msA; ufl+=msA*(a.ufl||0); pdin+=msA*(a.pdin||0); pdie+=msA*(a.pdie||0); uel+=msA*getUEL(a);
+    ami+=msA*(a.ami||0);
+    if(['Foin','Ensilage','Enrubannage','Herbe','Paille'].includes(a.cat)) msFourr+=msA;
+    else if(a.cat!=='Autre') msConc+=msA;
+  });
+  if(!ufl) return null;
+  // Utiliser les params du lot pour calculer production permise
+  const p=lot.params||{};
+  const pv=p.poids||75, p75=Math.pow(pv,.75);
+  const kAE=[1,.8,.7][p.paratb||0], kAP=[1,.75,.65][p.paratb||0];
+  const kMaj=[1,1.15,1.25][p.paratb||0], kCAEV=[1,.8,.65,.6][p.caev||0];
+  const prodUFL  = ((ufl*kAE - 0.0365*p75*kMaj)/0.41)*kCAEV;
+  const prodPDIN = ((pdin*kAP - 2.5*p75*kMaj)/47)*kCAEV;
+  const prodPDIE = ((pdie*kAP - 2.5*p75*kMaj)/42)*kCAEV;
+  const prodPermise = Math.max(0,Math.min(prodUFL,prodPDIN,prodPDIE));
+  return {ufl,pdin,pdie,uel,ms,prodUFL,prodPDIN,prodPDIE,prodPermise};
+}
+
+function renderAnalyseProduction(){
+  // Analyse tous les lots avec données
+  const lotsAvecDonnees = lots.filter(l=>getProductionLot(l.id).length>0);
+  if(!lotsAvecDonnees.length){
+    return `<div class="card"><div class="ct">📊 Analyse</div>
+      <div class="empty">Aucune donnée de production enregistrée.<br>Saisissez la production journalière à gauche.</div>
+    </div>`;
+  }
+
+  let html = '';
+  lotsAvecDonnees.forEach(lot=>{
+    const entries = getProductionLot(lot.id);
+    const nb = lot.params?.nb||1;
+    const ap = calcApForLot(lot);
+    const permise = ap?.prodPermise||0;
+
+    // Moyennes
+    const moyTotal = entries.reduce((s,e)=>s+e.total,0)/entries.length;
+    const moyPch   = moyTotal/nb;
+    const derniere = entries[entries.length-1];
+    const efficacite = permise>0 ? moyPch/permise*100 : null;
+
+    const col = permise>0 ? (moyPch>=permise*0.95?'var(--vert-f)':moyPch>=permise*0.80?'#d68910':'#c0392b') : 'var(--gris)';
+    const ico = permise>0 ? (moyPch>=permise*0.95?'✅':moyPch>=permise*0.80?'⚠️':'❌') : '—';
+
+    html += `<div class="card" style="margin-bottom:.8rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem">
+        <div>
+          <div style="font-family:'Lora',serif;font-size:1rem;font-weight:600;color:var(--vert-f)">${lot.nom}</div>
+          <div style="font-size:11px;color:var(--gris)">${nb} ch. · ${entries.length} jour${entries.length>1?'s':''} de données</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'DM Mono',monospace;font-size:1.6rem;font-weight:700;color:${col}">${moyPch.toFixed(2)}</div>
+          <div style="font-size:10px;color:var(--gris)">L/ch./j moy.</div>
+        </div>
+      </div>
+
+      <!-- Barre de comparaison -->
+      ${permise>0 ? `
+      <div style="margin-bottom:.6rem">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+          <span style="color:var(--gris)">Production réelle vs permise</span>
+          <span style="font-weight:600;color:${col}">${ico} ${efficacite?.toFixed(0)}% de la permise</span>
+        </div>
+        <div style="height:10px;background:var(--gris-c);border-radius:5px;overflow:hidden;position:relative">
+          <div style="height:100%;width:${Math.min(100,efficacite||0)}%;background:${col};border-radius:5px;transition:width .4s"></div>
+          <!-- Marque 100% = production permise -->
+          <div style="position:absolute;top:0;left:${Math.min(99,permise/Math.max(permise,moyPch)*100)}%;height:100%;width:2px;background:#2d6a4f;opacity:.6"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--gris);margin-top:2px">
+          <span>0</span>
+          <span style="color:var(--vert-f)">Permise : ${permise.toFixed(2)} L/j</span>
+        </div>
+      </div>` : ''}
+
+      <!-- KPIs -->
+      <div class="mg" style="grid-template-columns:repeat(4,1fr)">
+        <div class="mc"><div class="mv" style="font-size:1rem;color:${col}">${moyPch.toFixed(2)}</div><div class="ml">L/ch moy</div></div>
+        <div class="mc"><div class="mv" style="font-size:1rem">${permise>0?permise.toFixed(2):'—'}</div><div class="ml">L permise</div></div>
+        <div class="mc"><div class="mv" style="font-size:1rem">${(moyTotal).toFixed(0)}</div><div class="ml">L/j total</div></div>
+        <div class="mc"><div class="mv" style="font-size:1rem">${derniere?derniere.date.slice(5):'—'}</div><div class="ml">Dernier relevé</div></div>
+      </div>
+
+      <!-- Interprétation -->
+      ${permise>0 ? `<div class="al ${efficacite>=95?'al-ok':efficacite>=80?'al-w':'al-e'}" style="margin-top:.5rem;font-size:11.5px">
+        ${efficacite>=95
+          ? `✅ Production conforme — la ration couvre bien les besoins.`
+          : efficacite>=80
+          ? `⚠️ Production en dessous de la permise (${efficacite?.toFixed(0)}%) — vérifiez l'ingestion réelle ou ajustez la ration.`
+          : `❌ Écart important (${efficacite?.toFixed(0)}%) — ration insuffisante ou facteur externe (santé, stress, stade).`
+        }
+      </div>` : ''}
+    </div>`;
+  });
+
+  // Récap global
+  const totalEntries = productionLog;
+  if(totalEntries.length>0){
+    const dates = [...new Set(totalEntries.map(e=>e.date))].sort();
+    const prodParJour = dates.map(d=>({
+      date:d,
+      total: totalEntries.filter(e=>e.date===d).reduce((s,e)=>s+e.total,0)
+    }));
+    const moyGlobal = prodParJour.reduce((s,d)=>s+d.total,0)/prodParJour.length;
+    const nbTotalAnimaux = lots.reduce((s,l)=>s+(l.params?.nb||0),0);
+
+    html += `<div class="card" style="border:2px solid var(--vert-c)">
+      <div class="ct">🌐 Récap global troupeau</div>
+      <div class="mg" style="grid-template-columns:repeat(3,1fr)">
+        <div class="mc"><div class="mv">${moyGlobal.toFixed(0)}</div><div class="ml">L/j moy. troupeau</div></div>
+        <div class="mc"><div class="mv">${nbTotalAnimaux>0?(moyGlobal/nbTotalAnimaux).toFixed(2):'—'}</div><div class="ml">L/ch./j moy.</div></div>
+        <div class="mc"><div class="mv">${dates.length}</div><div class="ml">Jours de données</div></div>
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
+async function importerDepuisCapriScan(){
+  if(!_csUser){ alert('Connectez-vous d\'abord à CapriScan.'); return; }
+  setSyncStatus('sync');
+  try {
+    const snap = await window._csGetDocs(`users/${_csUser.uid}/sessions`);
+    if(snap.empty){ setSyncStatus('idle'); alert('Aucune session trouvée.'); return; }
+    let importes = 0;
+    snap.forEach(d=>{
+      const s=d.data();
+      if(!s.date) return;
+      const date = new Date(s.date).toISOString().split('T')[0];
+      // Associer au lot par csKey
+      lots.forEach(lot=>{
+        if(!lot.csKey) return;
+        const nb=lot.params?.nb||1;
+        // Chercher la production de ce lot dans la session
+        let prodLot=0;
+        if(s.animals){
+          Object.values(s.animals).forEach(a=>{
+            if(String(a.lot)===String(lot.csKey) && a.score)
+              prodLot += a.score; // si score = litres
+          });
+        }
+        if(prodLot>0){
+          const isMatinSession = s.name?.toLowerCase().includes('matin') || s.moment==='matin';
+          const matin = isMatinSession ? prodLot/nb : 0;
+          const soir  = !isMatinSession ? prodLot/nb : 0;
+          ajouterProduction(lot.id, date, matin, soir, 'capriscan');
+          importes++;
+        }
+      });
+    });
+    setSyncStatus('ok', importes);
+    if(importes>0) renderSuivi();
+    else alert('Aucune donnée de production trouvée dans les sessions CapriScan.');
+  } catch(e){
+    setSyncStatus('error');
+    alert('Erreur import : '+e.message);
+  }
+}
+
+// Mettre à jour renderSuivi au changement de lot
+function allerALaRation(lotId){
+  sauvegarderFormulaireDansLot();
+  lotActifId = lotId;
+  saveLots();
+  renderLotSelector();
+  chargerLotDansFormulaire();
+  calculer();
+  showPage('ration');
+}
+
+function renderDistrib(){
+  if(!B.uflFinal) calculer();
+
+  // Collecter tous les lots qui ont une ration
+  const lotsAvecRation = lots.filter(l => Object.keys(l.ration||{}).length > 0);
+
+  if(lotsAvecRation.length === 0){
+    document.getElementById('distrib-content').innerHTML =
+      `<div class="empty" style="margin-top:3rem">🪣<br>Aucun lot n'a de ration composée.<br>
+      <button class="btn btn-s" style="margin-top:.75rem" onclick="showPage('ration')">Composer une ration →</button></div>`;
+    return;
+  }
+
+  const al = allAliments();
+
+  // Construire le tableau par lot
+  let html = '';
+
+  lotsAvecRation.forEach(lot => {
+    const nb     = lot.params?.nb || 1;
+    const ration = lot.ration || {};
+    const items  = Object.entries(ration)
+      .map(([sid, qte]) => ({ aliment: al.find(a=>a.id===+sid), qte: +qte }))
+      .filter(x => x.aliment && x.qte > 0)
+      .sort((a,b) => {
+        // Fourrages d'abord, concentrés ensuite
+        const ordre = {Foin:0,Enrubannage:1,Ensilage:2,Herbe:3,Paille:4,Concentré:5,'Aliment composé':6,Autre:7};
+        return (ordre[a.aliment.cat]??9) - (ordre[b.aliment.cat]??9);
+      });
+
+    if(!items.length) return;
+
+    // Totaux lot
+    const totalBrut = items.reduce((s,x) => s + x.qte, 0);
+    const totalBrutLot = totalBrut * nb;
+    const coutJour = items.reduce((s,x) => s + x.qte*(x.aliment.prix||0)/1000, 0);
+
+    html += `
+    <div class="card distrib-card" style="margin-bottom:1.2rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:2px solid var(--vert-p)">
+        <div>
+          <div style="font-family:'Lora',serif;font-size:1.05rem;font-weight:600;color:var(--vert-f)">${lot.nom}</div>
+          <div style="font-size:11.5px;color:var(--gris);margin-top:2px">
+            ${nb} animal${nb>1?'s':''} · ${totalBrut.toFixed(2)} kg/tête/j · ${totalBrutLot.toFixed(0)} kg total/j
+            ${coutJour>0 ? ` · <b style="color:var(--vert-f)">${(coutJour*nb).toFixed(0)} €/j</b>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.8rem">
+          <button onclick="allerALaRation(${lot.id})" class="btn btn-s btn-sm" title="Modifier la ration de ce lot">✏️ Modifier la ration</button>
+          <div style="font-family:'DM Mono',monospace;font-size:1.6rem;font-weight:500;color:var(--vert-f)">${nb}<span style="font-size:.8rem;color:var(--gris);margin-left:4px">têtes</span></div>
+        </div>
+      </div>
+
+      <div class="tw">
+        <table>
+          <thead><tr>
+            <th>Aliment</th>
+            <th>Catégorie</th>
+            <th style="text-align:right">kg/tête/j</th>
+            <th style="text-align:right;color:var(--vert-f)">Total lot (kg/j)</th>
+            <th style="text-align:right">kg MS/tête</th>
+            <th style="text-align:right">kg MS total</th>
+            ${coutJour>0?'<th style="text-align:right">€/j lot</th>':''}
+          </tr></thead>
+          <tbody>
+            ${items.map(({aliment:a, qte}) => {
+              const msT  = qte*(a.ms||0)/100;
+              const qteLot = qte*nb;
+              const msTot  = msT*nb;
+              const cout   = a.prix ? (qte*a.prix/1000*nb).toFixed(2) : '—';
+              return `<tr>
+                <td style="font-weight:500">${a.nom}</td>
+                <td><span class="badge ${catBadge(a.cat)}">${a.cat}</span></td>
+                <td style="text-align:right;font-family:'DM Mono',monospace">${qte.toFixed(2)}</td>
+                <td style="text-align:right;font-family:'DM Mono',monospace;font-weight:700;color:var(--vert-f);font-size:1.05em">${qteLot.toFixed(1)}</td>
+                <td style="text-align:right;font-family:'DM Mono',monospace;color:var(--gris)">${msT.toFixed(2)}</td>
+                <td style="text-align:right;font-family:'DM Mono',monospace;color:var(--gris)">${msTot.toFixed(1)}</td>
+                ${coutJour>0?`<td style="text-align:right;font-family:'DM Mono',monospace">${cout}</td>`:''}
+              </tr>`;
+            }).join('')}
+          </tbody>
+          <tfoot><tr style="background:var(--vert-p);font-weight:700">
+            <td colspan="2">TOTAL</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">${totalBrut.toFixed(2)}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;font-size:1.05em">${totalBrutLot.toFixed(1)}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">${items.reduce((s,x)=>s+x.qte*(x.aliment.ms||0)/100,0).toFixed(2)}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">${(items.reduce((s,x)=>s+x.qte*(x.aliment.ms||0)/100,0)*nb).toFixed(1)}</td>
+            ${coutJour>0?`<td style="text-align:right;font-family:'DM Mono',monospace">${(coutJour*nb).toFixed(2)}</td>`:''}
+          </tfoot>
+        </table>
+      </div>
+    </div>`;
+  });
+
+  // Récapitulatif global tous lots
+  const totalTetes = lotsAvecRation.reduce((s,l)=>s+(l.params?.nb||0),0);
+  const lignesGlobales = construireRecapGlobal(lotsAvecRation, al);
+
+  html += `
+  <div class="card" style="border:2px solid var(--vert-c)">
+    <div class="ct">📦 Récapitulatif global — tous lots</div>
+    <div style="font-size:12px;color:var(--gris);margin-bottom:.8rem">${lotsAvecRation.length} lot${lotsAvecRation.length>1?'s':''} · ${totalTetes} têtes au total</div>
+    <div class="tw"><table>
+      <thead><tr>
+        <th>Aliment</th>
+        <th>Catégorie</th>
+        <th style="text-align:right;color:var(--vert-f)">Total tous lots (kg/j)</th>
+        <th style="text-align:right">kg MS total</th>
+      </tr></thead>
+      <tbody>
+        ${lignesGlobales.map(({nom,cat,qteTot,msTot})=>`
+        <tr>
+          <td style="font-weight:500">${nom}</td>
+          <td><span class="badge ${catBadge(cat)}">${cat}</span></td>
+          <td style="text-align:right;font-family:'DM Mono',monospace;font-weight:700;color:var(--vert-f);font-size:1.05em">${qteTot.toFixed(1)}</td>
+          <td style="text-align:right;font-family:'DM Mono',monospace;color:var(--gris)">${msTot.toFixed(1)}</td>
+        </tr>`).join('')}
+      </tbody>
+      <tfoot><tr style="background:var(--vert-p);font-weight:700">
+        <td colspan="2">TOTAL</td>
+        <td style="text-align:right;font-family:'DM Mono',monospace">${lignesGlobales.reduce((s,x)=>s+x.qteTot,0).toFixed(1)} kg</td>
+        <td style="text-align:right;font-family:'DM Mono',monospace">${lignesGlobales.reduce((s,x)=>s+x.msTot,0).toFixed(1)} kg MS</td>
+      </tfoot>
+    </table></div>
+  </div>`;
+
+  document.getElementById('distrib-content').innerHTML = html;
+}
+
+function construireRecapGlobal(lotsAvecRation, al){
+  const totaux = {}; // {alimId: {nom, cat, qteTot, msTot}}
+  lotsAvecRation.forEach(lot => {
+    const nb = lot.params?.nb || 1;
+    Object.entries(lot.ration||{}).forEach(([sid, qte]) => {
+      const a = al.find(x=>x.id===+sid);
+      if(!a || !qte) return;
+      if(!totaux[sid]) totaux[sid] = {nom:a.nom, cat:a.cat, qteTot:0, msTot:0};
+      totaux[sid].qteTot += qte*nb;
+      totaux[sid].msTot  += qte*(a.ms||0)/100*nb;
+    });
+  });
+  return Object.values(totaux).sort((a,b)=>{
+    const ordre={Foin:0,Enrubannage:1,Ensilage:2,Herbe:3,Paille:4,Concentré:5,'Aliment composé':6,Autre:7};
+    return (ordre[a.cat]??9)-(ordre[b.cat]??9);
+  });
+}
+
+function imprimerDistrib(){
+  window.print();
+}
+
+// PAGE ALIMENTS
+// ══════════════════════════════════════════════════
+function catBadge(c){
+  return {Concentré:'bb','Aliment composé':'bo',Ensilage:'bg',Enrubannage:'bg',Foin:'bg',Herbe:'bg',Paille:'ba',Autre:'bm'}[c]||'ba';
+}
+
+function renderCatTabs(){
+  document.getElementById('cat-tabs').innerHTML=CATS.map(c=>
+    `<button class="cat-tab ${c===catFilter?'active':''}" onclick="setCat('${c}')">${c}</button>`
+  ).join('');
+}
+
+function setCat(c){ catFilter=c; renderCatTabs(); renderAliments(); }
+
+function renderAliments(){
+  renderCatTabs();
+  const q=(document.getElementById('al-search').value||'').toLowerCase();
+  const al=allAliments().filter(a=>{
+    const catOk=catFilter==='Tous'||a.cat===catFilter;
+    const qOk=!q||a.nom.toLowerCase().includes(q);
+    const masqueOk=!alimentsMasques.includes(a.id);
+    return catOk&&qOk&&masqueOk;
+  });
+
+  document.getElementById('al-tbody').innerHTML=al.map(a=>{
+    // Afficher/masquer le bouton réafficher
+    const btnMasques = document.getElementById('btn-masques');
+    if(btnMasques) btnMasques.style.display = alimentsMasques.length ? '' : 'none';
+    const inR=getRation()[a.id]>0;
+    const isUser=userAliments.find(u=>u.id===a.id);
+    return `<tr>
+      <td style="font-weight:500">${a.nom}${isUser?'<span style="font-size:9px;color:var(--gris);margin-left:4px">[perso]</span>':''}</td>
+      <td><span class="badge ${catBadge(a.cat)}">${a.cat}</span></td>
+      <td>${a.ms??'—'}</td>
+      <td style="color:#1b5e20;font-weight:600">${a.ufl??'—'}</td>
+      <td style="color:#0d47a1;font-weight:600">${a.pdin??'—'}</td>
+      <td style="color:#4a148c;font-weight:600">${a.pdie??'—'}</td>
+      <td style="color:#bf360c;font-weight:600">${a.mat??'—'}</td>
+      <td style="color:#880e4f;font-weight:600">${a.uel??'—'}</td>
+      <td>${a.ami??'—'}</td>
+      <td>${a.ca??'—'}</td>
+      <td>${a.p??'—'}</td>
+      <td>${a.prix??'—'}</td>
+      <td>
+        <button onclick="toggleRation(${a.id})" class="btn btn-sm ${inR?'btn-p':'btn-s'}">
+          ${inR?'✓ Ration':'+ Ajouter'}
+        </button>
+      </td>
+      <td style="display:flex;gap:3px">
+        <button onclick="ouvrirModification(${a.id})" class="btn btn-sm" title="Modifier" style="font-size:10px">✏️</button>
+        ${isUser
+          ? `<button onclick="supprimerAliment(${a.id})" class="btn btn-d btn-sm" title="Supprimer">🗑</button>`
+          : `<button onclick="masquerAliment(${a.id})" class="btn btn-sm btn-d" title="Masquer de la base" style="opacity:.5;font-size:10px">🚫</button>`
+        }
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleRation(id){
+  const r=getRation();
+  if(r[id]>0){ delete r[id]; }
+  else { r[id]=1.0; }
+  saveRation(); renderAliments();
+}
+let alimentsMasques = JSON.parse(localStorage.getItem('cap3_masques')||'[]');
+function saveMasques(){ localStorage.setItem('cap3_masques', JSON.stringify(alimentsMasques)); }
+
+function masquerAliment(id){
+  if(!confirm('Masquer cet aliment de la base ? Il ne sera plus visible mais reste dans les rations existantes.')) return;
+  if(!alimentsMasques.includes(id)) alimentsMasques.push(id);
+  saveMasques();
+  renderAliments();
+}
+
+function supprimerAliment(id){
+  if(!confirm('Supprimer ?')) return;
+  userAliments=userAliments.filter(x=>x.id!==id);
+  delete getRation()[id];
+  saveUser(); saveRation(); renderAliments();
+}
+function reinitMasques(){
+  alimentsMasques=[];
+  saveMasques();
+  renderAliments();
+}
+
+function ouvrirModification(id){
+  const a = allAliments().find(x=>x.id===id);
+  if(!a) return;
+  // Pré-remplir le formulaire
+  document.getElementById('al-edit-id').value  = id;
+  document.getElementById('al-nom').value  = a.nom||'';
+  document.getElementById('al-cat').value  = a.cat||'Foin';
+  document.getElementById('al-ms').value   = a.ms??'';
+  document.getElementById('al-ufl').value  = a.ufl??'';
+  document.getElementById('al-pdin').value = a.pdin??'';
+  document.getElementById('al-pdie').value = a.pdie??'';
+  document.getElementById('al-mat').value  = a.mat??'';
+  document.getElementById('al-uel').value  = a.uel??'';
+  document.getElementById('al-ami').value  = a.ami??'';
+  document.getElementById('al-ca').value   = a.ca??'';
+  document.getElementById('al-p').value    = a.p??'';
+  document.getElementById('al-prix').value = a.prix??'';
+  document.getElementById('al-submit-btn').textContent = '💾 Modifier';
+  // Ouvrir le formulaire et scroller dessus
+  const f = document.getElementById('add-form');
+  f.style.display = 'block';
+  f.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function soumettreAliment(){
+  const editId = +document.getElementById('al-edit-id').value||0;
+  const nom = document.getElementById('al-nom').value.trim();
+  if(!nom){ alert('Nom requis'); return; }
+  const vals = {
+    nom, cat:  document.getElementById('al-cat').value,
+    ms:   +document.getElementById('al-ms').value  ||null,
+    ufl:  +document.getElementById('al-ufl').value ||null,
+    pdin: +document.getElementById('al-pdin').value||null,
+    pdie: +document.getElementById('al-pdie').value||null,
+    mat:  +document.getElementById('al-mat').value ||null,
+    uel:  +document.getElementById('al-uel').value ||null,
+    ami:  +document.getElementById('al-ami').value ||null,
+    ca:   +document.getElementById('al-ca').value  ||null,
+    p:    +document.getElementById('al-p').value   ||null,
+    prix: +document.getElementById('al-prix').value||null,
+  };
+  if(editId){
+    // Modification : chercher dans userAliments d'abord
+    const idx = userAliments.findIndex(x=>x.id===editId);
+    if(idx>=0){
+      userAliments[idx] = {...userAliments[idx], ...vals};
+    } else {
+      // Aliment BASE : créer une version personnalisée qui surcharge
+      userAliments.push({id:editId, ...vals, _override:true});
+    }
+  } else {
+    // Nouvel aliment
+    userAliments.push({id:++nextId, ...vals});
+  }
+  saveUser();
+  // Réinitialiser
+  document.getElementById('al-edit-id').value = '';
+  document.getElementById('al-submit-btn').textContent = 'Enregistrer';
+  ['al-nom','al-ms','al-ufl','al-pdin','al-pdie','al-mat','al-uel','al-ami','al-ca','al-p','al-prix']
+    .forEach(i=>{ const el=document.getElementById(i); if(el) el.value=''; });
+  toggleAF();
+  renderAliments();
+}
+
+function toggleAF(){
+  const f=document.getElementById('add-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+}
+function ajouterAliment(){
+  const nom=document.getElementById('al-nom').value.trim();
+  if(!nom){alert('Nom requis');return;}
+  userAliments.push({
+    id:++nextId, nom, cat:document.getElementById('al-cat').value,
+    ms:   +document.getElementById('al-ms').value  ||null,
+    ufl:  +document.getElementById('al-ufl').value ||null,
+    pdin: +document.getElementById('al-pdin').value||null,
+    pdie: +document.getElementById('al-pdie').value||null,
+    mat:  +document.getElementById('al-mat').value ||null,
+    uel:  +document.getElementById('al-uel').value ||null,
+    ami:  +document.getElementById('al-ami').value ||null,
+    ca:   +document.getElementById('al-ca').value  ||null,
+    p:    +document.getElementById('al-p').value   ||null,
+    prix: +document.getElementById('al-prix').value||null,
+  });
+  saveUser(); toggleAF();
+  ['al-nom','al-ms','al-ufl','al-pdin','al-pdie','al-mat','al-uel','al-ami','al-ca','al-p','al-prix']
+    .forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  renderAliments();
+}
+
+// ══════════════════════════════════════════════════
+// DRAG & DROP — ORDRE RATION
+// ══════════════════════════════════════════════════
+let _dragId = null;
+
+function getRationOrdre(){
+  const lot = lotActif();
+  if(!lot.rationOrdre || !Array.isArray(lot.rationOrdre)) lot.rationOrdre = [];
+  return lot.rationOrdre;
+}
+
+function itemsOrdonnes(ration, al){
+  const ordre = getRationOrdre();
+  const ids = Object.keys(ration).map(Number).filter(id=>ration[id]>0);
+  const ordonnes = ordre.filter(id=>ids.includes(id));
+  const nouveaux = ids.filter(id=>!ordonnes.includes(id));
+  return [...ordonnes, ...nouveaux].map(id=>al.find(a=>a.id===id)).filter(Boolean);
+}
+
+function dragStart(e){
+  _dragId = +e.currentTarget.dataset.id;
+  e.currentTarget.style.opacity = '.4';
+  e.dataTransfer.effectAllowed = 'move';
+}
+function dragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('.rrow').forEach(r=>r.classList.remove('drag-over'));
+  e.currentTarget.classList.add('drag-over');
+}
+function dragDrop(e){
+  e.preventDefault();
+  const targetId = +e.currentTarget.dataset.id;
+  if(_dragId === targetId) return;
+  const ids = itemsOrdonnes(getRation(), allAliments()).map(a=>a.id);
+  const fromIdx = ids.indexOf(_dragId);
+  const toIdx   = ids.indexOf(targetId);
+  if(fromIdx===-1||toIdx===-1) return;
+  ids.splice(fromIdx,1);
+  ids.splice(toIdx,0,_dragId);
+  lotActif().rationOrdre = ids;
+  saveLots();
+  renderRation();
+}
+function dragEnd(e){
+  e.currentTarget.style.opacity = '';
+  document.querySelectorAll('.rrow').forEach(r=>r.classList.remove('drag-over'));
+  _dragId = null;
+}
+
+// ══════════════════════════════════════════════════
+// MULTI-SÉLECTION LOTS POUR LA RATION
+// ══════════════════════════════════════════════════
+let lotsRationIds = []; // vide = seulement le lot actif
+
+function ouvrirMultiSelect(){
+  const ration = getRation();
+  const html = lots.map(l=>{
+    const nb = l.params?.nb||0;
+    const checked = lotsRationIds.includes(l.id) || l.id===lotActifId;
+    const isActif = l.id===lotActifId;
+    return `<label style="display:flex;align-items:center;gap:8px;padding:.5rem .7rem;border:1px solid var(--bord);border-radius:7px;cursor:pointer;background:${isActif?'var(--vert-p)':'#fff'}">
+      <input type="checkbox" name="ms-lot" value="${l.id}" ${checked?'checked':''} ${isActif?'disabled':''} style="accent-color:var(--vert-f)">
+      <span style="font-size:13px;font-weight:500;color:var(--vert-f)">${l.nom}</span>
+      ${isActif?'<span style="font-size:10px;color:var(--vert-f);font-style:italic">(lot de référence)</span>':''}
+      <span style="margin-left:auto;font-family:\'DM Mono\',monospace;font-size:11px;background:${nb>0?'var(--vert-p)':'var(--gris-c)'};color:${nb>0?'var(--vert-f)':'var(--gris)'};padding:2px 8px;border-radius:20px">${nb>0?nb+' ch.':'—'}</span>
+    </label>`;
+  }).join('');
+  document.getElementById('ms-liste').innerHTML = html;
+  document.getElementById('ms-overlay').style.display = 'flex';
+}
+
+function fermerMultiSelect(){
+  document.getElementById('ms-overlay').style.display = 'none';
+}
+
+function confirmerMultiSelect(){
+  const cases = [...document.querySelectorAll('input[name="ms-lot"]:checked:not(:disabled)')];
+  lotsRationIds = [lotActifId, ...cases.map(c=>+c.value).filter(id=>id!==lotActifId)];
+  fermerMultiSelect();
+  renderRation();
+}
+
+function reinitMultiSelect(){
+  lotsRationIds = [];
+  renderRation();
+}
+
+function renderBandeauLots(){
+  const ids = lotsRationIds.length ? lotsRationIds : [lotActifId];
+  const bandeau = document.getElementById('ration-lots-actifs');
+  const tags    = document.getElementById('ration-lots-tags');
+  if(ids.length <= 1){
+    bandeau.style.display = 'none';
+    return;
+  }
+  bandeau.style.display = 'flex';
+  tags.innerHTML = ids.map(id=>{
+    const l = lots.find(x=>x.id===id);
+    if(!l) return '';
+    const nb = l.params?.nb||0;
+    return `<span style="background:#fff;border:1px solid var(--vert-c);border-radius:20px;padding:1px 9px;font-size:11.5px;font-weight:500">${l.nom}${nb?' · '+nb+' ch.':''}</span>`;
+  }).join('');
+}
+
+function renderBilanParLot(ap){
+  const ids = lotsRationIds.length > 1 ? lotsRationIds : [];
+  const el  = document.getElementById('bilan-perlot');
+  if(!ids.length || !ap.items.length){ el.style.display='none'; return; }
+
+  // Calculer la couverture pour chaque lot avec les mêmes aliments
+  const rows = ids.map(id=>{
+    const l = lots.find(x=>x.id===id);
+    if(!l) return '';
+    const nb = l.params?.nb||0;
+
+    // Recalculer B pour ce lot
+    const p = l.params||{};
+    const p75 = Math.pow(p.poids||75, .75);
+    const kMajP = [1,1.15,1.25][p.paratb||0];
+    const kAbsP = [1,.8,.65][p.paratb||0];
+    const kCAEV = [1,.85,.75,.6][p.caev||0];
+    const prod  = p.prod||0;
+    const tp    = p.tp||32;
+
+    const uflBes  = ((0.044*p75 + prod*(0.071*(p.tb||38)/1000+0.053*tp/1000+0.020))*kMajP)/kAbsP;
+    const pdinBes = ((2.5*p75*kMajP)+(prod*45*(tp/32)))/(kAbsP*kCAEV);
+    const pdieBes = ((2.8*p75*kMajP)+(prod*50*(tp/32)))/(kAbsP*kCAEV);
+
+    const rU = ap.ufl/uflBes*100, rD=ap.pdin/pdinBes*100, rE=ap.pdie/pdieBes*100;
+    const col = (v)=>v<85?'#c0392b':v>120?'#d68910':'#2d6a4f';
+    const ico = (v)=>v<85?'▼':v>120?'▲':'✓';
+
+    function mini(lbl,val,bes,pct){
+      const c=col(pct);
+      return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-family:'DM Mono',monospace">
+        <span style="font-weight:700;color:${c}">${ico(pct)}</span>
+        <span style="color:var(--gris)">${lbl}</span>
+        <span style="color:${c};font-weight:600">${Math.round(pct)}%</span>
+      </span>`;
+    }
+
+    return `<tr>
+      <td style="font-weight:600;color:var(--vert-f)">${l.nom}</td>
+      <td style="font-family:'DM Mono',monospace;text-align:right">${nb}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace">${(ap.ms*(nb||1)).toFixed(1)} kg</td>
+      <td>${mini('UFL',ap.ufl,uflBes,rU)}</td>
+      <td>${mini('PDIN',ap.pdin,pdinBes,rD)}</td>
+      <td>${mini('PDIE',ap.pdie,pdieBes,rE)}</td>
+      <td style="text-align:right;font-family:'DM Mono',monospace;color:var(--vert-f);font-weight:600">${(ap.prix*(nb||1)).toFixed(0)} €</td>
+    </tr>`;
+  }).join('');
+
+  const totalNb  = ids.reduce((s,id)=>{const l=lots.find(x=>x.id===id);return s+(l?.params?.nb||0);},0);
+  const totalMs  = ap.ms*totalNb;
+  const totalEur = ap.prix*totalNb;
+
+  el.innerHTML = `<div class="card">
+    <div class="ct">📊 Couverture par lot — ration commune</div>
+    <div class="tw"><table>
+      <thead><tr>
+        <th>Lot</th><th style="text-align:right">Têtes</th>
+        <th style="text-align:right">MS total/j</th>
+        <th>UFL</th><th>PDIN</th><th>PDIE</th>
+        <th style="text-align:right">Coût/j</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr style="background:var(--vert-p);font-weight:700">
+        <td>TOTAL</td>
+        <td style="text-align:right;font-family:'DM Mono',monospace">${totalNb}</td>
+        <td style="text-align:right;font-family:'DM Mono',monospace">${totalMs.toFixed(1)} kg</td>
+        <td colspan="3"></td>
+        <td style="text-align:right;font-family:'DM Mono',monospace;color:var(--vert-f)">${totalEur.toFixed(0)} €</td>
+      </tr></tfoot>
+    </table></div>
+  </div>`;
+  el.style.display = '';
+}
+// ══════════════════════════════════════════════════
+const CS_CONFIG = {
+  apiKey:            "AIzaSyCfnYILKnS9jF4vpxy9JZiNs9TZHfBtJzI",
+  authDomain:        "capriscan.firebaseapp.com",
+  projectId:         "capriscan",
+  storageBucket:     "capriscan.firebasestorage.app",
+  messagingSenderId: "928490915599",
+  appId:             "1:928490915599:web:6613db0af99ec2f2a7e07a"
+};
+
+let _csApp=null, _csAuth=null, _csDb=null, _csUser=null, _lotsImportes=null;
+
+async function initFirebase(){
+  if(_csApp) return;
+  const {initializeApp, getApps}                          = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const {getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  const {getFirestore, doc, getDoc, getDocs, collection}  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const apps = getApps();
+  _csApp  = apps.find(a=>a.name==='capration_cs') || initializeApp(CS_CONFIG, 'capration_cs');
+  _csAuth = getAuth(_csApp);
+  _csDb   = getFirestore(_csApp);
+  window._csSignIn  = (e,p) => signInWithEmailAndPassword(_csAuth,e,p);
+  window._csSignOut = ()    => signOut(_csAuth);
+  window._csGetDoc  = (path)=> getDoc(doc(_csDb,...path.split('/')));
+  window._csGetDocs = (path)=> getDocs(collection(_csDb,...path.split('/')));
+  // Restaurer session automatiquement
+  onAuthStateChanged(_csAuth, user => {
+    if(user){
+      _csUser = user;
+      afficherBadgeConnecte(user.email);
+      syncCapriScan({ silencieux: true });
+    }
+  });
+}
+
+// ── Sync silencieuse : met à jour noms + effectifs des lots existants ──────
+async function syncCapriScan({ silencieux=false } = {}){
+  if(!_csUser) return;
+  try {
+    setSyncStatus('sync');
+    const [snapLots, snapAnimaux] = await Promise.all([
+      window._csGetDoc(`users/${_csUser.uid}/data/lotNoms`),
+      window._csGetDocs(`users/${_csUser.uid}/animaux`)
+    ]);
+
+    if(!snapLots.exists() || !snapLots.data().noms){
+      setSyncStatus('idle'); return;
+    }
+
+    const noms = snapLots.data().noms; // { "1":"Lot 1 haut", ... }
+
+    // Compter animaux actifs par lot — lot peut être string ou number
+    const compteLot = {};
+    snapAnimaux.forEach(d => {
+      const a = d.data();
+      // statut actif = 'active', absence de statut, ou pas 'sortie'/'morte'
+      const actif = !a.statut || a.statut === 'active' || a.statut === 'Présente' || a.statut === 'Présent';
+      if(actif && a.lot !== undefined && a.lot !== null && a.lot !== ''){
+        const key = String(a.lot); // normaliser en string
+        compteLot[key] = (compteLot[key]||0) + 1;
+      }
+    });
+
+    console.log('[CAPRation] lotNoms:', noms, 'compteLot:', compteLot);
+
+    _lotsImportes = { noms, compteLot };
+
+    // Mettre à jour tous les lots CAPRation qui ont un correspondant CapriScan
+    let miseAJour = 0;
+    lots.forEach(lot => {
+      // 1. Chercher par csKey stockée
+      // 2. Chercher par nom exact
+      // 3. Chercher par nom normalisé (sans accents, casse)
+      const normalise = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+      const csKey = lot.csKey
+        || Object.keys(noms).find(k => noms[k] === lot.nom)
+        || Object.keys(noms).find(k => normalise(noms[k]) === normalise(lot.nom));
+      if(!csKey) return;
+      lot.csKey = csKey;
+      const nbCs  = compteLot[csKey] || 0;
+      const nomCs = noms[csKey];
+      let changed = false;
+      if(nomCs && lot.nom !== nomCs){ lot.nom = nomCs; changed = true; }
+      if(nbCs > 0 && lot.params.nb !== nbCs){ lot.params.nb = nbCs; changed = true; }
+      if(changed) miseAJour++;
+    });
+
+    saveLots();
+    renderLotSelector();
+    chargerLotDansFormulaire();
+    calculer();
+    setSyncStatus('ok', miseAJour);
+    if(!silencieux && miseAJour===0) setSyncStatus('ok', 0);
+
+  } catch(e){
+    setSyncStatus('error');
+    if(!silencieux) alert('Erreur sync CapriScan : '+e.message);
+  }
+}
+
+function setSyncStatus(state, nb){
+  const el = document.getElementById('cs-sync-status');
+  if(!el) return;
+  const cfg = {
+    sync:  { txt:'Synchronisation…', col:'#d68910', ico:'🔄' },
+    ok:    { txt: nb>0 ? `Sync OK — ${nb} lot${nb>1?'s':''} mis à jour` : 'Synchronisé', col:'#2d6a4f', ico:'✅' },
+    error: { txt:'Erreur de sync',   col:'#c0392b', ico:'⚠️' },
+    idle:  { txt:'',                 col:'',        ico:'' },
+  }[state]||{};
+  el.innerHTML = cfg.ico ? `<span style="color:${cfg.col};font-size:10px">${cfg.ico} ${cfg.txt}</span>` : '';
+  if(state==='ok') setTimeout(()=>{ el.innerHTML=''; }, 4000);
+}
+
+function afficherBadgeConnecte(email){
+  document.getElementById('cs-user-email').textContent    = email;
+  document.getElementById('cs-user-badge').style.display  = '';
+}
+
+// ── Ouverture modale ───────────────────────────────────────────────────────
+function ouvrirImportCapriScan(){
+  if(_csUser){
+    // Déjà connecté → sync + afficher résultat
+    syncCapriScan({ silencieux: false }).then(()=>{
+      if(_lotsImportes) afficherModalResultat();
+    });
+    return;
+  }
+  document.getElementById('cs-modal-login').style.display  = '';
+  document.getElementById('cs-modal-result').style.display = 'none';
+  document.getElementById('cs-error').style.display        = 'none';
+  document.getElementById('cs-email').value    = '';
+  document.getElementById('cs-password').value = '';
+  document.getElementById('cs-modal-overlay').style.display = 'flex';
+  setTimeout(()=>document.getElementById('cs-email').focus(), 50);
+}
+
+function fermerImportCapriScan(){
+  document.getElementById('cs-modal-overlay').style.display = 'none';
+}
+
+async function connecterCapriScan(){
+  const email = document.getElementById('cs-email').value.trim();
+  const pass  = document.getElementById('cs-password').value;
+  const errEl = document.getElementById('cs-error');
+  errEl.style.display = 'none';
+  if(!email||!pass){ errEl.textContent='Email et mot de passe requis.'; errEl.style.display=''; return; }
+  const btn = document.querySelector('#cs-modal-login .btn-p');
+  btn.textContent = 'Connexion…'; btn.disabled = true;
+  try {
+    await initFirebase();
+    const cred = await window._csSignIn(email, pass);
+    _csUser = cred.user;
+    afficherBadgeConnecte(email);
+    await syncCapriScan({ silencieux: true });
+    afficherModalResultat();
+  } catch(e){
+    const msgs = {
+      'auth/wrong-password':     'Mot de passe incorrect.',
+      'auth/user-not-found':     'Aucun compte avec cet email.',
+      'auth/invalid-credential': 'Email ou mot de passe incorrect.',
+      'auth/too-many-requests':  'Trop de tentatives, réessayez plus tard.',
+    };
+    errEl.textContent = msgs[e.code]||('Erreur : '+e.message);
+    errEl.style.display = '';
+  } finally {
+    btn.textContent = 'Se connecter & importer'; btn.disabled = false;
+  }
+}
+
+function afficherModalResultat(){
+  if(!_lotsImportes) return;
+  const {noms, compteLot} = _lotsImportes;
+  const html = Object.entries(noms)
+    .sort((a,b)=>+a[0]-+b[0])
+    .map(([k,v])=>{
+      const nb      = compteLot[k]||0;
+      const existe  = lots.find(l=>l.nom===v || l.csKey===k);
+      return `
+      <label style="display:flex;align-items:center;gap:8px;padding:.5rem .7rem;border:1px solid var(--bord);border-radius:7px;cursor:pointer;background:${existe?'#f8f9f5':'#fff'}">
+        <input type="checkbox" name="cs-lot" value="${k}" ${existe?'disabled':'checked'} style="accent-color:var(--vert-f)">
+        <span style="font-size:13px;font-weight:500;color:${existe?'var(--gris)':'var(--vert-f)'}">Lot ${k}</span>
+        <span style="font-size:12px;color:var(--gris);flex:1">${v}</span>
+        ${existe?'<span style="font-size:10px;color:var(--gris);font-style:italic">déjà présent</span>':''}
+        <span style="font-family:\'DM Mono\',monospace;font-size:11px;background:${nb>0?'var(--vert-p)':'var(--gris-c)'};color:${nb>0?'var(--vert-f)':'var(--gris)'};padding:2px 8px;border-radius:20px">${nb} ch.</span>
+      </label>`;
+    }).join('');
+  document.getElementById('cs-lots-liste').innerHTML =
+    `<div style="font-size:12px;color:var(--gris);margin-bottom:.5rem">
+      Lots CapriScan — effectifs remontés automatiquement. Les lots déjà présents sont mis à jour en temps réel.
+    </div>`+html;
+  document.getElementById('cs-modal-login').style.display  = 'none';
+  document.getElementById('cs-modal-result').style.display = '';
+}
+
+function confirmerImportLots(){
+  const cases = [...document.querySelectorAll('input[name="cs-lot"]:checked:not(:disabled)')];
+  if(!cases.length){ fermerImportCapriScan(); return; }
+  sauvegarderFormulaireDansLot();
+  const {noms, compteLot} = _lotsImportes;
+  let crees = 0;
+  cases.forEach(cb=>{
+    const k = cb.value;
+    const nomFinal = noms[k]||`Lot ${k}`;
+    if(lots.find(l=>l.nom===nomFinal||l.csKey===k)) return;
+    const nouveau = defaultLot(nextLotId++, nomFinal);
+    nouveau.csKey = k; // lier à la clé CapriScan pour syncs futures
+    const nb = compteLot[k]||0;
+    if(nb>0) nouveau.params.nb = nb;
+    lots.push(nouveau);
+    crees++;
+  });
+  saveLots();
+  if(crees>0){
+    lotActifId = lots[lots.length-1].id;
+    saveLots(); renderLotSelector(); chargerLotDansFormulaire(); calculer();
+  }
+  fermerImportCapriScan();
+  if(crees>0) setSyncStatus('ok', crees);
+}
+
+function deconnecterCapriScan(){
+  if(window._csSignOut) window._csSignOut().catch(()=>{});
+  _csUser = null;
+  document.getElementById('cs-user-badge').style.display = 'none';
+  // Effacer csKey des lots pour rompre le lien
+  lots.forEach(l=>{ delete l.csKey; });
+  saveLots();
+}
+
+// INIT
+chargerLotDansFormulaire();
+renderLotSelector();
+calculer();
+renderAliments();
+// Lancer Firebase en arrière-plan pour restaurer session si déjà connecté
+initFirebase().catch(()=>{});
+
+// ══════════════════════════════════════════════════
+// PAYWALL CAPRATION — Firebase Auth + Stripe
+// ══════════════════════════════════════════════════
+const CR_CONFIG = {
+  apiKey:            "AIzaSyAFdyY7GbDUJiacJVOCdWJP_3raIzJqMzc",
+  authDomain:        "capration-f344c.firebaseapp.com",
+  projectId:         "capration-f344c",
+  storageBucket:     "capration-f344c.firebasestorage.app",
+  messagingSenderId: "89141443221",
+  appId:             "1:89141443221:web:049c0c6271e2bc8bbd799c"
+};
+
+const CR_PRICES = {
+  mensuel: 'price_1ThrtRBWMG5LE5PSpuxQMmf4',
+  annuel:  'price_1ThrtRBWMG5LE5PSm9eOQSXe'
+};
+
+let _crApp=null, _crAuth=null, _crDb=null, _crUser=null;
+
+// ── Overlay HTML ───────────────────────────────────
+(function injectPaywallUI(){
+  const css = `
+  #cr-overlay{position:fixed;inset:0;z-index:99999;background:#1b4332;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif}
+  #cr-box{background:#fff;border-radius:16px;padding:40px 36px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,.18);text-align:center}
+  #cr-box img.cr-logo{width:90px;margin-bottom:12px}
+  #cr-box h2{font-size:1.4rem;color:#1b4332;margin-bottom:4px}
+  #cr-box p.cr-sub{color:#6b7280;font-size:.9rem;margin-bottom:24px}
+  #cr-box input{width:100%;padding:10px 14px;border:1.5px solid #d4d7c9;border-radius:8px;font-size:.95rem;margin-bottom:10px;outline:none;transition:border .2s}
+  #cr-box input:focus{border-color:#2d6a4f}
+  #cr-box .cr-btn{width:100%;padding:11px;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:4px;transition:opacity .2s}
+  #cr-box .cr-btn:hover{opacity:.88}
+  #cr-btn-login{background:#2d6a4f;color:#fff}
+  #cr-btn-register{background:#fff;color:#2d6a4f;border:1.5px solid #2d6a4f !important;margin-top:6px}
+  #cr-err{color:#c0392b;font-size:.85rem;min-height:18px;margin-bottom:6px}
+  #cr-msg{color:#2d6a4f;font-size:.85rem;min-height:18px;margin-bottom:6px}
+  .cr-switch{font-size:.85rem;color:#6b7280;margin-top:12px;cursor:pointer}
+  .cr-switch span{color:#2d6a4f;font-weight:600;text-decoration:underline;cursor:pointer}
+  /* Paywall abonnement */
+  #cr-paywall{display:none;flex-direction:column;align-items:center}
+  #cr-paywall h3{font-size:1.15rem;color:#1b4332;margin-bottom:6px}
+  #cr-paywall p{color:#6b7280;font-size:.88rem;margin-bottom:20px}
+  .cr-plan{border:1.5px solid #d4d7c9;border-radius:10px;padding:14px 18px;margin-bottom:10px;cursor:pointer;transition:border .2s;text-align:left;width:100%}
+  .cr-plan:hover{border-color:#2d6a4f}
+  .cr-plan.featured{border-color:#2d6a4f;background:#f0faf4}
+  .cr-plan strong{display:block;color:#1b4332;font-size:1rem}
+  .cr-plan small{color:#6b7280;font-size:.82rem}
+  .cr-plan .badge{background:#2d6a4f;color:#fff;font-size:.72rem;padding:2px 7px;border-radius:20px;float:right;margin-top:2px}
+  #cr-btn-logout{background:#fff;color:#c0392b;border:1.5px solid #c0392b !important;margin-top:14px;font-size:.85rem;padding:8px}
+  #cr-loading{color:#6b7280;font-size:.9rem;padding:20px 0}
+  `;
+  const style = document.createElement('style');
+  style.textContent = css;
+  document.head.appendChild(style);
+
+  const html = `
+  <div id="cr-overlay">
+    <div id="cr-box">
+      <img class="cr-logo" src="icons/icon-192.png" alt="CAPRation">
+      <h2>CAPRation PC</h2>
+      <p class="cr-sub">Rationnement caprin INRA 2007</p>
+      <div id="cr-loading">Chargement…</div>
+
+      <!-- Formulaire login/register -->
+      <div id="cr-form" style="display:none">
+        <div id="cr-err"></div>
+        <div id="cr-msg"></div>
+        <input id="cr-email" type="email" placeholder="Adresse e-mail" autocomplete="email">
+        <input id="cr-pass"  type="password" placeholder="Mot de passe" autocomplete="current-password">
+        <button class="cr-btn" id="cr-btn-login">Se connecter</button>
+        <button class="cr-btn" id="cr-btn-register">Créer un compte</button>
+        <p class="cr-switch" id="cr-forgot">Mot de passe oublié ? <span onclick="crForgot()">Réinitialiser</span></p>
+      </div>
+
+      <!-- Paywall abonnement -->
+      <div id="cr-paywall">
+        <h3>Choisissez votre formule</h3>
+        <p>1 jour d'essai gratuit, résiliation à tout moment</p>
+        <div class="cr-plan" onclick="crCheckout('mensuel')">
+          <strong>Mensuel — 24,99 €/mois</strong>
+          <small>Sans engagement</small>
+        </div>
+        <div class="cr-plan featured" onclick="crCheckout('annuel')">
+          <span class="badge">2 mois offerts</span>
+          <strong>Annuel — 249,90 €/an</strong>
+          <small>Soit 20,83 €/mois</small>
+        </div>
+        <button class="cr-btn" id="cr-btn-logout">Se déconnecter</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('afterbegin', html);
+})();
+
+// ── Init Firebase Paywall ──────────────────────────
+async function initCrFirebase(){
+  const {initializeApp, getApps} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  const {getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+  const {getFirestore, doc, getDoc, setDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+  const apps = getApps();
+  _crApp  = apps.find(a=>a.name==='capration') || initializeApp(CR_CONFIG, 'capration');
+  _crAuth = getAuth(_crApp);
+  _crDb   = getFirestore(_crApp);
+
+  window._crSignIn     = (e,p) => signInWithEmailAndPassword(_crAuth,e,p);
+  window._crRegister   = (e,p) => createUserWithEmailAndPassword(_crAuth,e,p);
+  window._crSignOut    = ()    => signOut(_crAuth);
+  window._crResetPass  = (e)   => sendPasswordResetEmail(_crAuth,e);
+  window._crGetDoc     = (uid) => getDoc(doc(_crDb,'users',uid));
+  window._crSetDoc     = (uid,data) => setDoc(doc(_crDb,'users',uid), data, {merge:true});
+
+  onAuthStateChanged(_crAuth, async user => {
+    if(user){
+      _crUser = user;
+      await crVerifyAccess(user);
+    } else {
+      _crUser = null;
+      crShowForm();
+    }
+  });
+}
+
+// ── Vérifier accès abonnement ─────────────────────
+async function crVerifyAccess(user){
+  try {
+    const snap = await window._crGetDoc(user.uid);
+    const data = snap.exists() ? snap.data() : {};
+    const status = data.subscriptionStatus || '';
+    if(status === 'active' || status === 'trialing'){
+      crHideOverlay();
+      const badge = document.getElementById('cr-user-badge');
+      const emailEl = document.getElementById('cr-sidebar-email');
+      if(badge) badge.style.display = '';
+      if(emailEl) emailEl.textContent = user.email;
+    } else {
+      crShowPaywall();
+    }
+  } catch(e){
+    crShowPaywall();
+  }
+}
+
+// ── Affichage ─────────────────────────────────────
+function crHideOverlay(){
+  const o = document.getElementById('cr-overlay');
+  if(o) o.remove();
+}
+function crShowForm(){
+  document.getElementById('cr-loading').style.display = 'none';
+  document.getElementById('cr-form').style.display = 'block';
+  document.getElementById('cr-paywall').style.display = 'none';
+}
+function crShowPaywall(){
+  document.getElementById('cr-loading').style.display = 'none';
+  document.getElementById('cr-form').style.display = 'none';
+  document.getElementById('cr-paywall').style.display = 'flex';
+  document.getElementById('cr-btn-logout').onclick = async () => {
+    await window._crSignOut();
+    crShowForm();
+  };
+}
+function crSetErr(msg){ document.getElementById('cr-err').textContent = msg; }
+function crSetMsg(msg){ document.getElementById('cr-msg').textContent = msg; }
+
+// ── Connexion ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('cr-btn-login').addEventListener('click', async ()=>{
+    const e = document.getElementById('cr-email').value.trim();
+    const p = document.getElementById('cr-pass').value;
+    crSetErr(''); crSetMsg('');
+    if(!e||!p){ crSetErr('Remplissez tous les champs'); return; }
+    try {
+      await window._crSignIn(e,p);
+    } catch(err){
+      crSetErr('Email ou mot de passe incorrect');
+    }
+  });
+
+  document.getElementById('cr-btn-register').addEventListener('click', async ()=>{
+    const e = document.getElementById('cr-email').value.trim();
+    const p = document.getElementById('cr-pass').value;
+    crSetErr(''); crSetMsg('');
+    if(!e||!p){ crSetErr('Remplissez tous les champs'); return; }
+    if(p.length < 6){ crSetErr('Mot de passe trop court (6 car. min)'); return; }
+    try {
+      const cred = await window._crRegister(e,p);
+      await window._crSetDoc(cred.user.uid, { email: e, createdAt: new Date().toISOString() });
+      crShowPaywall();
+    } catch(err){
+      if(err.code === 'auth/email-already-in-use') crSetErr('Email déjà utilisé');
+      else crSetErr('Erreur lors de la création du compte');
+    }
+  });
+});
+
+// ── Mot de passe oublié ───────────────────────────
+async function crForgot(){
+  const e = document.getElementById('cr-email').value.trim();
+  if(!e){ crSetErr('Entrez votre email d\'abord'); return; }
+  try {
+    await window._crResetPass(e);
+    crSetMsg('Email de réinitialisation envoyé !');
+  } catch(err){
+    crSetErr('Erreur : vérifiez l\'adresse email');
+  }
+}
+
+// ── Checkout Stripe ───────────────────────────────
+async function crCheckout(plan){
+  if(!_crUser){ return; }
+  const priceId = CR_PRICES[plan];
+  const params = new URLSearchParams({
+    price_id: priceId,
+    client_reference_id: _crUser.uid,
+    prefilled_email: _crUser.email,
+  });
+  // Lien de paiement Stripe avec paramètres pré-remplis
+  const base = plan === 'mensuel'
+    ? 'https://buy.stripe.com/00w28q69D1CW7ysfhF3sI05'
+    : 'https://buy.stripe.com/9B6cN41Tn3L4cSM0mL3sI06';
+  window.location.href = `${base}?prefilled_email=${encodeURIComponent(_crUser.email)}&client_reference_id=${encodeURIComponent(_crUser.uid)}`;
+}
+
+// ── Lancer le paywall ─────────────────────────────
+async function crLogout(){
+  await window._crSignOut();
+  document.getElementById('cr-user-badge').style.display = 'none';
+  // Recharger pour afficher le login
+  location.reload();
+}
+
+initCrFirebase().catch(e => console.error('Paywall init error:', e));
+</script>
+</body>
+</html>
