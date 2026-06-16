@@ -1,0 +1,31 @@
+{
+  "name": "CapriRation Mobile",
+  "short_name": "CapriRation",
+  "description": "Distribution des rations caprines - CapriRation Mobile",
+  "start_url": "/CapRation/",
+  "scope": "/CapRation/",
+  "display": "standalone",
+  "background_color": "#1a3a2a",
+  "theme_color": "#1a3a2a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon_192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon_512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/CapriRation_full.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
