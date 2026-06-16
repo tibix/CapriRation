@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agrilium — Logiciels agricoles intelligents</title>
+<meta name="description" content="Agrilium propose des logiciels et applications mobiles pour l'élevage : CapriScan, CAPRation, MétéoScan Pro, CapCulture. Conçu par un éleveur, pour les éleveurs.">
+<meta name="keywords" content="logiciel élevage, application caprine, ration chèvre, CapriScan, CAPRation, gestion troupeau, élevage caprin, Agrilium">
+<meta name="author" content="Thibaut Lafon — Agrilium">
+<meta property="og:title" content="Agrilium — Logiciels agricoles intelligents">
+<meta property="og:description" content="Applications mobiles et logiciels PC pour piloter vos troupeaux, vos rations et vos données. Conçu par des éleveurs.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.myagrilium.com">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="google-site-verification" content="re8OMwo1THZui0DVmBMI-bFzOfvv6k1moqewAawsUX0" />
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4R351JN591"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-4R351JN591');
+</script>
+<link rel="canonical" href="https://www.myagrilium.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-deep: #0e2318;
+  --green-soft: #2d6645;
+  --green-light: #4a9463;
+  --green-pale: #d4ead9;
+  --cream: #f5f0e8;
+  --cream-dark: #ebe4d6;
+  --gold: #c8a96e;
+  --gold-light: #e8d4a8;
+  --white: #fafaf7;
+  --text-dark: #0e1a12;
+  --text-mid: #3a5244;
+  --text-light: #6b8a75;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --radius: 4px; --radius-lg: 12px;
+  --shadow: 0 2px 24px rgba(14,35,24,.10);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-sans); background: var(--cream); color: var(--text-dark); font-size: 16px; line-height: 1.65; }
+
+/* ── SYSTÈME BILINGUE ── */
+/* Par défaut : FR visible, EN caché */
+.en { display: none !important; }
+/* Quand body a la classe "lang-en" : EN visible, FR caché */
+body.lang-en .fr { display: none !important; }
+body.lang-en .en { display: revert !important; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(14,35,24,.97); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5%; height: 64px;
+  border-bottom: 1px solid rgba(200,169,110,.18);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo-mark { width: 34px; height: 34px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.nav-logo-mark svg { width: 18px; height: 18px; fill: var(--green-deep); }
+.nav-logo-text { font-family: var(--font-serif); font-size: 1.25rem; color: var(--white); letter-spacing: .02em; }
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a { color: rgba(245,240,232,.7); text-decoration: none; font-size: .875rem; letter-spacing: .04em; text-transform: uppercase; transition: color .2s; }
+.nav-links a:hover { color: var(--gold); }
+.lang-toggle { cursor: pointer; background: rgba(200,169,110,.15); border: 1px solid rgba(200,169,110,.3); border-radius: 20px; padding: 4px 14px; color: var(--gold-light); font-size: .8rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; transition: background .2s; font-family: var(--font-sans); }
+.lang-toggle:hover { background: rgba(200,169,110,.28); }
+
+/* HERO */
+.hero { min-height: 100vh; background: var(--green-deep); display: flex; flex-direction: column; justify-content: center; padding: 100px 5% 80px; position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; opacity: .07; background-image: radial-gradient(circle at 70% 60%, #4a9463 0%, transparent 55%), radial-gradient(circle at 20% 30%, #c8a96e 0%, transparent 40%); }
+.hero-grid { position: absolute; inset: 0; opacity: .04; background-image: linear-gradient(rgba(200,169,110,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(200,169,110,.5) 1px, transparent 1px); background-size: 60px 60px; }
+.hero-inner { max-width: 900px; width: 100%; position: relative; z-index: 1; margin-left: 250px; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(200,169,110,.12); border: 1px solid rgba(200,169,110,.3); border-radius: 20px; padding: 5px 14px; margin-bottom: 32px; color: var(--gold); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
+.hero-eyebrow .dot { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; display: inline-block; }
+h1 { font-family: var(--font-serif); font-size: clamp(2.8rem, 6vw, 4.8rem); line-height: 1.08; color: var(--white); margin-bottom: 24px; font-weight: 400; }
+h1 em { font-style: italic; color: var(--gold); }
+.hero-sub { font-size: clamp(1rem, 1.8vw, 1.2rem); color: rgba(245,240,232,.65); max-width: 540px; margin-bottom: 48px; font-weight: 300; line-height: 1.7; }
+.hero-cta { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn-primary { background: var(--gold); color: var(--green-deep); padding: 14px 32px; border-radius: var(--radius); font-weight: 500; font-size: .95rem; text-decoration: none; letter-spacing: .02em; border: none; cursor: pointer; transition: background .2s, transform .15s; display: inline-block; }
+.btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-outline { background: transparent; color: var(--white); padding: 14px 32px; border-radius: var(--radius); font-weight: 400; font-size: .95rem; text-decoration: none; border: 1px solid rgba(245,240,232,.3); cursor: pointer; transition: border-color .2s, background .2s; display: inline-block; }
+.btn-outline:hover { border-color: rgba(245,240,232,.7); background: rgba(245,240,232,.06); }
+.hero-stats { display: flex; flex-wrap: wrap; gap: 48px; margin-top: 72px; padding-top: 40px; border-top: 1px solid rgba(200,169,110,.15); }
+.stat-num { font-family: var(--font-serif); font-size: 2rem; color: var(--gold); line-height: 1; }
+.stat-label { font-size: .8rem; color: rgba(245,240,232,.5); letter-spacing: .06em; text-transform: uppercase; margin-top: 4px; }
+
+/* SECTIONS */
+section { padding: 96px 5%; }
+.section-inner { max-width: 1080px; margin: 0 auto; }
+.section-label { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--green-soft); font-weight: 500; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.section-label::before { content: ''; width: 24px; height: 2px; background: var(--green-soft); display: inline-block; }
+h2 { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3rem); line-height: 1.12; color: var(--text-dark); font-weight: 400; margin-bottom: 20px; }
+h2 em { font-style: italic; color: var(--green-soft); }
+.section-desc { font-size: 1.05rem; color: var(--text-mid); max-width: 540px; line-height: 1.7; font-weight: 300; }
+
+/* ABOUT */
+.about { background: var(--white); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; margin-top: 56px; }
+.about-visual { background: var(--green-deep); border-radius: var(--radius-lg); padding: 48px; position: relative; overflow: hidden; min-height: 320px; display: flex; flex-direction: column; justify-content: flex-end; }
+.about-visual-bg { position: absolute; inset: 0; opacity: .15; background: radial-gradient(circle at 80% 20%, var(--gold) 0%, transparent 60%); }
+.about-visual-icon { position: absolute; top: 32px; right: 32px; opacity: .2; }
+.about-visual-icon svg { width: 80px; height: 80px; fill: var(--gold); }
+.about-quote { font-family: var(--font-serif); font-size: 1.5rem; color: var(--white); line-height: 1.3; position: relative; z-index: 1; font-weight: 400; }
+.about-quote em { color: var(--gold); }
+.about-author { color: rgba(245,240,232,.5); font-size: .85rem; margin-top: 16px; position: relative; z-index: 1; }
+.about-text h3 { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 400; margin-bottom: 16px; color: var(--text-dark); }
+.about-text p { color: var(--text-mid); font-weight: 300; margin-bottom: 16px; }
+.about-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.badge { background: var(--green-pale); color: var(--green-soft); border-radius: 20px; padding: 5px 14px; font-size: .8rem; font-weight: 500; }
+
+/* PRODUCTS */
+.products { background: var(--cream); }
+.products-header { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; margin-bottom: 56px; }
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 24px; }
+.product-card { background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--cream-dark); padding: 32px; transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden; }
+.product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.product-card.coming-soon { opacity: .72; }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.card-icon { width: 48px; height: 48px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.card-badge { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 500; padding: 4px 10px; border-radius: 20px; }
+.badge-live { background: #ddf0e4; color: #1a5c34; }
+.badge-soon { background: var(--cream-dark); color: var(--text-light); }
+.card-name { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 400; margin-bottom: 8px; }
+.card-tagline { font-size: .9rem; color: var(--text-mid); font-weight: 300; margin-bottom: 20px; }
+.card-species { display: flex; flex-wrap: wrap; gap: 6px; }
+.species-tag { font-size: .75rem; color: var(--text-light); border: 1px solid var(--cream-dark); border-radius: 20px; padding: 3px 10px; }
+.card-accent { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+
+/* WHY */
+.why { background: var(--green-deep); }
+.why .section-label { color: var(--gold); }
+.why .section-label::before { background: var(--gold); }
+.why h2 { color: var(--white); }
+.why .section-desc { color: rgba(245,240,232,.6); }
+.why-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 32px; margin-top: 56px; }
+.why-item { border-top: 1px solid rgba(200,169,110,.2); padding-top: 24px; }
+.why-num { font-family: var(--font-serif); font-size: 2.5rem; color: rgba(200,169,110,.3); line-height: 1; margin-bottom: 16px; }
+.why-title { font-weight: 500; color: var(--white); margin-bottom: 8px; font-size: 1rem; }
+.why-desc { font-size: .9rem; color: rgba(245,240,232,.55); font-weight: 300; line-height: 1.6; }
+
+/* ROADMAP */
+.roadmap { background: var(--white); }
+.roadmap-timeline { margin-top: 56px; position: relative; }
+.roadmap-timeline::before { content: ''; position: absolute; left: 16px; top: 0; bottom: 0; width: 1px; background: var(--cream-dark); }
+.timeline-item { display: flex; gap: 32px; margin-bottom: 40px; position: relative; }
+.timeline-dot { width: 33px; height: 33px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .75rem; font-weight: 500; position: relative; z-index: 1; margin-top: 2px; }
+.dot-done { background: var(--green-soft); color: var(--white); }
+.dot-now  { background: var(--gold); color: var(--green-deep); }
+.dot-next { background: var(--cream-dark); color: var(--text-light); }
+.timeline-period { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--text-light); font-weight: 500; margin-bottom: 6px; }
+.timeline-title { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 400; margin-bottom: 6px; }
+.timeline-items { font-size: .9rem; color: var(--text-mid); font-weight: 300; }
+
+/* CONTACT */
+.contact { background: var(--cream); }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-top: 56px; }
+.contact-form { display: flex; flex-direction: column; gap: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: .8rem; font-weight: 500; color: var(--text-mid); letter-spacing: .04em; text-transform: uppercase; }
+.form-group input, .form-group textarea, .form-group select { background: var(--white); border: 1px solid var(--cream-dark); border-radius: var(--radius); padding: 12px 16px; font-family: var(--font-sans); font-size: .95rem; color: var(--text-dark); transition: border-color .2s; outline: none; }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--green-soft); }
+.form-group textarea { min-height: 120px; resize: vertical; }
+.contact-info h3 { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 400; margin-bottom: 16px; }
+.contact-info p { color: var(--text-mid); font-weight: 300; margin-bottom: 32px; }
+.contact-detail { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 20px; }
+.contact-detail-icon { width: 36px; height: 36px; background: var(--green-pale); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.contact-detail-icon svg { width: 16px; height: 16px; fill: var(--green-soft); }
+.contact-detail-text { font-size: .9rem; color: var(--text-mid); }
+.contact-detail-text strong { display: block; color: var(--text-dark); font-weight: 500; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
+
+/* FOOTER */
+footer { background: var(--green-deep); padding: 48px 5% 32px; border-top: 1px solid rgba(200,169,110,.1); }
+.footer-inner { max-width: 1080px; margin: 0 auto; }
+.footer-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 40px; margin-bottom: 48px; }
+.footer-brand p { color: rgba(245,240,232,.45); font-size: .85rem; max-width: 240px; margin-top: 10px; line-height: 1.6; }
+.footer-links h4 { color: rgba(245,240,232,.4); font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 16px; }
+.footer-links a { display: block; color: rgba(245,240,232,.6); text-decoration: none; font-size: .875rem; margin-bottom: 10px; transition: color .2s; }
+.footer-links a:hover { color: var(--gold); }
+.footer-bottom { border-top: 1px solid rgba(200,169,110,.1); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-bottom p { color: rgba(245,240,232,.3); font-size: .8rem; }
+
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ── OVERLAY PRODUIT ── */
+.product-card-clickable:hover { border-color: #b8d4f0; }
+
+#overlay-backdrop {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(14,26,18,.55); backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none; transition: opacity .3s ease;
+}
+#overlay-backdrop.open { opacity: 1; pointer-events: all; }
+
+#overlay-panel, .overlay-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+  width: min(680px, 100vw); background: var(--white);
+  overflow-y: auto; transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column;
+}
+#overlay-panel.open, .overlay-panel.open { transform: translateX(0); }
+
+.ov-close {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--white); border-bottom: 1px solid var(--cream-dark);
+  padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
+}
+.ov-close-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--cream-dark);
+  background: var(--cream); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: background .15s; flex-shrink: 0;
+}
+.ov-close-btn:hover { background: var(--cream-dark); }
+.ov-close-btn svg { width: 16px; height: 16px; stroke: var(--text-dark); fill: none; stroke-width: 2; stroke-linecap: round; }
+.ov-close-breadcrumb { font-size: .8rem; color: var(--text-light); }
+.ov-close-breadcrumb span { color: var(--text-dark); font-weight: 500; }
+
+.ov-hero {
+  background: var(--green-deep); padding: 40px 28px 36px;
+  position: relative; overflow: hidden;
+}
+.ov-hero-bg { position: absolute; inset: 0; opacity: .1; background: radial-gradient(circle at 80% 30%, #5577cc 0%, transparent 60%); }
+.ov-hero-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; position: relative; z-index: 1; }
+.ov-icon { width: 56px; height: 56px; border-radius: 14px; background: #e8f0fd; display: flex; align-items: center; justify-content: center; }
+.ov-badge { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; background: rgba(61,200,130,.15); border: 1px solid rgba(61,200,130,.3); color: #6ee8a8; }
+.ov-title { font-family: var(--font-serif); font-size: 2rem; color: var(--white); font-weight: 400; position: relative; z-index: 1; margin-bottom: 10px; }
+.ov-tagline { font-size: 1rem; color: rgba(245,240,232,.65); font-weight: 300; position: relative; z-index: 1; max-width: 440px; line-height: 1.6; }
+
+.ov-body { padding: 32px 28px; flex: 1; }
+
+/* Galerie screenshots */
+.ov-gallery { margin-bottom: 40px; }
+.ov-gallery-title { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--text-light); font-weight: 500; margin-bottom: 16px; }
+.ov-screenshots { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 12px; scroll-snap-type: x mandatory; }
+.ov-screenshots::-webkit-scrollbar { height: 4px; }
+.ov-screenshots::-webkit-scrollbar-track { background: var(--cream-dark); border-radius: 2px; }
+.ov-screenshots::-webkit-scrollbar-thumb { background: var(--text-light); border-radius: 2px; }
+.ov-screen {
+  flex-shrink: 0; scroll-snap-align: start;
+  width: 160px; height: 284px; border-radius: 14px;
+  border: 1px solid var(--cream-dark); overflow: hidden;
+  background: var(--cream); position: relative; cursor: pointer;
+  transition: transform .2s;
+}
+.ov-screen:hover { transform: scale(1.02); }
+.ov-screen img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ov-screen-placeholder {
+  width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+  background: linear-gradient(145deg, var(--cream) 0%, var(--cream-dark) 100%);
+  color: var(--text-light); font-size: .75rem; text-align: center; padding: 16px;
+}
+.ov-screen-placeholder svg { width: 28px; height: 28px; opacity: .4; }
+
+/* Lightbox */
+#lightbox {
+  position: fixed; inset: 0; z-index: 300; background: rgba(14,26,18,.92);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+#lightbox.open { opacity: 1; pointer-events: all; }
+#lightbox img { max-width: 80vw; max-height: 85vh; border-radius: 12px; object-fit: contain; }
+#lightbox-close { position: absolute; top: 24px; right: 24px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+#lightbox-close svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; }
+#lightbox-prev, #lightbox-next { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.15); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; z-index: 10; }
+#lightbox-prev { left: 24px; }
+#lightbox-next { right: 24px; }
+#lightbox-prev:hover, #lightbox-next:hover { background: rgba(255,255,255,.3); }
+#lightbox-prev svg, #lightbox-next svg { width: 20px; height: 20px; }
+#lightbox-dots { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+.lightbox-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.4); cursor: pointer; transition: background .2s; border: none; }
+.lightbox-dot.active { background: white; }
+
+/* Features */
+.ov-features { margin-bottom: 36px; }
+.ov-section-title { font-family: var(--font-serif); font-size: 1.2rem; font-weight: 400; color: var(--text-dark); margin-bottom: 16px; }
+.ov-feature-list { display: flex; flex-direction: column; gap: 12px; }
+.ov-feature { display: flex; gap: 12px; align-items: flex-start; }
+.ov-feature-dot { width: 20px; height: 20px; border-radius: 50%; background: #ddf0e4; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.ov-feature-dot svg { width: 11px; height: 11px; stroke: #1a5c34; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+.ov-feature-text { font-size: .92rem; color: var(--text-mid); font-weight: 300; line-height: 1.5; }
+.ov-feature-text strong { color: var(--text-dark); font-weight: 500; }
+
+/* Pricing */
+.ov-pricing {
+  background: var(--cream); border: 1px solid var(--cream-dark);
+  border-radius: var(--radius-lg); padding: 24px; margin-bottom: 28px;
+}
+.ov-price-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+.ov-price-main { display: flex; align-items: baseline; gap: 4px; }
+.ov-price-amount { font-family: var(--font-serif); font-size: 2.2rem; color: var(--text-dark); }
+.ov-price-period { font-size: .85rem; color: var(--text-light); }
+.ov-trial-badge { background: #ddf0e4; color: #1a5c34; border-radius: 20px; padding: 5px 14px; font-size: .8rem; font-weight: 500; }
+.ov-price-desc { font-size: .85rem; color: var(--text-mid); font-weight: 300; }
+
+/* CTA */
+.ov-cta { display: flex; flex-direction: column; gap: 12px; }
+.btn-play {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--green-deep); color: var(--white);
+  padding: 15px 24px; border-radius: var(--radius);
+  font-weight: 500; font-size: .95rem; text-decoration: none; border: none; cursor: pointer;
+  transition: background .2s;
+}
+.btn-play:hover { background: #1a3d28; }
+.btn-play svg { width: 20px; height: 20px; fill: var(--white); }
+.btn-play-soon {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--cream-dark); color: var(--text-light);
+  padding: 15px 24px; border-radius: var(--radius);
+  font-size: .9rem; border: 1px dashed var(--text-light);
+  cursor: not-allowed;
+}
+.ov-note { font-size: .78rem; color: var(--text-light); text-align: center; }
+.btn-cta {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--green-deep); color: var(--white);
+  padding: 15px 24px; border-radius: var(--radius);
+  font-size: .95rem; font-weight: 600; text-decoration: none;
+  transition: opacity .2s;
+}
+.btn-cta:hover { opacity: .88; }
+.btn-cta-secondary {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: var(--white); color: var(--green-deep);
+  padding: 13px 24px; border-radius: var(--radius);
+  font-size: .9rem; font-weight: 500; text-decoration: none;
+  border: 1.5px solid var(--green-deep); transition: opacity .2s;
+}
+.btn-cta-secondary:hover { opacity: .8; }
+
+/* FILTRES PRODUITS */
+.prod-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+.prod-filter { background: var(--white); border: 1px solid var(--cream-dark); border-radius: 20px; padding: 8px 18px; font-size: .85rem; color: var(--text-mid); cursor: pointer; font-family: var(--font-sans); transition: all .2s; font-weight: 400; }
+.prod-filter:hover { border-color: var(--green-soft); color: var(--green-soft); }
+.prod-filter.active { background: var(--green-deep); border-color: var(--green-deep); color: var(--white); font-weight: 500; }
+.product-card.hidden { display: none; }
+
+/* ── OVERLAY À VENIR ── */
+#overlay-coming-soon {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+  width: min(680px, 100vw); background: var(--white);
+  overflow-y: auto; transform: translateX(100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+#overlay-coming-soon.open { transform: translateX(0); }
+.ov-coming-inner { text-align: center; padding: 48px 32px; }
+.ov-coming-icon { font-size: 4rem; margin-bottom: 24px; }
+.ov-coming-title { font-family: var(--font-serif); font-size: 2rem; color: var(--text-dark); font-weight: 400; margin-bottom: 16px; }
+.ov-coming-title em { font-style: italic; color: var(--green-soft); }
+.ov-coming-desc { font-size: 1rem; color: var(--text-mid); font-weight: 300; line-height: 1.7; max-width: 360px; margin: 0 auto 32px; }
+.ov-coming-name { font-family: var(--font-serif); font-size: 1.3rem; color: var(--text-light); margin-bottom: 32px; }
+.ov-coming-close { position: absolute; top: 16px; right: 20px; }
+
+/* ── TABLETTE (768px - 1024px) ── */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .nav-links { display: none; }
+  h1 { font-size: 3rem; }
+  h2 { font-size: 2.2rem; }
+  .hero { padding: 100px 6% 80px; }
+  .hero-inner { margin-left: 0 !important; }
+  .hero-stats { gap: 32px; }
+  section { padding: 72px 6%; }
+  .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .why-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+  .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+  .footer-top { flex-wrap: wrap; gap: 32px; }
+  #overlay-panel, .overlay-panel { width: min(580px, 95vw); }
+}
+
+/* ── MOBILE (moins de 768px) ── */
+@media (max-width: 768px) {
+  .about-grid, .contact-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  h1 { font-size: 2.2rem; }
+  h2 { font-size: 1.8rem; }
+  .footer-top { flex-direction: column; }
+  .hero { padding: 80px 5% 60px; }
+  .hero-inner { margin-left: 0 !important; }
+  .hero-stats { flex-direction: column; gap: 20px; }
+  .hero-eyebrow { font-size: .7rem; }
+  .products-grid { grid-template-columns: 1fr; }
+  .why-grid { grid-template-columns: 1fr; }
+  section { padding: 60px 5%; }
+  #overlay-panel, .overlay-panel { width: 100vw; }
+  .ov-screenshots { gap: 8px; }
+  .ov-screen { width: 130px; height: 230px; }
+  .ov-hero { padding: 28px 20px 24px; }
+  .ov-body { padding: 24px 20px; }
+  .ov-title { font-size: 1.6rem; }
+  .contact-grid { gap: 40px; }
+  .about-grid { gap: 40px; }
+  .about-visual { min-height: 240px; padding: 32px; }
+  .about-quote { font-size: 1.2rem; }
+  .products-header { flex-direction: column; }
+  .footer-bottom { flex-direction: column; gap: 6px; }
+  .hero-cta { flex-direction: column; }
+  .btn-primary, .btn-outline { text-align: center; }
+  .nav-logo-text { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2C9 6 5 8 5 13a7 7 0 0014 0c0-5-4-7-7-11z"/><path d="M12 8v8M9 13l3 3 3-3" fill="none" stroke="#0e2318" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <span class="nav-logo-text">Agrilium</span>
+  </a>
+  <div class="nav-links">
+    <a href="#products" class="fr">Produits</a>
+    <a href="#products" class="en">Products</a>
+    <a href="#about" class="fr">À propos</a>
+    <a href="#about" class="en">About</a>
+    <a href="#roadmap" class="fr">Feuille de route</a>
+    <a href="#roadmap" class="en">Roadmap</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <button class="lang-toggle" onclick="toggleLang()" id="lang-lbl">EN</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      <span class="fr">Logiciels agricoles de précision</span>
+      <span class="en">Precision agricultural software</span>
+    </div>
+    <h1 class="fr">Le numérique<br>au service de<br>l'<em>élevage moderne</em></h1>
+    <h1 class="en">Digital tools<br>built for<br><em>modern livestock</em></h1>
+    <p class="hero-sub fr">Des outils conçus par un éleveur, pour les éleveurs. Applications mobiles et logiciels PC pour piloter vos troupeaux, vos rations et vos données au quotidien.</p>
+    <p class="hero-sub en">Tools created by a farmer, for farmers. Mobile apps and PC software to manage your herds, rations, and farm data every day.</p>
+    <div class="hero-cta">
+      <a href="#products" class="btn-primary fr">Voir nos produits</a>
+      <a href="#products" class="btn-primary en">Our products</a>
+      <a href="#contact" class="btn-outline fr">Nous contacter</a>
+      <a href="#contact" class="btn-outline en">Get in touch</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">1000+</div>
+        <div class="stat-label fr">Têtes suivies</div>
+        <div class="stat-label en">Animals tracked</div>
+      </div>
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label fr">Élevages</div>
+        <div class="stat-label en">Farms</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-inner">
+    <p class="section-label reveal"><span class="fr">À propos d'Agrilium</span><span class="en">About Agrilium</span></p>
+    <div class="about-grid reveal">
+      <div class="about-visual">
+        <div class="about-visual-bg"></div>
+        <div class="about-visual-icon"><svg viewBox="0 0 24 24"><path d="M12 2C9 6 5 8 5 13a7 7 0 0014 0c0-5-4-7-7-11z"/></svg></div>
+        <p class="about-quote fr">"Conçu sur le terrain, validé au <em>quotidien</em>."</p>
+        <p class="about-quote en">"Designed in the field, validated every <em>day</em>."</p>
+        <p class="about-author">— Thibaut Lafon, fondateur · 600 chèvres laitières</p>
+      </div>
+      <div class="about-text">
+        <h2><em class="fr">Née</em><em class="en">Born</em><span class="fr"> de la pratique</span><span class="en"> from practice</span></h2>
+        <p class="fr">Fondée en 2026 par Thibaut Lafon, éleveur caprin, bovin et apiculteur, Agrilium est née d'un besoin concret : aider les éleveurs avec des outils simples et fiables, testés au quotidien sur le terrain.</p>
+        <p class="en">Founded in 2026 by Thibaut Lafon, a goat, cattle and beekeeping farmer, Agrilium was born from a concrete need: helping farmers with simple and reliable tools, tested daily in the field.</p>
+        <p class="fr">Chaque détail compte : une interface claire, des données précises, et une prise en main immédiate même au milieu du troupeau.</p>
+        <p class="en">Every detail matters: a clear interface, accurate data, and immediate ease of use even in the middle of a herd.</p>
+        <div class="about-badges">
+          <span class="badge">🐐 Caprins</span>
+          <span class="badge fr">🐄 Bovins</span><span class="badge en">🐄 Cattle</span>
+          <span class="badge fr">🐑 Ovins</span><span class="badge en">🐑 Sheep</span>
+          <span class="badge fr">🐝 Apiculture</span><span class="badge en">🐝 Beekeeping</span>
+          <span class="badge fr">🌦️ Météo agricole</span><span class="badge en">🌦️ Agricultural weather</span>
+          <span class="badge fr">🌾 Calcul de rations</span><span class="badge en">🌾 Ration calculator</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="products" id="products">
+  <div class="section-inner">
+    <div class="products-header reveal">
+      <div>
+        <p class="section-label"><span class="fr">Nos logiciels</span><span class="en">Our software</span></p>
+        <h2 class="fr">Des outils pour chaque <em>espèce</em></h2>
+        <h2 class="en">Tools for every <em>species</em></h2>
+      </div>
+      <p class="section-desc fr">Applications mobiles et logiciels PC pensés pour le terrain, avec ou sans connexion internet.</p>
+      <p class="section-desc en">Mobile apps and PC software designed for field use, with or without internet.</p>
+    </div>
+
+    <!-- Filtres catégories -->
+    <div class="prod-filters reveal">
+      <button class="prod-filter active" onclick="filterProducts('all')" data-cat="all">
+        <span class="fr">Tous</span><span class="en">All</span>
+      </button>
+      <button class="prod-filter" onclick="filterProducts('caprin')">🐐 <span class="fr">Caprin</span><span class="en">Goat</span></button>
+      <button class="prod-filter" onclick="filterProducts('bovin')">🐂 <span class="fr">Bovin</span><span class="en">Cattle</span></button>
+      <button class="prod-filter" onclick="filterProducts('ovin')">🐑 <span class="fr">Ovin</span><span class="en">Sheep</span></button>
+      <button class="prod-filter" onclick="filterProducts('apicole')">🐝 <span class="fr">Apicole</span><span class="en">Beekeeping</span></button>
+      <button class="prod-filter" onclick="filterProducts('meteo')">🌦️ <span class="fr">Météo</span><span class="en">Weather</span></button>
+      <button class="prod-filter" onclick="filterProducts('culture')">🌾 <span class="fr">Cultures</span><span class="en">Crops</span></button>
+      <button class="prod-filter" onclick="filterProducts('pack')">⭐ <span class="fr">Packs</span><span class="en">Bundles</span></button>
+    </div>
+
+    <div class="products-grid">
+
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('capriscan')" data-category="caprin" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#2d6645,#4a9463);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐐</div>
+          <span class="card-badge badge-soon fr">Bientôt disponible</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">CapriScan <span style="color:var(--text-light);font-size:.9em">Lait</span></div>
+        <div class="card-tagline fr">Carnet de bord caprin — notation, suivi sanitaire, inventaire, mouvements</div>
+        <div class="card-tagline en">Goat herd logbook — scoring, health tracking, inventory, movements</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">Compatible lecteurs RFID</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('capriration')" data-category="caprin" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#c8a96e,#e8d4a8);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐐</div>
+          <span class="card-badge badge-soon fr">Bientôt disponible</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">CapriRation</div>
+        <div class="card-tagline fr">Calcul de rations caprines — PC & Mobile, formules INRA 2007</div>
+        <div class="card-tagline en">Goat ration calculator — PC & Mobile, INRA 2007 formulas</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">INRA 2007</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('meteo')" data-category="meteo" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#2a4a8c,#5577cc);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#e8f0fd;"><svg viewBox="0 0 24 24" fill="#2a4a8c" width="24" height="24"><path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.79 1.42-1.41zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91l-1.41-1.41-1.79 1.79 1.41 1.41 1.79-1.79zm-3.21 13.7l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91l1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z"/></svg></div>
+          <span class="card-badge badge-live fr">✓ Disponible</span><span class="card-badge badge-live en">✓ Available</span>
+        </div>
+        <div class="card-name">MétéoScan Pro</div>
+        <div class="card-tagline fr">Météo agricole locale — prévisions adaptées à l'élevage, conseils et alertes en temps réel</div>
+        <div class="card-tagline en">Local agricultural weather — livestock-tailored forecasts, real-time advice and alerts</div>
+        <div class="card-species"><span class="species-tag">📱 Mobile</span><span class="species-tag">🌦️ Météo</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('soon')" data-category="culture" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#3b6d11,#639922);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#eaf3de;font-size:24px;line-height:1;">🌾</div>
+          <span class="card-badge badge-soon fr">Bientôt disponible</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">CapCulture</div>
+        <div class="card-tagline fr">Saisie des cultures — suivi des parcelles et récoltes, bilan</div>
+        <div class="card-tagline en">Crop entry — field and harvest tracking, annual report</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">🌾 Cultures</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('pack-caprin')" data-category="pack caprin" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#0e2318,#2d6645,#c8a96e);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐐</div>
+          <span class="card-badge fr" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Pack</span>
+          <span class="card-badge en" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Bundle</span>
+        </div>
+        <div class="card-name fr">Pack Caprin</div>
+        <div class="card-name en">Goat Bundle</div>
+        <div class="card-tagline fr">CapriScan + CapriRation + MétéoScan Pro — la solution caprine complète</div>
+        <div class="card-tagline en">CapriScan + CapriRation + MétéoScan Pro — the complete goat solution</div>
+        <div class="card-species">
+          <span class="species-tag fr">💰 Économisez 99,80 €/an</span>
+          <span class="species-tag en">💰 Save 99,80 €/year</span>
+        </div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card coming-soon reveal product-card-clickable" onclick="openOverlay('coming-soon')" data-category="bovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:var(--cream-dark);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐂</div>
+          <span class="card-badge badge-soon fr">À venir</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name" data-bovlait="1">BoviScan <span style="color:var(--text-light);font-size:.9em">Lait</span></div>
+        <div class="card-tagline fr">Carnet de bord bovin — troupeau laitier</div>
+        <div class="card-tagline en">Cattle logbook — dairy herd</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">🐄 Bovins lait</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card coming-soon reveal product-card-clickable" onclick="openOverlay('coming-soon')" data-category="bovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:var(--cream-dark);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐂</div>
+          <span class="card-badge badge-soon fr">À venir</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">BoviScan <span style="color:var(--text-light);font-size:.9em">Viande</span></div>
+        <div class="card-tagline fr">Carnet de bord bovin — troupeau viande</div>
+        <div class="card-tagline en">Cattle logbook — beef herd</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">🐄 Bovins viande</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card coming-soon reveal product-card-clickable" onclick="openOverlay('coming-soon')" data-category="bovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:var(--cream-dark);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐂</div>
+          <span class="card-badge badge-soon fr">À venir</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">BoviRation</div>
+        <div class="card-tagline fr">Calcul de rations bovines — formules INRA 2007</div>
+        <div class="card-tagline en">Cattle ration calculator — INRA 2007 formulas</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">🐄 Bovins</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card coming-soon reveal product-card-clickable" onclick="openOverlay('coming-soon')" data-category="ovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:var(--cream-dark);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐑</div>
+          <span class="card-badge badge-soon fr">À venir</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">OviScan <span style="color:var(--text-light);font-size:.9em">Lait</span></div>
+        <div class="card-tagline fr">Carnet de bord ovin — troupeau laitier</div>
+        <div class="card-tagline en">Sheep logbook — dairy flock</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">🐑 Ovins lait</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card coming-soon reveal product-card-clickable" onclick="openOverlay('coming-soon')" data-category="ovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:var(--cream-dark);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐑</div>
+          <span class="card-badge badge-soon fr">À venir</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">OviScan <span style="color:var(--text-light);font-size:.9em">Viande</span></div>
+        <div class="card-tagline fr">Carnet de bord ovin — troupeau viande</div>
+        <div class="card-tagline en">Sheep logbook — meat flock</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">🐑 Ovins viande</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card coming-soon reveal product-card-clickable" onclick="openOverlay('coming-soon')" data-category="ovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:var(--cream-dark);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐑</div>
+          <span class="card-badge badge-soon fr">À venir</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">OviRation</div>
+        <div class="card-tagline fr">Calcul de rations ovines — formules INRA 2007</div>
+        <div class="card-tagline en">Sheep ration calculator — INRA 2007 formulas</div>
+        <div class="card-species"><span class="species-tag">💻 PC + 📱 Mobile</span><span class="species-tag">🐑 Ovins</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <div class="product-card coming-soon reveal product-card-clickable" onclick="openOverlay('coming-soon')" data-category="apicole" style="cursor:pointer;">
+        <div class="card-accent" style="background:var(--cream-dark);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#faeeda;font-size:24px;line-height:1;">🐝</div>
+          <span class="card-badge badge-soon fr">À venir</span><span class="card-badge badge-soon en">Coming soon</span>
+        </div>
+        <div class="card-name">ApiScan</div>
+        <div class="card-tagline fr">Gestion de ruches — suivi apicole et traitements</div>
+        <div class="card-tagline en">Hive management — beekeeping tracking and treatments</div>
+        <div class="card-species"><span class="species-tag">📱 Mobile</span><span class="species-tag">🐝 Apiculture</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <!-- Pack Bovin Lait -->
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('pack-bovin-lait')" data-category="pack bovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#0e1a2e,#1a3d5c,#4a9de0);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐂</div>
+          <span class="card-badge fr" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Pack</span>
+          <span class="card-badge en" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Bundle</span>
+        </div>
+        <div class="card-name fr">Pack Bovin Lait</div>
+        <div class="card-name en">Dairy Cattle Bundle</div>
+        <div class="card-tagline fr">BoviScan Lait + BoviRation + MétéoScan Pro</div>
+        <div class="card-tagline en">BoviScan Lait + BoviRation + MétéoScan Pro</div>
+        <div class="card-species"><span class="species-tag fr">À venir</span><span class="species-tag en">Coming soon</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <!-- Pack Bovin Viande -->
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('pack-bovin-viande')" data-category="pack bovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#1a0e0e,#3d1a1a,#c84a4a);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐂</div>
+          <span class="card-badge fr" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Pack</span>
+          <span class="card-badge en" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Bundle</span>
+        </div>
+        <div class="card-name fr">Pack Bovin Viande</div>
+        <div class="card-name en">Beef Cattle Bundle</div>
+        <div class="card-tagline fr">BoviScan Viande + BoviRation + MétéoScan Pro</div>
+        <div class="card-tagline en">BoviScan Viande + BoviRation + MétéoScan Pro</div>
+        <div class="card-species"><span class="species-tag fr">À venir</span><span class="species-tag en">Coming soon</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <!-- Pack Ovin Lait -->
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('pack-ovin-lait')" data-category="pack ovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#0e1a2e,#2e3d1a,#7ec850);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐑</div>
+          <span class="card-badge fr" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Pack</span>
+          <span class="card-badge en" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Bundle</span>
+        </div>
+        <div class="card-name fr">Pack Ovin Lait</div>
+        <div class="card-name en">Dairy Sheep Bundle</div>
+        <div class="card-tagline fr">OviScan Lait + OviRation + MétéoScan Pro</div>
+        <div class="card-tagline en">OviScan Lait + OviRation + MétéoScan Pro</div>
+        <div class="card-species"><span class="species-tag fr">À venir</span><span class="species-tag en">Coming soon</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <!-- Pack Ovin Viande -->
+      <div class="product-card reveal product-card-clickable" onclick="openOverlay('pack-ovin-viande')" data-category="pack ovin" style="cursor:pointer;">
+        <div class="card-accent" style="background:linear-gradient(90deg,#1a1a0e,#3d3d1a,#c8a030);"></div>
+        <div class="card-top">
+          <div class="card-icon" style="background:#f5f0e8;font-size:24px;line-height:1;">🐑</div>
+          <span class="card-badge fr" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Pack</span>
+          <span class="card-badge en" style="background:#fdf3e3;color:#8a6020;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;font-weight:500;padding:4px 10px;border-radius:20px;">⭐ Bundle</span>
+        </div>
+        <div class="card-name fr">Pack Ovin Viande</div>
+        <div class="card-name en">Meat Sheep Bundle</div>
+        <div class="card-tagline fr">OviScan Viande + OviRation + MétéoScan Pro</div>
+        <div class="card-tagline en">OviScan Viande + OviRation + MétéoScan Pro</div>
+        <div class="card-species"><span class="species-tag fr">À venir</span><span class="species-tag en">Coming soon</span></div>
+        <div style="margin-top:16px;font-size:.8rem;color:var(--green-soft);font-weight:500;display:flex;align-items:center;gap:5px;">
+          <span class="fr">Voir le détail</span><span class="en">View details</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="why" id="why">
+  <div class="section-inner">
+    <p class="section-label reveal"><span class="fr">Pourquoi Agrilium</span><span class="en">Why Agrilium</span></p>
+    <h2 class="reveal fr">Conçu pour <em>ceux qui produisent</em></h2>
+    <h2 class="reveal en">Built for <em>those who produce</em></h2>
+    <p class="section-desc reveal fr">Puissant et simple à la fois. Chaque fonctionnalité est née d'un besoin concret, testé quotidiennement sur le terrain.</p>
+    <p class="section-desc reveal en">Powerful and simple at the same time. Every feature was born from a concrete need, tested daily in the field.</p>
+    <div class="why-grid">
+      <div class="why-item reveal">
+        <div class="why-num">01</div>
+        <div class="why-title fr">Éleveur avant tout</div><div class="why-title en">Farmer first</div>
+        <div class="why-desc fr">Thibaut gère ses chèvres laitières, vaches allaitantes et abeilles. Chaque fonctionnalité est testée sur le terrain avant d'être publiée.</div>
+        <div class="why-desc en">Thibaut manages his dairy goats, beef cattle and bees. Every feature is tested in the field before release.</div>
+      </div>
+      <div class="why-item reveal">
+        <div class="why-num">02</div>
+        <div class="why-title fr">Hors ligne possible</div><div class="why-title en">Offline-ready</div>
+        <div class="why-desc fr">Applications PWA fonctionnant sans internet. Synchronisation cloud à la reconnexion.</div>
+        <div class="why-desc en">PWA apps that work without internet. Cloud sync when reconnected.</div>
+      </div>
+      <div class="why-item reveal">
+        <div class="why-num">03</div>
+        <div class="why-title fr">Formules validées</div><div class="why-title en">Validated formulas</div>
+        <div class="why-desc fr">CAPRation utilise les normes INRA 2007 vérifiées.</div>
+        <div class="why-desc en">CAPRation uses verified INRA 2007 standards.</div>
+      </div>
+      <div class="why-item reveal">
+        <div class="why-num">04</div>
+        <div class="why-title fr">Écosystème cohérent</div><div class="why-title en">Coherent ecosystem</div>
+        <div class="why-desc fr">PC, mobile, Bluetooth — tous les outils partagent et sécurisent vos données via le cloud.</div>
+        <div class="why-desc en">PC, mobile, Bluetooth — all tools share and secure your data via the cloud.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="roadmap" id="roadmap">
+  <div class="section-inner">
+    <p class="section-label reveal"><span class="fr">Feuille de route</span><span class="en">Roadmap</span></p>
+    <h2 class="reveal fr">Ce qui <em>arrive</em></h2>
+    <h2 class="reveal en">What's <em>coming</em></h2>
+    <div class="roadmap-timeline reveal">
+      <div class="timeline-item">
+        <div class="timeline-dot dot-done">✓</div>
+        <div>
+          <div class="timeline-period">2025 — 2026</div>
+          <div class="timeline-title fr"></div><div class="timeline-title en"></div>
+          <div class="timeline-items fr">CapriScan PC & Mobile · CAPRation PC & Mobile · CapCulture · MétéoScan Pro</div>
+          <div class="timeline-items en">CapriScan PC & Mobile · CAPRation PC & Mobile · CapCulture · MétéoScan Pro</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot dot-now">→</div>
+        <div>
+          <div class="timeline-period fr">2026 — en cours</div><div class="timeline-period en">2026 — in progress</div>
+          <div class="timeline-items fr">BoviScan L & V · BoviRation · OviScan L & V · OviRation</div>
+          <div class="timeline-items en">BoviScan L & V · BoviRation · OviScan L & V · OviRation</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot dot-next">◌</div>
+        <div>
+          <div class="timeline-period">2027</div>
+          <div class="timeline-items fr">ApiScan · Partage entre éleveurs</div>
+          <div class="timeline-items en">ApiScan · Farmer sharing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-inner">
+    <p class="section-label reveal"><span class="fr">Contact</span><span class="en">Contact</span></p>
+    <h2 class="reveal fr">Parlons de <em>votre élevage</em></h2>
+    <h2 class="reveal en">Let's talk about <em>your farm</em></h2>
+    <div class="contact-grid reveal">
+      <div class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label><span class="fr">Prénom</span><span class="en">First name</span></label>
+            <input type="text" placeholder="">
+          </div>
+          <div class="form-group">
+            <label><span class="fr">Nom</span><span class="en">Last name</span></label>
+            <input type="text" placeholder="">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="">
+        </div>
+        <div class="form-group">
+          <label><span class="fr">Sujet</span><span class="en">Subject</span></label>
+          <select>
+            <option class="fr">Choisir un produit…</option>
+            <option class="en">Choose a product…</option>
+            <option>CapriScan</option>
+            <option>CAPRation</option>
+            <option>BoviScan Lait</option>
+            <option>BoviScan Viande</option>
+            <option>BoviRation</option>
+            <option>OviScan Lait</option>
+            <option>OviScan Viande</option>
+            <option>OviRation</option>
+            <option>ApiScan</option>
+            <option>CapCulture</option>
+            <option>MétéoScan Pro</option>
+            <option class="fr">Question générale</option>
+            <option class="en">General question</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label><span class="fr">Message</span><span class="en">Message</span></label>
+          <textarea class="fr" placeholder="Décrivez votre élevage et vos besoins…"></textarea>
+          <textarea class="en" placeholder="Tell us about your farm and your needs…"></textarea>
+        </div>
+        <button class="btn-primary fr" style="align-self:flex-start;">Envoyer le message</button>
+        <button class="btn-primary en" style="align-self:flex-start;">Send message</button>
+      </div>
+      <div class="contact-info">
+        <h3>Agrilium</h3>
+        <div class="contact-detail">
+          <div class="contact-detail-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+          <div class="contact-detail-text"><strong>Email</strong>contact.agrilium@yahoo.com</div>
+        </div>
+        <div class="contact-detail">
+          <div class="contact-detail-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+          <div class="contact-detail-text">
+            <strong><span class="fr">Localisation</span><span class="en">Location</span></strong>
+            Occitanie, France
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div class="nav-logo-mark" style="width:28px;height:28px;"><svg viewBox="0 0 24 24" fill="#0e2318" width="14" height="14"><path d="M12 2C9 6 5 8 5 13a7 7 0 0014 0c0-5-4-7-7-11z"/></svg></div>
+          <span style="font-family:var(--font-serif);font-size:1.05rem;color:var(--white);">Agrilium</span>
+        </div>
+        <p class="fr"></p>
+        <p class="en"></p>
+      </div>
+      <div class="footer-links">
+        <h4><span class="fr">Produits</span><span class="en">Products</span></h4>
+        <a href="#products">CapriScan</a><a href="#products">CAPRation</a>
+        <a href="#products">BoviScan Lait</a><a href="#products">BoviScan Viande</a>
+        <a href="#products">BoviRation</a><a href="#products">OviScan Lait</a>
+        <a href="#products">OviScan Viande</a><a href="#products">OviRation</a>
+        <a href="#products">ApiScan</a><a href="#products">CapCulture</a>
+        <a href="#products">MétéoScan Pro</a>
+      </div>
+      <div class="footer-links">
+        <h4><span class="fr">Entreprise</span><span class="en">Company</span></h4>
+        <a href="#about" class="fr">À propos</a><a href="#about" class="en">About</a>
+        <a href="#roadmap" class="fr">Feuille de route</a><a href="#roadmap" class="en">Roadmap</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="footer-links">
+        <h4><span class="fr">Légal</span><span class="en">Legal</span></h4>
+        <a href="mentions-legales.html" class="fr">Mentions légales</a><a href="mentions-legales.html" class="en">Legal notice</a>
+        <a href="cgu.html" class="fr">CGU</a><a href="cgu.html" class="en">Terms of use</a>
+        <a href="politique-confidentialite.html" class="fr">Confidentialité</a><a href="politique-confidentialite.html" class="en">Privacy</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="fr">© 2026 Agrilium — Thibaut Lafon. Tous droits réservés.</p>
+      <p class="en">© 2026 Agrilium — Thibaut Lafon. All rights reserved.</p>
+      <p>Occitanie, France</p>
+    </div>
+  </div>
+</footer>
+
+<!-- OVERLAY : CapriScan -->
+<div id="overlay-capriscan" class="overlay-panel" role="dialog" aria-modal="true">
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>CapriScan</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>CapriScan</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ov-hero" style="background:linear-gradient(135deg,#0a1f12 0%,#1a3d28 100%);">
+    <div class="ov-hero-bg" style="background:radial-gradient(circle at 80% 30%,#4a9463 0%,transparent 60%);"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr">✓ Disponible — Mobile & PC</span>
+      <span class="ov-badge en">✓ Available — Mobile & PC</span>
+    </div>
+    <div class="ov-title">CapriScan</div>
+    <div class="ov-tagline fr">Le carnet de bord caprin complet — PC + Mobile inclus, synchronisation cloud en temps réel.</div>
+    <div class="ov-tagline en">The complete goat logbook — PC + Mobile included, real-time cloud synchronization.</div>
+  </div>
+  <div class="ov-body">
+    <div class="ov-gallery">
+      <div class="ov-gallery-title fr">Captures d'écran</div>
+      <div class="ov-gallery-title en">Screenshots</div>
+      <div class="ov-screenshots">
+        <div class="ov-screen" onclick="openLightboxOverlay('capriscan',0)"><img src="images/capriscan01.jpeg" alt="CapriScan - Accueil" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+        <div class="ov-screen" onclick="openLightboxOverlay('capriscan',1)"><img src="images/capriscan02.jpeg" alt="CapriScan - Fiche animal" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+        <div class="ov-screen" onclick="openLightboxOverlay('capriscan',2)"><img src="images/capriscan03.jpeg" alt="CapriScan - Notation" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+        <div class="ov-screen" onclick="openLightboxOverlay('capriscan',3)"><img src="images/capriscan04.jpeg" alt="CapriScan - Calendrier sanitaire" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+        <div class="ov-screen" onclick="openLightboxOverlay('capriscan',4)"><img src="images/capriscan05.jpeg" alt="CapriScan - Statistiques" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+      </div>
+    </div>
+    <div class="ov-features">
+      <div class="ov-section-title fr">Fonctionnalités</div>
+      <div class="ov-section-title en">Features</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Inventaire complet</strong> — gestion de tous vos animaux avec historique complet</div><div class="ov-feature-text en"><strong>Full inventory</strong> — manage all your animals with complete history</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Alertes DAL/DAV automatiques</strong> — délais d'attente lait et viande calculés automatiquement</div><div class="ov-feature-text en"><strong>Automatic withdrawal alerts</strong> — milk and meat withdrawal periods calculated automatically</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Pharmacie vétérinaire</strong> — gestion des médicaments, traitements et stocks</div><div class="ov-feature-text en"><strong>Veterinary pharmacy</strong> — medication management, treatments and stock</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Notation pour la sélection</strong> — évaluation morphologique et productive pour le renouvellement</div><div class="ov-feature-text en"><strong>Selection scoring</strong> — morphological and productive assessment for herd renewal</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Calendrier sanitaire</strong> — planification des vaccins, traitements et visites vétérinaires</div><div class="ov-feature-text en"><strong>Health calendar</strong> — planning vaccines, treatments and vet visits</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Documents de circulation PDF</strong> — génération automatique des documents réglementaires</div><div class="ov-feature-text en"><strong>Movement documents PDF</strong> — automatic generation of regulatory documents</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Lecteur bâton Bluetooth RS420</strong> — identification sans les mains en toute situation</div><div class="ov-feature-text en"><strong>Bluetooth RS420 wand reader</strong> — hands-free identification in any situation</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Gestion multi-lots</strong> — organisez vos animaux par lots, cases ou groupes de production</div><div class="ov-feature-text en"><strong>Multi-group management</strong> — organize your animals by batches, pens or production groups</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Synchronisation cloud temps réel</strong> — vos données disponibles sur tous vos appareils instantanément</div><div class="ov-feature-text en"><strong>Real-time cloud sync</strong> — your data available on all your devices instantly</div></div>
+      </div>
+    </div>
+    <!-- Tarifs CapriScan -->
+    <div class="ov-section-title fr" style="margin-bottom:14px;">Tarifs</div>
+    <div class="ov-section-title en" style="margin-bottom:14px;">Pricing</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;">
+      <div class="ov-pricing">
+        <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-light);margin-bottom:10px;">📱 Mobile + 💻 PC</div>
+        <div class="ov-price-main"><span class="ov-price-amount">29,99 €</span><span class="ov-price-period fr">/mois</span><span class="ov-price-period en">/month</span></div>
+        <div class="ov-price-desc fr" style="margin-top:8px;">Bluetooth RS420 · Sync cloud · PC & Mobile</div>
+        <div class="ov-price-desc en" style="margin-top:8px;">Bluetooth RS420 · Cloud sync · PC & Mobile</div>
+      </div>
+      <div class="ov-pricing">
+        <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-light);margin-bottom:10px;">📅 Annuel</div>
+        <div class="ov-price-main"><span class="ov-price-amount">299,90 €</span><span class="ov-price-period fr">/an</span><span class="ov-price-period en">/year</span></div>
+        <div class="ov-price-desc fr" style="margin-top:8px;"><span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 8px;font-size:.78rem;">2 mois offerts</span></div>
+        <div class="ov-price-desc en" style="margin-top:8px;"><span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 8px;font-size:.78rem;">2 months free</span></div>
+      </div>
+    </div>
+    <div class="ov-cta">
+      <div class="btn-play-soon">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18.5v-13A1.5 1.5 0 015.2 4.1l13 6.5a1.5 1.5 0 010 2.8l-13 6.5A1.5 1.5 0 013 18.5z" fill="#aaa"/></svg>
+        <span class="fr">Bientôt sur Google Play</span><span class="en">Coming soon on Google Play</span>
+      </div>
+      <div class="ov-note fr">Laissez votre email en contact pour être notifié à la sortie</div>
+      <div class="ov-note en">Leave your email in the contact form to be notified at launch</div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY : CAPRation -->
+<div id="overlay-capriration" class="overlay-panel" role="dialog" aria-modal="true">
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>CapriRation</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>CapriRation</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ov-hero" style="background:linear-gradient(135deg,#1a1200 0%,#3d2e00 100%);">
+    <div class="ov-hero-bg" style="background:radial-gradient(circle at 80% 30%,#c8a96e 0%,transparent 60%);"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr">✓ Disponible — PC & Mobile</span>
+      <span class="ov-badge en">✓ Available — PC & Mobile</span>
+    </div>
+    <div class="ov-title">CapriRation</div>
+    <div class="ov-tagline fr">L'équivalent d'un nutritionniste à portée de main — calcul de rations caprines PC + Mobile, formules INRA 2007.</div>
+    <div class="ov-tagline en">The equivalent of a nutritionist at your fingertips — goat ration calculator PC + Mobile, INRA 2007 formulas.</div>
+  </div>
+  <div class="ov-body">
+    <div class="ov-gallery">
+      <div class="ov-gallery-title fr">Captures d'écran</div>
+      <div class="ov-gallery-title en">Screenshots</div>
+      <div class="ov-screenshots">
+        <div class="ov-screen" onclick="openLightboxOverlay('capriration',0)"><img src="images/CapriRation1.jpeg" alt="CapriRation - Calcul ration" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+        <div class="ov-screen" onclick="openLightboxOverlay('capriration',1)"><img src="images/CapriRation2.jpeg" alt="CapriRation - Balance ration" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+        <div class="ov-screen" onclick="openLightboxOverlay('capriration',2)"><img src="images/CapriRation3.jpeg" alt="CapriRation - Gestion refus" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+        <div class="ov-screen" onclick="openLightboxOverlay('capriration',3)"><img src="images/CapriRation4.jpeg" alt="CapriRation - Multi-lots" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+        <div class="ov-screen" onclick="openLightboxOverlay('capriration',4)"><img src="images/CapriRation5.jpeg" alt="CapriRation - Historique" style="width:100%;height:100%;object-fit:cover;border-radius:14px;"></div>
+      </div>
+    </div>
+    <div class="ov-features">
+      <div class="ov-section-title fr">Fonctionnalités</div>
+      <div class="ov-section-title en">Features</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Formules INRA 2007</strong> — calcul précis des besoins nutritionnels selon les normes officielles</div><div class="ov-feature-text en"><strong>INRA 2007 formulas</strong> — precise nutritional needs calculation based on official standards</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Gestion multi-lots</strong> — calculez les rations de plusieurs lots simultanément</div><div class="ov-feature-text en"><strong>Multi-group management</strong> — calculate rations for multiple groups simultaneously</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Correction par race</strong> — coefficients spécifiques Alpine, Saanen, Poitevine, Rove, Pyrénéenne, Angora</div><div class="ov-feature-text en"><strong>Breed correction</strong> — specific coefficients for Alpine, Saanen, Poitevine, Rove, Pyrénéenne, Angora</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Coefficients sanitaires ParaTB/CAEV</strong> — ajustement automatique selon le statut sanitaire du troupeau</div><div class="ov-feature-text en"><strong>ParaTB/CAEV health coefficients</strong> — automatic adjustment based on herd health status</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Production permise saine/réelle</strong> — deux modes de calcul selon l'état sanitaire de votre troupeau</div><div class="ov-feature-text en"><strong>Healthy/actual permitted production</strong> — two calculation modes based on herd health status</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Gestion des refus avec historique</strong> — ajustement des rations selon les refus constatés au fil du temps</div><div class="ov-feature-text en"><strong>Refusal management with history</strong> — ration adjustment based on recorded refusals over time</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Balance indicateur ration</strong> — visualisation graphique de l'équilibre nutritionnel de chaque ration</div><div class="ov-feature-text en"><strong>Ration balance indicator</strong> — graphical visualization of the nutritional balance of each ration</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>PC + Mobile inclus</strong> — accédez à vos rations depuis votre bureau ou sur le terrain</div><div class="ov-feature-text en"><strong>PC + Mobile included</strong> — access your rations from your desk or in the field</div></div>
+      </div>
+    </div>
+    <div class="ov-section-title fr" style="margin-bottom:14px;">Tarifs</div>
+    <div class="ov-section-title en" style="margin-bottom:14px;">Pricing</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;">
+      <div class="ov-pricing">
+        <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-light);margin-bottom:10px;">📱 Mobile + 💻 PC</div>
+        <div class="ov-price-main"><span class="ov-price-amount">24,99 €</span><span class="ov-price-period fr">/mois</span><span class="ov-price-period en">/month</span></div>
+        <div class="ov-price-desc fr" style="margin-top:8px;">Formules INRA 2007 · Multi-lots · PC & Mobile</div>
+        <div class="ov-price-desc en" style="margin-top:8px;">INRA 2007 formulas · Multi-groups · PC & Mobile</div>
+      </div>
+      <div class="ov-pricing">
+        <div style="font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text-light);margin-bottom:10px;">📅 Annuel</div>
+        <div class="ov-price-main"><span class="ov-price-amount">249,90 €</span><span class="ov-price-period fr">/an</span><span class="ov-price-period en">/year</span></div>
+        <div class="ov-price-desc fr" style="margin-top:8px;"><span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 8px;font-size:.78rem;">2 mois offerts</span></div>
+        <div class="ov-price-desc en" style="margin-top:8px;"><span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 8px;font-size:.78rem;">2 months free</span></div>
+      </div>
+    </div>
+    <div class="ov-cta">
+      <a href="https://tibix.github.io/CapriRation/CapriRation_PC.html" class="btn-cta fr" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Accéder à CapriRation PC
+      </a>
+      <a href="https://tibix.github.io/CapriRation/CapriRation_PC.html" class="btn-cta en" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Open CapriRation PC
+      </a>
+      <div class="ov-note fr">1 jour d'essai gratuit · Résiliable à tout moment · Paiement sécurisé Stripe</div>
+      <div class="ov-note en">1-day free trial · Cancel anytime · Secure payment via Stripe</div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY : CapCulture -->
+<div id="overlay-capculture" class="overlay-panel" role="dialog" aria-modal="true">
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>CapCulture</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>CapCulture</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ov-hero" style="background:linear-gradient(135deg,#0d1f0a 0%,#1e3d10 100%);">
+    <div class="ov-hero-bg" style="background:radial-gradient(circle at 80% 30%,#639922 0%,transparent 60%);"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr">✓ Disponible — PC & Mobile</span>
+      <span class="ov-badge en">✓ Available — PC & Mobile</span>
+    </div>
+    <div class="ov-title">CapCulture</div>
+    <div class="ov-tagline fr">Gérez vos parcelles, cultures et rendements depuis votre téléphone ou votre PC, avec carte satellite intégrée.</div>
+    <div class="ov-tagline en">Manage your fields, crops and yields from your phone or PC, with integrated satellite map.</div>
+  </div>
+  <div class="ov-body">
+    <div class="ov-gallery">
+      <div class="ov-gallery-title fr">Captures d'écran</div>
+      <div class="ov-gallery-title en">Screenshots</div>
+      <div class="ov-screenshots">
+        <div class="ov-screen"><div class="ov-screen-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="fr">Carte parcelles</span><span class="en">Field map</span></div></div>
+        <div class="ov-screen"><div class="ov-screen-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="fr">Vue satellite</span><span class="en">Satellite view</span></div></div>
+        <div class="ov-screen"><div class="ov-screen-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="fr">Saisie rendement</span><span class="en">Yield entry</span></div></div>
+        <div class="ov-screen"><div class="ov-screen-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="fr">Bilan annuel</span><span class="en">Annual report</span></div></div>
+        <div class="ov-screen"><div class="ov-screen-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg><span class="fr">Cadastre</span><span class="en">Land registry</span></div></div>
+      </div>
+    </div>
+    <div class="ov-features">
+      <div class="ov-section-title fr">Fonctionnalités</div>
+      <div class="ov-section-title en">Features</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Parcelles sur carte satellite</strong> — visualisez et délimitez vos parcelles en vue aérienne</div><div class="ov-feature-text en"><strong>Fields on satellite map</strong> — view and outline your fields from aerial view</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Carte cadastrale</strong> — superposition du cadastre pour identifier les limites officielles</div><div class="ov-feature-text en"><strong>Land registry overlay</strong> — cadastre layer to identify official field boundaries</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Saisie des rendements</strong> — enregistrez les récoltes par parcelle et par culture</div><div class="ov-feature-text en"><strong>Yield recording</strong> — log harvests by field and crop type</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Surface automatique</strong> — calcul de la surface de chaque parcelle en hectares</div><div class="ov-feature-text en"><strong>Automatic area</strong> — automatic field area calculation in hectares</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Bilan rendement annuel</strong> — production totale par culture, comparaison entre campagnes</div><div class="ov-feature-text en"><strong>Annual yield report</strong> — total production by crop, campaign comparison</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>PC & Mobile</strong> — accès depuis votre bureau ou sur le terrain depuis votre téléphone</div><div class="ov-feature-text en"><strong>PC & Mobile</strong> — access from your desk or in the field from your phone</div></div>
+      </div>
+    </div>
+    <div class="ov-pricing" style="margin-bottom:28px;">
+      <div class="ov-price-top">
+        <div class="ov-price-main"><span class="ov-price-amount">24,99 €</span><span class="ov-price-period fr">/mois</span><span class="ov-price-period en">/month</span></div>
+        <span class="ov-trial-badge fr">PC + Mobile inclus</span>
+        <span class="ov-trial-badge en">PC + Mobile included</span>
+      </div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+        <span style="font-family:var(--font-serif);font-size:1.3rem;color:var(--text-dark);">249,90 €</span>
+        <span class="fr" style="font-size:.85rem;color:var(--text-mid);">/ an <span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:500;">2 mois offerts</span></span>
+        <span class="en" style="font-size:.85rem;color:var(--text-mid);">/ year <span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:500;">2 months free</span></span>
+      </div>
+      <div class="ov-price-desc fr" style="margin-top:12px;">Un seul abonnement pour l'accès PC et mobile. Résiliable à tout moment.</div>
+      <div class="ov-price-desc en" style="margin-top:12px;">One subscription for both PC and mobile access. Cancel anytime.</div>
+    </div>
+    <div class="ov-cta">
+      <div class="btn-play-soon">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18.5v-13A1.5 1.5 0 015.2 4.1l13 6.5a1.5 1.5 0 010 2.8l-13 6.5A1.5 1.5 0 013 18.5z" fill="#aaa"/></svg>
+        <span class="fr">Bientôt disponible</span><span class="en">Coming soon</span>
+      </div>
+      <div class="ov-note fr">Laissez votre email en contact pour être notifié à la sortie</div>
+      <div class="ov-note en">Leave your email in the contact form to be notified at launch</div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY : Pack Caprin -->
+<div id="overlay-pack-caprin" class="overlay-panel" role="dialog" aria-modal="true">
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>Pack Caprin</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>Goat Bundle</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ov-hero" style="background:linear-gradient(135deg,#0e2318 0%,#1a3d28 60%,#3d2e00 100%);">
+    <div class="ov-hero-bg" style="background:radial-gradient(circle at 80% 30%,#c8a96e 0%,transparent 60%);"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Meilleure valeur</span>
+      <span class="ov-badge en" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Best value</span>
+    </div>
+    <div class="ov-title fr">Pack Caprin</div>
+    <div class="ov-title en">Goat Bundle</div>
+    <div class="ov-tagline fr">La solution caprine complète — CapriScan + CAPRation + MétéoScan Pro réunis en un seul abonnement.</div>
+    <div class="ov-tagline en">The complete goat solution — CapriScan + CAPRation + MétéoScan Pro in a single subscription.</div>
+  </div>
+  <div class="ov-body">
+    <div class="ov-features">
+      <div class="ov-section-title fr">Ce pack inclut</div>
+      <div class="ov-section-title en">This bundle includes</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>CapriScan Lait</strong> — carnet de bord caprin complet, Bluetooth RS420, calendrier sanitaire, documents PDF</div><div class="ov-feature-text en"><strong>CapriScan Lait</strong> — complete goat logbook, Bluetooth RS420, health calendar, PDF documents</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>CAPRation</strong> — calcul de rations INRA 2007, coefficients ParaTB/CAEV, gestion des refus</div><div class="ov-feature-text en"><strong>CAPRation</strong> — INRA 2007 ration calculator, ParaTB/CAEV coefficients, refusal management</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>MétéoScan Pro</strong> — météo agricole, stress thermique ITH, radar Windy, alertes personnalisées</div><div class="ov-feature-text en"><strong>MétéoScan Pro</strong> — agricultural weather, ITH heat stress, Windy radar, custom alerts</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>PC + Mobile inclus</strong> — accès sur tous vos appareils avec synchronisation cloud en temps réel</div><div class="ov-feature-text en"><strong>PC + Mobile included</strong> — access on all your devices with real-time cloud sync</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>Support prioritaire</strong> — assistance dédiée aux abonnés pack</div><div class="ov-feature-text en"><strong>Priority support</strong> — dedicated assistance for bundle subscribers</div></div>
+      </div>
+    </div>
+
+    <!-- Tarifs Pack -->
+    <div class="ov-pricing" style="margin-bottom:16px;">
+      <div class="ov-price-top">
+        <div class="ov-price-main">
+          <span class="ov-price-amount">49,99 €</span>
+          <span class="ov-price-period fr">/ mois</span>
+          <span class="ov-price-period en">/ month</span>
+        </div>
+        <span class="ov-trial-badge fr">7 jours offerts</span>
+        <span class="ov-trial-badge en">7-day free trial</span>
+      </div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+        <span style="font-family:var(--font-serif);font-size:1.3rem;color:var(--text-dark);">499,90 €</span>
+        <span class="fr" style="font-size:.85rem;color:var(--text-mid);">/ an <span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:500;">2 mois offerts</span></span>
+        <span class="en" style="font-size:.85rem;color:var(--text-mid);">/ year <span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:500;">2 months free</span></span>
+      </div>
+      <div class="ov-price-desc fr" style="margin-top:12px;">Valeur séparée : 599,70 €/an — <strong>économisez 99,80 €/an</strong> avec le pack.</div>
+      <div class="ov-price-desc en" style="margin-top:12px;">Separate value: 599,70 €/year — <strong>save 99,80 €/year</strong> with the bundle.</div>
+    </div>
+
+    <div class="ov-cta">
+      <div class="btn-play-soon">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18.5v-13A1.5 1.5 0 015.2 4.1l13 6.5a1.5 1.5 0 010 2.8l-13 6.5A1.5 1.5 0 013 18.5z" fill="#aaa"/></svg>
+        <span class="fr">Bientôt disponible</span><span class="en">Coming soon</span>
+      </div>
+      <div class="ov-note fr">Laissez votre email en contact pour être notifié à la sortie</div>
+      <div class="ov-note en">Leave your email in the contact form to be notified at launch</div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY : SORTIE IMMINENTE -->
+
+<!-- OVERLAY : Pack Bovin Lait -->
+<div id="overlay-pack-bovin-lait" class="overlay-panel" role="dialog" aria-modal="true">
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>Pack Bovin Lait</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>Dairy Cattle Bundle</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="ov-hero" style="background:linear-gradient(135deg,#0e1a2e 0%,#1a2e3d 100%);">
+    <div class="ov-hero-bg" style="background:radial-gradient(circle at 80% 30%,#4a9de0 0%,transparent 60%);"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Pack</span>
+      <span class="ov-badge en" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Bundle</span>
+    </div>
+    <div class="ov-title fr">Pack Bovin Lait</div>
+    <div class="ov-title en">Dairy Cattle Bundle</div>
+    <div class="ov-tagline fr">La solution bovine laitière complète — BoviScan Lait + BoviRation + MétéoScan Pro.</div>
+    <div class="ov-tagline en">The complete dairy cattle solution — BoviScan Lait + BoviRation + MétéoScan Pro.</div>
+  </div>
+  <div class="ov-body">
+    <div class="ov-features">
+      <div class="ov-section-title fr">Ce pack inclut</div>
+      <div class="ov-section-title en">This bundle includes</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>BoviScan Lait</strong> — carnet de bord bovin laitier complet, PC + Mobile</div><div class="ov-feature-text en"><strong>BoviScan Lait</strong> — complete dairy cattle logbook, PC + Mobile</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>BoviRation</strong> — calcul de rations bovines INRA 2007, PC + Mobile</div><div class="ov-feature-text en"><strong>BoviRation</strong> — INRA 2007 cattle ration calculator, PC + Mobile</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>MétéoScan Pro</strong> — météo agricole, stress thermique ITH, radar Windy</div><div class="ov-feature-text en"><strong>MétéoScan Pro</strong> — agricultural weather, ITH heat stress, Windy radar</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>PC + Mobile inclus</strong> — synchronisation cloud en temps réel</div><div class="ov-feature-text en"><strong>PC + Mobile included</strong> — real-time cloud sync</div></div>
+      </div>
+    </div>
+    <div class="ov-cta" style="margin-top:28px;">
+      <div class="btn-play-soon"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18.5v-13A1.5 1.5 0 015.2 4.1l13 6.5a1.5 1.5 0 010 2.8l-13 6.5A1.5 1.5 0 013 18.5z" fill="#aaa"/></svg>
+        <span class="fr">Bientôt disponible</span><span class="en">Coming soon</span>
+      </div>
+      <div class="ov-note fr">Laissez votre email en contact pour être notifié à la sortie</div>
+      <div class="ov-note en">Leave your email in the contact form to be notified at launch</div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY : Pack Bovin Viande -->
+<div id="overlay-pack-bovin-viande" class="overlay-panel" role="dialog" aria-modal="true">
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>Pack Bovin Viande</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>Beef Cattle Bundle</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="ov-hero" style="background:linear-gradient(135deg,#1a0e0e 0%,#3d1a1a 100%);">
+    <div class="ov-hero-bg" style="background:radial-gradient(circle at 80% 30%,#c84a4a 0%,transparent 60%);"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Pack</span>
+      <span class="ov-badge en" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Bundle</span>
+    </div>
+    <div class="ov-title fr">Pack Bovin Viande</div>
+    <div class="ov-title en">Beef Cattle Bundle</div>
+    <div class="ov-tagline fr">La solution bovine viande complète — BoviScan Viande + BoviRation + MétéoScan Pro.</div>
+    <div class="ov-tagline en">The complete beef cattle solution — BoviScan Viande + BoviRation + MétéoScan Pro.</div>
+  </div>
+  <div class="ov-body">
+    <div class="ov-features">
+      <div class="ov-section-title fr">Ce pack inclut</div>
+      <div class="ov-section-title en">This bundle includes</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>BoviScan Viande</strong> — carnet de bord bovin viande complet, PC + Mobile</div><div class="ov-feature-text en"><strong>BoviScan Viande</strong> — complete beef cattle logbook, PC + Mobile</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>BoviRation</strong> — calcul de rations bovines INRA 2007, PC + Mobile</div><div class="ov-feature-text en"><strong>BoviRation</strong> — INRA 2007 cattle ration calculator, PC + Mobile</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>MétéoScan Pro</strong> — météo agricole, stress thermique ITH, radar Windy</div><div class="ov-feature-text en"><strong>MétéoScan Pro</strong> — agricultural weather, ITH heat stress, Windy radar</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>PC + Mobile inclus</strong> — synchronisation cloud en temps réel</div><div class="ov-feature-text en"><strong>PC + Mobile included</strong> — real-time cloud sync</div></div>
+      </div>
+    </div>
+    <div class="ov-cta" style="margin-top:28px;">
+      <div class="btn-play-soon"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18.5v-13A1.5 1.5 0 015.2 4.1l13 6.5a1.5 1.5 0 010 2.8l-13 6.5A1.5 1.5 0 013 18.5z" fill="#aaa"/></svg>
+        <span class="fr">Bientôt disponible</span><span class="en">Coming soon</span>
+      </div>
+      <div class="ov-note fr">Laissez votre email en contact pour être notifié à la sortie</div>
+      <div class="ov-note en">Leave your email in the contact form to be notified at launch</div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY : Pack Ovin Lait -->
+<div id="overlay-pack-ovin-lait" class="overlay-panel" role="dialog" aria-modal="true">
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>Pack Ovin Lait</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>Dairy Sheep Bundle</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="ov-hero" style="background:linear-gradient(135deg,#0e1a2e 0%,#2e3d1a 100%);">
+    <div class="ov-hero-bg" style="background:radial-gradient(circle at 80% 30%,#7ec850 0%,transparent 60%);"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Pack</span>
+      <span class="ov-badge en" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Bundle</span>
+    </div>
+    <div class="ov-title fr">Pack Ovin Lait</div>
+    <div class="ov-title en">Dairy Sheep Bundle</div>
+    <div class="ov-tagline fr">La solution ovine laitière complète — OviScan Lait + OviRation + MétéoScan Pro.</div>
+    <div class="ov-tagline en">The complete dairy sheep solution — OviScan Lait + OviRation + MétéoScan Pro.</div>
+  </div>
+  <div class="ov-body">
+    <div class="ov-features">
+      <div class="ov-section-title fr">Ce pack inclut</div>
+      <div class="ov-section-title en">This bundle includes</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>OviScan Lait</strong> — carnet de bord ovin laitier complet, PC + Mobile</div><div class="ov-feature-text en"><strong>OviScan Lait</strong> — complete dairy sheep logbook, PC + Mobile</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>OviRation</strong> — calcul de rations ovines INRA 2007, PC + Mobile</div><div class="ov-feature-text en"><strong>OviRation</strong> — INRA 2007 sheep ration calculator, PC + Mobile</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>MétéoScan Pro</strong> — météo agricole, stress thermique ITH, radar Windy</div><div class="ov-feature-text en"><strong>MétéoScan Pro</strong> — agricultural weather, ITH heat stress, Windy radar</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>PC + Mobile inclus</strong> — synchronisation cloud en temps réel</div><div class="ov-feature-text en"><strong>PC + Mobile included</strong> — real-time cloud sync</div></div>
+      </div>
+    </div>
+    <div class="ov-cta" style="margin-top:28px;">
+      <div class="btn-play-soon"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18.5v-13A1.5 1.5 0 015.2 4.1l13 6.5a1.5 1.5 0 010 2.8l-13 6.5A1.5 1.5 0 013 18.5z" fill="#aaa"/></svg>
+        <span class="fr">Bientôt disponible</span><span class="en">Coming soon</span>
+      </div>
+      <div class="ov-note fr">Laissez votre email en contact pour être notifié à la sortie</div>
+      <div class="ov-note en">Leave your email in the contact form to be notified at launch</div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY : Pack Ovin Viande -->
+<div id="overlay-pack-ovin-viande" class="overlay-panel" role="dialog" aria-modal="true">
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>Pack Ovin Viande</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>Meat Sheep Bundle</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="ov-hero" style="background:linear-gradient(135deg,#1a1a0e 0%,#3d3d1a 100%);">
+    <div class="ov-hero-bg" style="background:radial-gradient(circle at 80% 30%,#c8a030 0%,transparent 60%);"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Pack</span>
+      <span class="ov-badge en" style="background:rgba(200,169,110,.2);border-color:rgba(200,169,110,.4);color:#e8d4a8;">⭐ Bundle</span>
+    </div>
+    <div class="ov-title fr">Pack Ovin Viande</div>
+    <div class="ov-title en">Meat Sheep Bundle</div>
+    <div class="ov-tagline fr">La solution ovine viande complète — OviScan Viande + OviRation + MétéoScan Pro.</div>
+    <div class="ov-tagline en">The complete meat sheep solution — OviScan Viande + OviRation + MétéoScan Pro.</div>
+  </div>
+  <div class="ov-body">
+    <div class="ov-features">
+      <div class="ov-section-title fr">Ce pack inclut</div>
+      <div class="ov-section-title en">This bundle includes</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>OviScan Viande</strong> — carnet de bord ovin viande complet, PC + Mobile</div><div class="ov-feature-text en"><strong>OviScan Viande</strong> — complete meat sheep logbook, PC + Mobile</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>OviRation</strong> — calcul de rations ovines INRA 2007, PC + Mobile</div><div class="ov-feature-text en"><strong>OviRation</strong> — INRA 2007 sheep ration calculator, PC + Mobile</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>MétéoScan Pro</strong> — météo agricole, stress thermique ITH, radar Windy</div><div class="ov-feature-text en"><strong>MétéoScan Pro</strong> — agricultural weather, ITH heat stress, Windy radar</div></div>
+        <div class="ov-feature"><div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="ov-feature-text fr"><strong>PC + Mobile inclus</strong> — synchronisation cloud en temps réel</div><div class="ov-feature-text en"><strong>PC + Mobile included</strong> — real-time cloud sync</div></div>
+      </div>
+    </div>
+    <div class="ov-cta" style="margin-top:28px;">
+      <div class="btn-play-soon"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18.5v-13A1.5 1.5 0 015.2 4.1l13 6.5a1.5 1.5 0 010 2.8l-13 6.5A1.5 1.5 0 013 18.5z" fill="#aaa"/></svg>
+        <span class="fr">Bientôt disponible</span><span class="en">Coming soon</span>
+      </div>
+      <div class="ov-note fr">Laissez votre email en contact pour être notifié à la sortie</div>
+      <div class="ov-note en">Leave your email in the contact form to be notified at launch</div>
+    </div>
+  </div>
+</div>
+<div id="overlay-soon" role="dialog" aria-modal="true" class="overlay-panel">
+  <div class="ov-coming-close">
+    <button class="ov-close-btn" onclick="closeOverlay()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ov-coming-inner">
+    <div class="ov-coming-icon">🚀</div>
+    <div class="ov-coming-title fr">Sortie <em>imminente</em></div>
+    <div class="ov-coming-title en">Coming <em>very soon</em></div>
+    <div class="ov-coming-desc fr">Cette application est en phase finale de développement. La sortie est imminente — laissez votre email pour être parmi les premiers notifiés !</div>
+    <div class="ov-coming-desc en">This application is in its final development phase. Launch is imminent — leave your email to be among the first notified!</div>
+    <a href="#contact" class="btn-primary fr" onclick="closeOverlay()">Me notifier à la sortie</a>
+    <a href="#contact" class="btn-primary en" onclick="closeOverlay()">Notify me at launch</a>
+  </div>
+</div>
+
+<!-- OVERLAY : À VENIR -->
+<div id="overlay-coming-soon" role="dialog" aria-modal="true">
+  <div class="ov-coming-close">
+    <button class="ov-close-btn" onclick="closeOverlay()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ov-coming-inner">
+    <div class="ov-coming-icon">🚜</div>
+    <div class="ov-coming-title fr">En cours de <em>développement</em></div>
+    <div class="ov-coming-title en">Currently in <em>development</em></div>
+    <div class="ov-coming-desc fr">Cette application est en cours de développement. Laissez votre email pour être notifié à la sortie.</div>
+    <div class="ov-coming-desc en">This application is currently being developed. Leave your email to be notified at launch.</div>
+    <a href="#contact" class="btn-primary fr" onclick="closeOverlay()">Me notifier à la sortie</a>
+    <a href="#contact" class="btn-primary en" onclick="closeOverlay()">Notify me at launch</a>
+  </div>
+</div>
+
+<div id="overlay-backdrop" onclick="closeOverlay()"></div>
+
+<!-- OVERLAY PANEL : MétéoScan Pro -->
+<div id="overlay-panel" role="dialog" aria-modal="true" aria-label="MétéoScan Pro">
+
+  <!-- Barre sticky -->
+  <div class="ov-close">
+    <span class="ov-close-breadcrumb fr">Produits → <span>MétéoScan Pro</span></span>
+    <span class="ov-close-breadcrumb en">Products → <span>MétéoScan Pro</span></span>
+    <button class="ov-close-btn" onclick="closeOverlay()" aria-label="Fermer">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <!-- Hero de l'overlay -->
+  <div class="ov-hero">
+    <div class="ov-hero-bg"></div>
+    <div class="ov-hero-top">
+      <span class="ov-badge fr">✓ Disponible — Android</span>
+      <span class="ov-badge en">✓ Available — Android</span>
+    </div>
+    <div class="ov-title">MétéoScan Pro</div>
+    <div class="ov-tagline fr">L'unique application météo dédiée aux éleveurs. Alertes stress thermique ITH, radar Windy, conditions potager, disponible en FR/EN/ES.</div>
+    <div class="ov-tagline en">The only weather app dedicated to livestock farmers. ITH heat stress alerts, Windy radar, garden conditions, available in FR/EN/ES.</div>
+  </div>
+
+  <div class="ov-body">
+
+    <!-- Galerie captures d'écran -->
+    <div class="ov-gallery">
+      <div class="ov-gallery-title fr">Captures d'écran</div>
+      <div class="ov-gallery-title en">Screenshots</div>
+      <div class="ov-screenshots" id="screenshots-meteo">
+        <div class="ov-screen" onclick="openLightbox(0)">
+          <img src="images/meteo01.jpeg" alt="MétéoScan Pro écran 1" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">
+        </div>
+        <div class="ov-screen" onclick="openLightbox(1)">
+          <img src="images/meteo02.jpeg" alt="MétéoScan Pro écran 2" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">
+        </div>
+        <div class="ov-screen" onclick="openLightbox(2)">
+          <img src="images/meteo03.jpeg" alt="MétéoScan Pro écran 3" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">
+        </div>
+        <div class="ov-screen" onclick="openLightbox(3)">
+          <img src="images/meteo04.jpeg" alt="MétéoScan Pro écran 4" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">
+        </div>
+        <div class="ov-screen" onclick="openLightbox(4)">
+          <img src="images/meteo05.jpeg" alt="MétéoScan Pro écran 5" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">
+        </div>
+      </div>
+    </div>
+
+    <!-- Fonctionnalités -->
+    <div class="ov-features">
+      <div class="ov-section-title fr">Fonctionnalités</div>
+      <div class="ov-section-title en">Features</div>
+      <div class="ov-feature-list">
+        <div class="ov-feature">
+          <div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="ov-feature-text fr"><strong>Météo hyper-locale</strong> — prévisions à l'heure, ciblées sur votre exploitation</div>
+          <div class="ov-feature-text en"><strong>Hyper-local weather</strong> — hourly forecasts targeted to your farm location</div>
+        </div>
+        <div class="ov-feature">
+          <div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="ov-feature-text fr"><strong>Stress thermique ITH</strong> — indice de confort animal calculé en temps réel pour votre troupeau</div>
+          <div class="ov-feature-text en"><strong>ITH heat stress index</strong> — real-time animal comfort index calculated for your herd</div>
+        </div>
+        <div class="ov-feature">
+          <div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="ov-feature-text fr"><strong>Radar Windy intégré</strong> — visualisez les précipitations en temps réel sur la carte</div>
+          <div class="ov-feature-text en"><strong>Integrated Windy radar</strong> — visualize real-time precipitation on the map</div>
+        </div>
+        <div class="ov-feature">
+          <div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="ov-feature-text fr"><strong>Alertes personnalisées</strong> — gel, canicule, orage, vent fort, fortes pluies</div>
+          <div class="ov-feature-text en"><strong>Custom alerts</strong> — frost, heat wave, storm, strong winds, heavy rain</div>
+        </div>
+        <div class="ov-feature">
+          <div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="ov-feature-text fr"><strong>Conditions potager</strong> — suivi adapté pour la gestion de vos cultures</div>
+          <div class="ov-feature-text en"><strong>Garden conditions</strong> — tailored monitoring for your crop management</div>
+        </div>
+        <div class="ov-feature">
+          <div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="ov-feature-text fr"><strong>Prévisions 7 jours</strong> — planifiez la tonte, les traitements et les sorties de troupeau</div>
+          <div class="ov-feature-text en"><strong>7-day forecast</strong> — plan shearing, treatments and herd outings</div>
+        </div>
+        <div class="ov-feature">
+          <div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="ov-feature-text fr"><strong>Pluviométrie cumulée</strong> — suivi des précipitations pour la gestion des pâtures</div>
+          <div class="ov-feature-text en"><strong>Cumulative rainfall</strong> — precipitation tracking for pasture management</div>
+        </div>
+        <div class="ov-feature">
+          <div class="ov-feature-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="ov-feature-text fr"><strong>Trilingue FR/EN/ES</strong> — interface disponible en français, anglais et espagnol</div>
+          <div class="ov-feature-text en"><strong>Trilingual FR/EN/ES</strong> — interface available in French, English and Spanish</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarif -->
+    <div class="ov-pricing">
+      <div class="ov-price-top">
+        <div class="ov-price-main">
+          <span class="ov-price-amount">4,99 €</span>
+          <span class="ov-price-period fr">/ mois</span>
+          <span class="ov-price-period en">/ month</span>
+        </div>
+        <span class="ov-trial-badge fr">Essai 7 jours</span>
+        <span class="ov-trial-badge en">7-day trial</span>
+      </div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+        <span style="font-family:var(--font-serif);font-size:1.3rem;color:var(--text-dark);">49,90 €</span>
+        <span class="fr" style="font-size:.85rem;color:var(--text-mid);">/ an <span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:500;">2 mois offerts</span></span>
+        <span class="en" style="font-size:.85rem;color:var(--text-mid);">/ year <span style="background:#ddf0e4;color:#1a5c34;border-radius:20px;padding:2px 10px;font-size:.78rem;font-weight:500;">2 months free</span></span>
+      </div>
+      <div class="ov-price-desc fr" style="margin-top:12px;">Essai gratuit sans engagement. Paiement sécurisé par Stripe. Résiliable à tout moment.</div>
+      <div class="ov-price-desc en" style="margin-top:12px;">Free trial, no commitment. Secure payment via Stripe. Cancel anytime.</div>
+    </div>
+
+    <!-- CTA -->
+    <div class="ov-cta">
+      <div class="btn-play-soon">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18.5v-13A1.5 1.5 0 015.2 4.1l13 6.5a1.5 1.5 0 010 2.8l-13 6.5A1.5 1.5 0 013 18.5z" fill="#aaa"/></svg>
+        <span class="fr">Bientôt sur Google Play</span>
+        <span class="en">Coming soon on Google Play</span>
+      </div>
+      <div class="ov-note fr">Publication en cours — laissez votre email en contact pour être notifié</div>
+      <div class="ov-note en">Publishing in progress — leave your email in the contact form to be notified</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="closeLightbox()">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <button id="lightbox-prev" onclick="event.stopPropagation();navigateLightbox(-1)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <img id="lightbox-img" src="" alt="">
+  <button id="lightbox-next" onclick="event.stopPropagation();navigateLightbox(1)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div id="lightbox-dots"></div>
+</div>
+
+<script>
+// ── FILTRES PRODUITS ──
+function filterProducts(cat) {
+  document.querySelectorAll('.prod-filter').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.querySelectorAll('.product-card').forEach(card => {
+    if(cat === 'all') {
+      card.classList.remove('hidden');
+    } else {
+      const cardCat = (card.getAttribute('data-category') || '').split(' ');
+      if(cardCat.includes(cat)) card.classList.remove('hidden');
+      else card.classList.add('hidden');
+    }
+  });
+}
+
+function toggleLang(){
+  const b = document.body, l = document.getElementById('lang-lbl');
+  if(b.classList.contains('lang-en')){ b.classList.remove('lang-en'); l.textContent='EN'; document.documentElement.lang='fr'; }
+  else { b.classList.add('lang-en'); l.textContent='FR'; document.documentElement.lang='en'; }
+}
+
+const obs = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('visible'); }), {threshold:.08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── OVERLAY ──
+function openOverlay(id) {
+  document.querySelectorAll('.overlay-panel, #overlay-panel, #overlay-coming-soon, #overlay-soon').forEach(p => p.classList.remove('open'));
+  let panel;
+  if(id === 'meteo') panel = document.getElementById('overlay-panel');
+  else if(id === 'coming-soon') panel = document.getElementById('overlay-coming-soon');
+  else if(id === 'soon') panel = document.getElementById('overlay-soon');
+  else panel = document.getElementById('overlay-' + id);  if(panel) panel.classList.add('open');
+  document.getElementById('overlay-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeOverlay() {
+  document.querySelectorAll('.overlay-panel, #overlay-panel, #overlay-coming-soon, #overlay-soon').forEach(p => p.classList.remove('open'));
+  document.getElementById('overlay-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}document.addEventListener('keydown', e => { if(e.key === 'Escape') { closeOverlay(); closeLightbox(); } });
+
+// ── LIGHTBOX ──
+const screenshotsData = {
+  meteo: ['images/meteo01.jpeg','images/meteo02.jpeg','images/meteo03.jpeg','images/meteo04.jpeg','images/meteo05.jpeg'],
+  capriscan: ['images/capriscan01.jpeg','images/capriscan02.jpeg','images/capriscan03.jpeg','images/capriscan04.jpeg','images/capriscan05.jpeg'],
+  capriration: ['images/CapriRation1.jpeg','images/CapriRation2.jpeg','images/CapriRation3.jpeg','images/CapriRation4.jpeg','images/CapriRation5.jpeg'],
+};
+let currentOverlay = 'meteo';
+let currentIndex = 0;
+
+function openLightbox(i) { openLightboxOverlay('meteo', i); }
+function openLightboxOverlay(overlay, i) {
+  const imgs = screenshotsData[overlay] || [];
+  if(!imgs[i]) return;
+  currentOverlay = overlay;
+  currentIndex = i;
+  document.getElementById('lightbox-img').src = imgs[i];
+  document.getElementById('lightbox').classList.add('open');
+  updateLightboxDots(imgs.length, i);
+}
+function navigateLightbox(dir) {
+  const imgs = screenshotsData[currentOverlay] || [];
+  currentIndex = (currentIndex + dir + imgs.length) % imgs.length;
+  document.getElementById('lightbox-img').src = imgs[currentIndex];
+  updateLightboxDots(imgs.length, currentIndex);
+}
+function updateLightboxDots(total, active) {
+  const dots = document.getElementById('lightbox-dots');
+  dots.innerHTML = '';
+  for(let i = 0; i < total; i++) {
+    const d = document.createElement('button');
+    d.className = 'lightbox-dot' + (i === active ? ' active' : '');
+    d.onclick = (e) => { e.stopPropagation(); currentIndex = i; document.getElementById('lightbox-img').src = screenshotsData[currentOverlay][i]; updateLightboxDots(total, i); };
+    dots.appendChild(d);
+  }
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lightbox-img').src = '';
+}
+// Navigation clavier
+document.addEventListener('keydown', e => {
+  if(document.getElementById('lightbox').classList.contains('open')) {
+    if(e.key === 'ArrowRight') navigateLightbox(1);
+    if(e.key === 'ArrowLeft') navigateLightbox(-1);
+  }
+  if(e.key === 'Escape') { closeOverlay(); closeLightbox(); }
+});
+</script>
+</body>
+</html>
