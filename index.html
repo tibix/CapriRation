@@ -1,0 +1,1440 @@
+<!--
+================================================================================
+  CapriRation Mobile — Application de distribution des rations caprines
+  Copyright (c) 2026 Agrilium (Thibaut Lafon) — SIRET 10595610600014
+  Tous droits réservés.
+
+  LICENCE PROPRIÉTAIRE — UTILISATION STRICTEMENT INTERDITE SANS AUTORISATION
+
+  Ce logiciel et son code source sont la propriété exclusive d'Agrilium.
+  Toute reproduction, modification, distribution, ingénierie inverse,
+  décompilation, extraction ou réutilisation partielle ou totale de ce code,
+  sous quelque forme que ce soit et par quelque moyen que ce soit, est
+  strictement interdite sans l'autorisation écrite préalable d'Agrilium.
+
+  L'accès à ce fichier ne confère aucun droit d'utilisation du code source.
+  Ce logiciel est protégé par le droit d'auteur français (Code de la propriété
+  intellectuelle) et les conventions internationales sur le droit d'auteur.
+
+  Toute violation fera l'objet de poursuites judiciaires.
+
+  Contact : contact@myagrilium.com
+  Site    : https://www.myagrilium.com
+================================================================================
+-->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CapriRation">
+<meta name="theme-color" content="#1a3a2a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>CapriRation Mobile</title>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js'));
+}
+</script>
+<style>
+:root{
+  --vert:#2d6a4f;--vert-f:#1a3a2a;--vert-c:#52b788;--vert-p:#e8f5e9;
+  --gris:#6b7280;--bord:#e5e7eb;--danger:#c0392b;--warn:#d68910;
+  --bg:#f5f7f2;--card:#fff;--r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:#1f2937;min-height:100dvh}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:var(--vert-f);color:#fff;
+  padding:env(safe-area-inset-top) 0 0;
+}
+.topbar-inner{display:flex;align-items:center;gap:10px;padding:.75rem 1rem}
+.topbar-logo{font-size:1.4rem}
+.topbar-title{font-size:1.1rem;font-weight:700;letter-spacing:-.02em}
+.topbar-sub{font-size:.7rem;opacity:.7;margin-top:1px}
+.topbar-status{margin-left:auto;font-size:.7rem;padding:3px 9px;border-radius:20px;background:rgba(255,255,255,.15)}
+.topbar-status.ok{background:rgba(82,183,136,.35)}
+.topbar-status.err{background:rgba(192,57,43,.35)}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--vert-f);border-top:1px solid rgba(255,255,255,.1)}
+.tab{flex:1;padding:.6rem .3rem;text-align:center;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;transition:all .15s;border-bottom:2px solid transparent}
+.tab.active{color:#fff;border-bottom-color:var(--vert-c)}
+
+/* ── SCROLL AREA ── */
+.scroll{overflow-y:auto;padding:1rem;padding-bottom:calc(1rem + env(safe-area-inset-bottom))}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:var(--r);padding:1rem;margin-bottom:.75rem;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.card-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--gris);margin-bottom:.6rem}
+.lot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.lot-name{font-size:1.05rem;font-weight:700;color:var(--vert-f)}
+.lot-badge{font-size:.75rem;font-weight:600;background:var(--vert-p);color:var(--vert);padding:3px 10px;border-radius:20px}
+.lot-sub{font-size:.75rem;color:var(--gris);margin-bottom:.6rem}
+
+/* ── ALIMENTS LIST ── */
+.alim-row{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid var(--bord)}
+.alim-row:last-child{border-bottom:none}
+.alim-num{font-size:1.1rem;font-weight:700;color:var(--vert);width:22px;text-align:center;flex-shrink:0}
+.alim-info{flex:1}
+.alim-name{font-size:.9rem;font-weight:600}
+.alim-cat{font-size:.7rem;color:var(--gris)}
+.alim-qte{text-align:right;flex-shrink:0}
+.alim-qte-val{font-size:1.15rem;font-weight:700;color:var(--vert-f);font-family:monospace}
+.alim-qte-unit{font-size:.7rem;color:var(--gris)}
+
+/* ── TOTAL ROW ── */
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem .6rem;background:var(--vert-p);border-radius:8px;margin-top:.5rem}
+.total-label{font-size:.8rem;font-weight:700;color:var(--vert-f)}
+.total-val{font-size:1rem;font-weight:700;color:var(--vert-f);font-family:monospace}
+
+/* ── PASSAGE CHIPS ── */
+.passage-chips{display:flex;gap:.4rem;margin-bottom:.7rem;flex-wrap:wrap}
+.chip{padding:.3rem .8rem;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;border:1.5px solid var(--bord);background:#fff;color:var(--gris);transition:all .15s}
+.chip.active{background:var(--vert-f);color:#fff;border-color:var(--vert-f)}
+
+/* ── REFUS FORM ── */
+.refus-form{display:flex;gap:.5rem;align-items:center;margin-top:.6rem;padding:.5rem .6rem;background:#fafafa;border-radius:8px}
+.refus-label{font-size:.8rem;color:var(--gris);flex:1}
+.refus-input{width:70px;padding:.35rem .5rem;border:1.5px solid var(--bord);border-radius:8px;font-size:.95rem;font-weight:600;text-align:center;font-family:monospace}
+.refus-input:focus{outline:none;border-color:var(--vert-c)}
+.refus-unit{font-size:.75rem;color:var(--gris)}
+.btn-save{background:var(--vert-f);color:#fff;border:none;border-radius:8px;padding:.4rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer}
+.btn-save:active{opacity:.75}
+
+/* ── STATUT DISTRIBUTION ── */
+.distrib-status{display:flex;align-items:center;gap:.5rem;padding:.45rem .7rem;border-radius:8px;font-size:.8rem;font-weight:600;margin-top:.5rem;cursor:pointer}
+.distrib-status.fait{background:#e8f5e9;color:var(--vert)}
+.distrib-status.encours{background:#fff8e1;color:var(--warn)}
+.distrib-status.todo{background:#f5f5f5;color:var(--gris)}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--vert-f);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;z-index:999}
+.login-logo{font-size:3rem;margin-bottom:.5rem}
+.login-title{font-size:1.8rem;font-weight:800;color:#fff;margin-bottom:.3rem}
+.login-sub{font-size:.85rem;color:rgba(255,255,255,.6);margin-bottom:2rem;text-align:center}
+.login-input{width:100%;padding:.9rem 1rem;border-radius:12px;border:none;font-size:1rem;margin-bottom:.75rem;background:rgba(255,255,255,.1);color:#fff}
+.login-input::placeholder{color:rgba(255,255,255,.4)}
+.login-input:focus{outline:none;background:rgba(255,255,255,.15)}
+.login-btn{width:100%;padding:.9rem;border-radius:12px;border:none;background:var(--vert-c);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .15s}
+.login-btn:active{opacity:.8}
+.login-error{color:#ff8a80;font-size:.85rem;text-align:center;margin-top:.5rem;min-height:20px}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:3rem 1rem;color:var(--gris)}
+.spinner{width:36px;height:36px;border:3px solid var(--bord);border-top-color:var(--vert);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:3rem 1rem;color:var(--gris);font-size:.9rem}
+
+/* ── BADGE CAT ── */
+.badge{font-size:.65rem;font-weight:600;padding:1px 6px;border-radius:20px}
+.b-fourr{background:#e8f5e9;color:#1b5e20}
+.b-conc{background:#e8eaf6;color:#1a237e}
+.b-comp{background:#e3f2fd;color:#0d47a1}
+.b-autre{background:#f3e5f5;color:#4a148c}
+
+/* ── SYNC BANNER ── */
+.sync-banner{background:var(--vert-p);border-left:3px solid var(--vert-c);padding:.5rem .8rem;font-size:.75rem;color:var(--vert);margin-bottom:.75rem;border-radius:0 8px 8px 0;display:flex;align-items:center;gap:.4rem}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(1rem + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--vert-f);color:#fff;padding:.6rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:600;z-index:500;animation:fadeInOut 2.5s forwards}
+@keyframes fadeInOut{0%{opacity:0;transform:translateX(-50%) translateY(8px)}15%{opacity:1;transform:translateX(-50%) translateY(0)}85%{opacity:1}100%{opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-logo">🐐</div>
+  <div class="login-title">CapriRation</div>
+  <div class="login-sub">Distribution mobile<br>Connexion avec vos identifiants CapriScan</div>
+  <input class="login-input" id="l-email" type="email" placeholder="Email" autocomplete="email">
+  <input class="login-input" id="l-pwd" type="password" placeholder="Mot de passe" autocomplete="current-password">
+  <button class="login-btn" onclick="doLogin()">Se connecter</button>
+  <div class="login-error" id="l-err"></div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;height:100dvh;display:none;flex-direction:column">
+
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <div class="topbar-title">CapriRation</div>
+        <div class="topbar-sub">Distribution · v3.6</div>
+      </div>
+      <div class="topbar-status" id="sync-status">Connexion…</div>
+      <!-- Bouton menu légal -->
+      <div style="position:relative;margin-left:.25rem">
+        <button onclick="toggleMenuLegalMobile(event)" style="background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:8px;color:#fff;font-size:1.3rem;line-height:1">⋮</button>
+        <div id="menu-legal-mobile" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);min-width:190px;z-index:500;overflow:hidden">
+          <button onclick="ouvrirOverlayLegalMobile('apropos');toggleMenuLegalMobile()" style="width:100%;text-align:left;padding:.75rem 1rem;background:none;border:none;border-bottom:1px solid #f3f4f6;cursor:pointer;font-size:.9rem;color:#374151;display:flex;align-items:center;gap:.6rem">ℹ️ À propos</button>
+          <button onclick="ouvrirOverlayLegalMobile('mentions');toggleMenuLegalMobile()" style="width:100%;text-align:left;padding:.75rem 1rem;background:none;border:none;border-bottom:1px solid #f3f4f6;cursor:pointer;font-size:.9rem;color:#374151;display:flex;align-items:center;gap:.6rem">🏢 Mentions légales</button>
+          <button onclick="ouvrirOverlayLegalMobile('cgu');toggleMenuLegalMobile()" style="width:100%;text-align:left;padding:.75rem 1rem;background:none;border:none;border-bottom:1px solid #f3f4f6;cursor:pointer;font-size:.9rem;color:#374151;display:flex;align-items:center;gap:.6rem">📄 CGU</button>
+          <button onclick="ouvrirOverlayLegalMobile('confidentialite');toggleMenuLegalMobile()" style="width:100%;text-align:left;padding:.75rem 1rem;background:none;border:none;cursor:pointer;font-size:.9rem;color:#374151;display:flex;align-items:center;gap:.6rem">🔒 Confidentialité</button>
+        </div>
+      </div>
+    </div>
+    <div id="last-sync-mobile" style="font-size:9px;color:rgba(255,255,255,.45);padding:.15rem 1rem .3rem;text-align:right"></div>
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('rations')" id="tab-rations">🌾 Rations</div>
+      <div class="tab" onclick="showTab('chargement')" id="tab-chargement">📋 Chargement</div>
+      <div class="tab" onclick="showTab('distribution')" id="tab-distribution">🪣 Distribution</div>
+      <div class="tab" onclick="showTab('refus')" id="tab-refus">📋 Refus</div>
+      <div class="tab" onclick="showTab('production')" id="tab-production">🥛 Production</div>
+    </div>
+  </div>
+
+  <div class="scroll" id="scroll-area">
+    <!-- Rations -->
+    <div id="page-rations">
+      <div class="loading"><div class="spinner"></div>Chargement des rations…</div>
+    </div>
+    <!-- Chargement -->
+    <div id="page-chargement" style="display:none">
+      <div class="loading"><div class="spinner"></div>Chargement…</div>
+    </div>
+    <!-- Distribution -->
+    <div id="page-distribution" style="display:none">
+      <div class="loading"><div class="spinner"></div>Chargement…</div>
+    </div>
+    <!-- Refus -->
+    <div id="page-refus" style="display:none">
+      <div class="loading"><div class="spinner"></div>Chargement…</div>
+    </div>
+    <!-- Production -->
+    <div id="page-production" style="display:none">
+      <div class="loading"><div class="spinner"></div>Chargement…</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+// ══════════════════════════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════════════════════════
+const FB_CONFIG = {
+  apiKey:            "AIzaSyAFdyY7GbDUJiacJVOCdWJP_3raIzJqMzc",
+  authDomain:        "capration-f344c.firebaseapp.com",
+  projectId:         "capration-f344c",
+  storageBucket:     "capration-f344c.firebasestorage.app",
+  messagingSenderId: "89141443221",
+  appId:             "1:89141443221:web:049c0c6271e2bc8bbd799c"
+};
+
+import {initializeApp}    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import {getFirestore,doc,getDoc,setDoc,collection,getDocs,serverTimestamp}
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const app  = initializeApp(FB_CONFIG);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+let uid = null;
+let lotsData   = [];   // [{id,nom,nb,ration:[{nom,cat,qte,qteRefus}]}]
+let refusData  = {};   // {date: {lotId: {valeur,kg,pct}}}
+let prodData   = [];   // [{lotId, date, matin, soir, total, source}]
+
+// ══ AUTH ══
+onAuthStateChanged(auth, async user=>{
+  if(user){
+    uid = user.uid;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    setSyncStatus('Synchronisation…','');
+    await chargerDonnees();
+    setSyncStatus('Synchronisé ✓','ok');
+    afficherDerniereSyncMobile();
+  } else {
+    document.getElementById('login-screen').style.display='flex';
+    document.getElementById('app').style.display='none';
+  }
+});
+
+window.doLogin = async()=>{
+  const email = document.getElementById('l-email').value.trim();
+  const pwd   = document.getElementById('l-pwd').value;
+  document.getElementById('l-err').textContent='';
+  try{
+    await signInWithEmailAndPassword(auth, email, pwd);
+  } catch(e){
+    document.getElementById('l-err').textContent = 'Email ou mot de passe incorrect.';
+  }
+};
+
+// ══ DONNÉES ══
+async function chargerDonnees(){
+  try{
+    // 1. Charger les lots et rations depuis Firestore (chemin CapriRation)
+    const lotDoc = await getDoc(doc(db,`users/${uid}/capration/lots`));
+    if(lotDoc.exists()){
+      const lotsRaw = lotDoc.data().lots || {};
+      const nomsRaw = lotDoc.data().noms || {};
+      if(Array.isArray(lotsRaw)){
+        lotsData = lotsRaw;
+      } else {
+        lotsData = Object.entries(lotsRaw).map(([k,v]) => ({
+          id: +k,
+          nom: nomsRaw[k] || ('Lot ' + k),
+          nb: v.nb || 0,
+          ration: v.ration || [],
+          prodReelle: v.prodReelle || null
+        }));
+      }
+    } else {
+      // Fallback : essayer de lire les noms de lots CapriScan
+      const nomDoc = await getDoc(doc(db,`users/${uid}/data/lotNoms`));
+      if(nomDoc.exists()){
+        const noms = nomDoc.data().noms||{};
+        lotsData = Object.entries(noms).map(([k,v])=>({id:+k,nom:v,nb:0,ration:[]}));
+      }
+    }
+
+    // 2. Charger les refus du jour
+    const today = todayStr();
+    const refDoc = await getDoc(doc(db,`users/${uid}/capration/refus_${today}`));
+    if(refDoc.exists()) refusData = refDoc.data()||{};
+
+    // 3. Charger la production depuis Firestore
+    const prodDoc = await getDoc(doc(db,`users/${uid}/capration/production`));
+    if(prodDoc.exists()) prodData = prodDoc.data().log || [];
+
+    renderAll();
+  } catch(e){
+    setSyncStatus('Erreur sync','err');
+    console.error(e);
+    // Charger depuis localStorage si dispo
+    const local = localStorage.getItem('cap3_mobile_lots');
+    if(local) lotsData = JSON.parse(local);
+    renderAll();
+  }
+}
+
+// ══ TABS ══
+window.showTab = (tab)=>{
+  ['rations','chargement','distribution','refus','production'].forEach(t=>{
+    document.getElementById(`page-${t}`).style.display = t===tab?'':'none';
+    document.getElementById(`tab-${t}`).classList.toggle('active', t===tab);
+  });
+};
+
+// ══ RENDER ALL ══
+function renderAll(){
+  renderRations();
+  renderChargement();
+  renderDistribution();
+  renderRefus();
+  renderProduction();
+}
+
+// ══════════════════════════════════════════════════
+// PAGE RATIONS
+// ══════════════════════════════════════════════════
+function renderRations(){
+  const el = document.getElementById('page-rations');
+  if(!lotsData.length){
+    el.innerHTML=`<div class="empty">🌿<br>Aucune ration disponible.<br><small>Synchronisez depuis CapriRation PC</small></div>`;
+    return;
+  }
+
+  const lotsAvecRation = lotsData.filter(l=>l.ration?.length>0);
+  if(!lotsAvecRation.length){
+    el.innerHTML=`<div class="empty">🌿<br>Aucune ration configurée.<br><small>Créez des rations dans CapriRation PC</small></div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="sync-banner">🔄 Rations synchronisées depuis CapriRation PC</div>
+    ${lotsAvecRation.map(lot=>renderLotRation(lot)).join('')}`;
+}
+
+function catBadge(cat){
+  if(['Foin','Ensilage','Enrubannage','Herbe','Paille'].includes(cat)) return 'b-fourr';
+  if(cat==='Concentré') return 'b-conc';
+  if(cat==='Aliment composé') return 'b-comp';
+  return 'b-autre';
+}
+
+function renderLotRation(lot){
+  const ORDRE = {'Paille':1,'Foin':2,'Enrubannage':3,'Ensilage':4,'Herbe':5,'Aliment composé':6,'Concentré':7,'Autre':8};
+  const items = [...(lot.ration||[])].sort((a,b)=>(ORDRE[a.cat]||9)-(ORDRE[b.cat]||9));
+  const total = items.reduce((s,a)=>s+a.qte,0);
+
+  return `<div class="card">
+    <div class="lot-header">
+      <div class="lot-name">${lot.nom}</div>
+      <div class="lot-badge">${lot.nb||0} ch.</div>
+    </div>
+    <div class="lot-sub">${items.length} aliment${items.length>1?'s':''} · ${total.toFixed(2)} kg brut/tête/j</div>
+    ${items.map((a,i)=>`
+    <div class="alim-row">
+      <div class="alim-num">${i+1}</div>
+      <div class="alim-info">
+        <div class="alim-name">${a.nom}</div>
+        <div class="alim-cat"><span class="badge ${catBadge(a.cat)}">${a.cat}</span></div>
+      </div>
+      <div class="alim-qte">
+        <div class="alim-qte-val">${a.qte.toFixed(2)}</div>
+        <div class="alim-qte-unit">kg/tête</div>
+      </div>
+    </div>`).join('')}
+    <div class="total-row">
+      <div class="total-label">Total lot (${lot.nb||0} têtes)</div>
+      <div class="total-val">${((total)*(lot.nb||0)).toFixed(0)} kg/j</div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// PAGE DISTRIBUTION — 1 bol / jour
+// ══════════════════════════════════════════════════
+// ── Temps de mélange par catégorie (modifiables) ──
+const TEMPS_DEFAUT = {'Paille':4,'Foin':4,'Enrubannage':3,'Ensilage':3,'Herbe':3,'Aliment composé':2,'Concentré':2,'Autre':2};
+function getTemps(){ try{ return {...TEMPS_DEFAUT,...JSON.parse(localStorage.getItem('capration_bol_temps')||'{}')}; }catch(e){ return {...TEMPS_DEFAUT}; } }
+function setTemps(obj){ localStorage.setItem('capration_bol_temps', JSON.stringify(obj)); }
+
+// ── État des coches bol (persistant localStorage) ──
+function getBolChecked(){ try{ return JSON.parse(localStorage.getItem('capration_bol_checked')||'{}'); }catch(e){ return {}; } }
+function setBolChecked(obj){ localStorage.setItem('capration_bol_checked', JSON.stringify(obj)); }
+
+// ── État des lots actifs (persistant localStorage) ──
+function getLotsActifs(){ try{ return JSON.parse(localStorage.getItem('capration_lots_actifs')||'{}'); }catch(e){ return {}; } }
+function setLotsActifs(obj){ localStorage.setItem('capration_lots_actifs', JSON.stringify(obj)); }
+window.toggleLotActif = function(lotId){
+  const actifs = getLotsActifs();
+  actifs[lotId] = !actifs[lotId];
+  setLotsActifs(actifs);
+  renderDistribution();
+  renderChargement();
+};
+window.toggleBolItem = function(nom){
+  const checked = getBolChecked();
+  checked[nom] = !checked[nom];
+  setBolChecked(checked);
+  renderDistribution();
+  renderChargement();
+};
+
+window.saveTempsModal = function(){
+  const t = {};
+  document.querySelectorAll('#temps-modal-overlay input[data-cat]').forEach(inp=>{
+    t[inp.dataset.cat] = parseInt(inp.value)||0;
+  });
+  setTemps(t);
+  document.getElementById('temps-modal-overlay').remove();
+  renderChargement();
+};
+
+window.openTempsModal = function(){
+  const temps = getTemps();
+  const cats = Object.keys(TEMPS_DEFAUT);
+  const overlay = document.createElement('div');
+  overlay.id = 'temps-modal-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:16px;padding:1.2rem;width:100%;max-width:380px;max-height:85dvh;overflow-y:auto">
+      <div style="font-weight:700;font-size:1rem;margin-bottom:1rem;color:var(--vert-f)">⏱️ Temps de mélange par catégorie</div>
+      <div style="font-size:.78rem;color:var(--gris);margin-bottom:1rem">Durée de mélange <b>après chaque ajout</b> de cette catégorie au bol.</div>
+      ${cats.map(cat=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid #f0f0f0">
+          <span style="font-size:.9rem;font-weight:500">${cat}</span>
+          <div style="display:flex;align-items:center;gap:.4rem">
+            <button onclick="this.nextElementSibling.stepDown()" style="width:28px;height:28px;border-radius:50%;border:1px solid #ddd;background:#f5f5f5;font-size:1rem;cursor:pointer;line-height:1">−</button>
+            <input type="number" data-cat="${cat}" value="${temps[cat]??2}" min="0" max="30" style="width:48px;text-align:center;border:1px solid #ddd;border-radius:8px;padding:4px;font-size:.95rem;font-weight:600">
+            <button onclick="this.previousElementSibling.stepUp()" style="width:28px;height:28px;border-radius:50%;border:1px solid #ddd;background:#f5f5f5;font-size:1rem;cursor:pointer;line-height:1">+</button>
+            <span style="font-size:.75rem;color:var(--gris);width:22px">min</span>
+          </div>
+        </div>`).join('')}
+      <div style="display:flex;gap:.5rem;margin-top:1rem">
+        <button onclick="document.getElementById('temps-modal-overlay').remove()" style="flex:1;padding:.6rem;border:1px solid #ddd;border-radius:10px;background:#f5f5f5;font-size:.9rem;cursor:pointer">Annuler</button>
+        <button onclick="saveTempsModal()" style="flex:2;padding:.6rem;border:none;border-radius:10px;background:var(--vert-f);color:#fff;font-size:.9rem;font-weight:600;cursor:pointer">✓ Enregistrer</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e=>{ if(e.target===overlay) overlay.remove(); });
+};
+
+// ── Données consolidées (communes aux deux pages) ──
+function getConsolide(){
+  const lotsAvecRation = lotsData.filter(l=>l.ration?.length>0);
+  // Initialiser lots actifs (tous actifs par défaut)
+  const actifs = getLotsActifs();
+  lotsAvecRation.forEach(l=>{ if(actifs[l.id]===undefined) actifs[l.id]=true; });
+  setLotsActifs(actifs);
+  const lotsActifs = lotsAvecRation.filter(l=>actifs[l.id]);
+  const consolide = {};
+  let nbTotal = 0;
+  lotsActifs.forEach(lot=>{
+    const nb=lot.nb||0; nbTotal+=nb;
+    (lot.ration||[]).forEach(a=>{
+      if(!consolide[a.nom]) consolide[a.nom]={...a,qteTotal:0};
+      consolide[a.nom].qteTotal += a.qte*(nb||1);
+    });
+  });
+  const ORDRE = {'Paille':1,'Foin':2,'Enrubannage':3,'Ensilage':4,'Herbe':5,'Aliment composé':6,'Concentré':7,'Autre':8};
+  const items = Object.values(consolide).sort((a,b)=>(ORDRE[a.cat]||9)-(ORDRE[b.cat]||9));
+  return {items, nbTotal, lotsAvecRation, lotsActifs};
+}
+
+// ══════════════════════════════════════════════════
+// PAGE CHARGEMENT
+// ══════════════════════════════════════════════════
+
+// ── État chrono ──
+let chronoState = {
+  running: false,
+  startTs: null,       // timestamp démarrage chrono global
+  etapeIdx: 0,         // étape en cours (index dans itemsBol)
+  etapeStartTs: null,  // timestamp début étape courante
+  intervalId: null,
+  items: [],           // snapshot des étapes au démarrage
+};
+
+function chronoTick(){
+  const cs = chronoState;
+  if(!cs.running) return;
+  const now = Date.now();
+  const totalSec = Math.floor((now - cs.startTs)/1000);
+  const etape = cs.items[cs.etapeIdx];
+  if(!etape){ chronoStop(true); return; }
+  const etapeDurSec = (etape.tMin||0)*60;
+  const etapeEcouleSec = Math.floor((now - cs.etapeStartTs)/1000);
+  const etapeResteSec = Math.max(0, etapeDurSec - etapeEcouleSec);
+
+  // Passage automatique à l'étape suivante
+  if(etapeDurSec > 0 && etapeEcouleSec >= etapeDurSec){
+    cs.etapeIdx++;
+    cs.etapeStartTs = now;
+    if(cs.etapeIdx >= cs.items.length){ chronoStop(true); return; }
+    // Vibration si dispo
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+    soundEtape();
+    updateChronoUI(totalSec, etapeResteSec);
+    return;
+  }
+  updateChronoUI(totalSec, etapeResteSec);
+}
+
+function fmtTime(sec){
+  const m = Math.floor(sec/60), s = sec%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function updateChronoUI(totalSec, etapeResteSec){
+  const cs = chronoState;
+  const elTotal = document.getElementById('chrono-total');
+  const elEtapeNom = document.getElementById('chrono-etape-nom');
+  const elEtapeReste = document.getElementById('chrono-etape-reste');
+  const elEtapeBar = document.getElementById('chrono-etape-bar');
+  const elEtapeNum = document.getElementById('chrono-etape-num');
+  if(!elTotal) return;
+
+  const etape = cs.items[cs.etapeIdx];
+  if(!etape) return;
+
+  elTotal.textContent = fmtTime(totalSec);
+  elEtapeNom.textContent = etape.nom;
+  elEtapeNum.textContent = `Étape ${cs.etapeIdx+1}/${cs.items.length}`;
+  if(etape.tMin > 0){
+    elEtapeReste.textContent = fmtTime(etapeResteSec);
+    const pct = Math.max(0, Math.min(100, (1 - etapeResteSec/(etape.tMin*60))*100));
+    elEtapeBar.style.width = pct + '%';
+  } else {
+    elEtapeReste.textContent = '—';
+    elEtapeBar.style.width = '0%';
+  }
+
+  // Mettre à jour la timeline
+  cs.items.forEach((it, i) => {
+    const row = document.getElementById(`chrono-row-${i}`);
+    if(!row) return;
+    if(i < cs.etapeIdx) row.style.opacity = '0.4';
+    else if(i === cs.etapeIdx) { row.style.opacity = '1'; row.style.background = '#e3f2fd'; }
+    else row.style.opacity = '0.6';
+  });
+}
+
+async function chronoStart(){
+  const cs = chronoState;
+  if(cs.running) return;
+  const {items} = getConsolide();
+  const checked = getBolChecked();
+  const temps = getTemps();
+  const itemsBol = items.filter(a=>checked[a.nom]);
+  cs.items = itemsBol.map(a=>({nom:a.nom, cat:a.cat, tMin:temps[a.cat]||0}));
+  cs.running = true;
+  cs.startTs = Date.now();
+  cs.etapeStartTs = Date.now();
+  cs.etapeIdx = 0;
+  cs.intervalId = setInterval(chronoTick, 500);
+
+  // ── Wake Lock : garder l'écran allumé ──
+  if('wakeLock' in navigator){
+    navigator.wakeLock.request('screen')
+      .then(lock=>{ cs.wakeLock = lock; })
+      .catch(()=>{});
+  }
+
+  // ── Permission notifs + programmation (au tap Start) ──
+  await requestNotifPermission();
+  scheduleNotifications();
+
+  renderChargement();
+}
+
+// ── Demander permission notifications ──
+async function requestNotifPermission(){
+  if(!('Notification' in window)) return false;
+  if(Notification.permission === 'granted') return true;
+  const perm = await Notification.requestPermission();
+  return perm === 'granted';
+}
+
+// ── Programmer les notifications de chaque étape ──
+async function scheduleNotifications(){
+  const cs = chronoState;
+  if(!await requestNotifPermission()) return;
+  // Annuler les anciennes
+  (cs.notifTimers||[]).forEach(t=>clearTimeout(t));
+  cs.notifTimers = [];
+
+  let cumul = 0;
+  cs.items.forEach((etape, i)=>{
+    const tMin = etape.tMin||0;
+    if(tMin === 0) return;
+    cumul += tMin;
+    const delayMs = cumul * 60 * 1000;
+    const isLast = i === cs.items.length - 1;
+    const timer = setTimeout(()=>{
+      if(!cs.running) return;
+      if(isLast){
+        new Notification('🎉 CapriRation — Bol terminé !', {
+          body: 'Mélange terminé. Le bol est prêt.',
+          icon: 'icon-192.png',
+          tag: 'capration-chrono',
+          renotify: true
+        });
+      } else {
+        const next = cs.items[i+1];
+        new Notification(`⏭ CapriRation — Étape ${i+2}/${cs.items.length}`, {
+          body: `Ajouter : ${next.nom} (${next.tMin} min)`,
+          icon: 'icon-192.png',
+          tag: 'capration-chrono',
+          renotify: true
+        });
+      }
+    }, delayMs);
+    cs.notifTimers.push(timer);
+  });
+}
+
+window.chronoStart = chronoStart;
+
+// ── Sons Web Audio ──
+function getAudioCtx(){
+  if(!window._audioCtx) window._audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return window._audioCtx;
+}
+function playBip(freq, dur, vol){
+  try{
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(vol||0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + dur);
+  }catch(e){}
+}
+function soundEtape(){
+  // Deux bips courts — changement d'étape
+  playBip(880, 0.12, 0.35);
+  setTimeout(()=>playBip(1046, 0.15, 0.35), 140);
+}
+function soundFin(){
+  // Mélodie de fin : do-mi-sol-do
+  const notes = [[523,0],[659,180],[784,360],[1046,540]];
+  notes.forEach(([f,t])=>setTimeout(()=>playBip(f, 0.45, 0.5), t));
+}
+
+window.chronoStop = function(finished){
+  const cs = chronoState;
+  if(cs.intervalId) clearInterval(cs.intervalId);
+  cs.running = false;
+  cs.intervalId = null;
+  // Relâcher wake lock
+  if(cs.wakeLock){ cs.wakeLock.release().catch(()=>{}); cs.wakeLock = null; }
+  // Annuler notifs programmées si arrêt manuel
+  if(!finished) (cs.notifTimers||[]).forEach(t=>clearTimeout(t));
+  cs.notifTimers = [];
+  if(finished){
+    if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+    soundFin();
+  }
+  renderChargement();
+};
+
+window.chronoReset = function(){
+  chronoStop(false);
+  chronoState.etapeIdx = 0;
+  chronoState.startTs = null;
+  renderChargement();
+};
+
+// Réacquérir wake lock si page redevient visible (ex: retour depuis autre app)
+document.addEventListener('visibilitychange', ()=>{
+  const cs = chronoState;
+  if(document.visibilityState === 'visible' && cs.running && !cs.wakeLock){
+    if('wakeLock' in navigator){
+      navigator.wakeLock.request('screen')
+        .then(lock=>{ cs.wakeLock = lock; })
+        .catch(()=>{});
+    }
+  }
+});
+
+window.chronoNextEtape = function(){
+  const cs = chronoState;
+  cs.etapeIdx++;
+  cs.etapeStartTs = Date.now();
+  soundEtape();
+  if(cs.etapeIdx >= cs.items.length){ chronoStop(true); return; }
+  if(!cs.running) renderChargement();
+};
+
+function renderChargement(){
+  const el = document.getElementById('page-chargement');
+  const {items: allItems, nbTotal: allNb, lotsAvecRation} = getConsolide();
+  if(!lotsAvecRation.length){ el.innerHTML=`<div class="empty">📋<br>Aucune ration configurée.</div>`; return; }
+
+  const COULEURS = {'Paille':'#8B6914','Foin':'#8B6914','Enrubannage':'#2d6a4f','Ensilage':'#1b5e20','Herbe':'#2d6a4f','Aliment composé':'#0d47a1','Concentré':'#4a148c','Autre':'#6b7280'};
+  const actifs = getLotsActifs();
+  lotsAvecRation.forEach(l=>{ if(actifs[l.id]===undefined) actifs[l.id]=true; });
+  const checked = getBolChecked();
+  // Recalculer items/nbTotal uniquement sur lots actifs
+  const ORDRE = {'Paille':1,'Foin':2,'Enrubannage':3,'Ensilage':4,'Herbe':5,'Aliment composé':6,'Concentré':7,'Autre':8};
+  const consolide = {};
+  let nbTotal = 0;
+  lotsAvecRation.filter(l=>actifs[l.id]).forEach(lot=>{
+    const nb=lot.nb||0; nbTotal+=nb;
+    (lot.ration||[]).forEach(a=>{
+      if(!consolide[a.nom]) consolide[a.nom]={...a,qteTotal:0};
+      consolide[a.nom].qteTotal += a.qte*(nb||1);
+    });
+  });
+  const items = Object.values(consolide).sort((a,b)=>(ORDRE[a.cat]||9)-(ORDRE[b.cat]||9));
+  items.forEach(a=>{ if(checked[a.nom]===undefined) checked[a.nom]=true; });
+  setBolChecked(checked);
+
+  const temps = getTemps();
+  const itemsBol = items.filter(a=>checked[a.nom]);
+  const totalBol = itemsBol.reduce((s,a)=>s+a.qteTotal,0);
+  const tempsTotalMin = itemsBol.reduce((s,a)=>s+(temps[a.cat]||0),0);
+  const nbLotsInactifs = lotsAvecRation.filter(l=>!actifs[l.id]).length;
+  const cs = chronoState;
+  const isRunning = cs.running;
+  const isFinished = !isRunning && cs.startTs && cs.etapeIdx >= (cs.items.length||1);
+  const etapesSnap = isRunning ? cs.items : itemsBol.map(a=>({nom:a.nom, cat:a.cat, tMin:temps[a.cat]||0}));
+  let cumul = 0; let bolIdx = 0;
+
+  el.innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+        <div class="card-title" style="margin-bottom:0">📋 Chargement — ${nbTotal} animaux</div>
+        <button onclick="openTempsModal()" style="font-size:.75rem;padding:4px 10px;border-radius:20px;border:1px solid var(--vert-c);background:var(--vert-p);color:var(--vert-f);font-weight:600;cursor:pointer">⏱️ Temps</button>
+      </div>
+      <div style="display:flex;gap:.4rem;margin-bottom:.8rem;flex-wrap:wrap">
+        <span style="font-size:.75rem;background:#e8f5e9;color:var(--vert-f);border-radius:6px;padding:2px 8px;font-weight:600">🪣 ${totalBol.toFixed(0)} kg</span>
+        ${tempsTotalMin>0?`<span style="font-size:.75rem;background:#e3f2fd;color:#0d47a1;border-radius:6px;padding:2px 8px;font-weight:600">⏱️ ${tempsTotalMin} min</span>`:''}
+        ${nbLotsInactifs>0?`<span style="font-size:.75rem;background:#fff3e0;color:#e65100;border-radius:6px;padding:2px 8px;font-weight:600">${nbLotsInactifs} lot${nbLotsInactifs>1?'s':''} exclu${nbLotsInactifs>1?'s':''}</span>`:''}
+      </div>
+
+      <!-- Lots à distribuer -->
+      <div style="margin-bottom:.8rem;border:1px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div style="background:#f8f9fa;padding:.45rem .7rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gris)">🏷️ Lots à distribuer</div>
+        ${lotsAvecRation.map((lot,i)=>{
+          const isActif = actifs[lot.id] !== false;
+          const totalLot = (lot.ration||[]).reduce((s,a)=>s+a.qte,0);
+          const nb = lot.nb||0;
+          return `<div onclick="toggleLotActif('${lot.id}');" style="display:flex;align-items:center;gap:.5rem;padding:.5rem .7rem;border-top:${i>0?'1px solid var(--bord)':'none'};cursor:pointer;opacity:${isActif?1:0.45};transition:opacity .15s">
+            <input type="checkbox" ${isActif?'checked':''} onclick="event.stopPropagation();toggleLotActif('${lot.id}');" style="width:18px;height:18px;accent-color:var(--vert-f);flex-shrink:0;cursor:pointer">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.88rem;font-weight:600;${isActif?'':'text-decoration:line-through;color:var(--gris)'}">${lot.nom}</div>
+              <div style="font-size:.67rem;color:var(--gris)">${nb} ch. · ${totalLot.toFixed(2)} kg/tête${!isActif?' · <span style="color:#e65100">exclu</span>':''}</div>
+            </div>
+            <span style="font-family:monospace;font-size:.9rem;font-weight:700;color:${isActif?'var(--vert-f)':'#bbb'}">${(totalLot*nb).toFixed(0)} kg</span>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <!-- Aliments au bol -->
+      <div style="margin-bottom:.8rem;border:1px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div style="background:#f8f9fa;padding:.45rem .7rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gris);display:flex;align-items:center;justify-content:space-between">
+          <span>🪣 Aliments au bol</span>
+          <button onclick="ajusterSelonRefusMobile()" style="font-size:.7rem;padding:3px 9px;border-radius:20px;border:1px solid #f9ca24;background:#fff3e0;color:#b7791f;font-weight:700;cursor:pointer">⚖️ Ajuster selon refus</button>
+        </div>
+        ${items.length===0?`<div style="padding:.6rem .7rem;font-size:.82rem;color:var(--gris)">Aucun lot actif.</div>`:''}
+        ${items.map((a,i)=>{
+          const isBol = checked[a.nom];
+          if(isBol) bolIdx++;
+          return `<div onclick="toggleBolItem('${a.nom.replace(/'/g,"\\'").replace(/"/g,"&quot;")}');" style="display:flex;align-items:center;gap:.5rem;padding:.5rem .7rem;border-top:${i>0?'1px solid var(--bord)':'none'};cursor:pointer;opacity:${isBol?1:0.42};transition:opacity .15s">
+            <input type="checkbox" ${isBol?'checked':''} onclick="event.stopPropagation();toggleBolItem('${a.nom.replace(/'/g,"\\'").replace(/"/g,"&quot;")}');" style="width:18px;height:18px;accent-color:var(--vert-f);flex-shrink:0;cursor:pointer">
+            ${isBol?`<span style="font-size:.9rem;font-weight:800;color:${COULEURS[a.cat]||'#999'};width:20px;text-align:center;flex-shrink:0">${bolIdx}</span>`:`<span style="width:20px;flex-shrink:0"></span>`}
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.88rem;font-weight:600;${isBol?'':'text-decoration:line-through;color:var(--gris)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.nom}</div>
+              <div style="font-size:.67rem;color:var(--gris)">${a.cat}${!isBol?' · <span style="color:#e65100">hors bol</span>':''}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:.9rem;font-weight:700;color:${isBol?'var(--vert-f)':'#e65100'};font-family:monospace">${a.qteTotal.toFixed(0)} kg</div>
+              <div style="font-size:.6rem;color:var(--gris)">${nbTotal>0?(a.qteTotal/nbTotal).toFixed(2):0} kg/tête</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <!-- Chrono -->
+      ${itemsBol.length>0 ? `
+      <div id="chrono-bloc" style="background:${isFinished?'#e8f5e9':isRunning?'#0d47a1':'#1a3a2a'};border-radius:12px;padding:1rem;margin-bottom:.8rem;transition:background .3s">
+        ${isFinished ? `
+          <div style="text-align:center;color:var(--vert-f)">
+            <div style="font-size:2rem">✅</div>
+            <div style="font-weight:700;font-size:1rem;margin:.3rem 0">Mélange terminé !</div>
+            <button onclick="chronoReset()" style="margin-top:.5rem;padding:.5rem 1.2rem;border:none;border-radius:20px;background:var(--vert-f);color:#fff;font-weight:600;font-size:.9rem;cursor:pointer">🔄 Recommencer</button>
+          </div>
+        ` : isRunning ? `
+          <div style="color:#fff">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
+              <span style="font-size:.75rem;opacity:.7" id="chrono-etape-num">Étape 1/${itemsBol.length}</span>
+              <span style="font-family:monospace;font-size:1.6rem;font-weight:800;letter-spacing:2px" id="chrono-total">00:00</span>
+            </div>
+            <div style="font-weight:700;font-size:1rem;margin-bottom:.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="chrono-etape-nom">—</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem">
+              <span style="font-size:.75rem;opacity:.7">Reste</span>
+              <span style="font-family:monospace;font-size:1.2rem;font-weight:700" id="chrono-etape-reste">—</span>
+            </div>
+            <div style="background:rgba(255,255,255,.2);border-radius:20px;height:6px;margin-bottom:.8rem;overflow:hidden">
+              <div id="chrono-etape-bar" style="height:100%;background:#fff;border-radius:20px;width:0%;transition:width .4s"></div>
+            </div>
+            <div style="display:flex;gap:.5rem">
+              <button onclick="chronoNextEtape()" style="flex:1;padding:.5rem;border:1px solid rgba(255,255,255,.4);border-radius:10px;background:rgba(255,255,255,.15);color:#fff;font-size:.85rem;font-weight:600;cursor:pointer">⏭ Étape suivante</button>
+              <button onclick="chronoStop(false)" style="padding:.5rem .8rem;border:1px solid rgba(255,255,255,.4);border-radius:10px;background:rgba(255,255,255,.1);color:#fff;font-size:.85rem;cursor:pointer">⏹</button>
+            </div>
+          </div>
+        ` : `
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="color:#fff;font-weight:600;font-size:.9rem">Démarrer le bol</div>
+              <div style="color:rgba(255,255,255,.6);font-size:.72rem">${tempsTotalMin} min · ${itemsBol.length} étapes</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:.4rem;align-items:flex-end">
+              <button onclick="chronoStart()" style="padding:.6rem 1.2rem;border:none;border-radius:20px;background:#52b788;color:#fff;font-weight:700;font-size:.95rem;cursor:pointer">▶ Start</button>
+            </div>
+          </div>
+        `}
+      </div>` : ''}
+
+      <!-- Timeline -->
+      ${etapesSnap.length===0?`<div style="font-size:.85rem;color:var(--gris);padding:.3rem 0">Cochez des aliments au bol pour voir le protocole.</div>`:''}
+      ${etapesSnap.map((a,i)=>{
+        const tMin = a.tMin||0;
+        const isCurrent = isRunning && i===cs.etapeIdx;
+        const isDone = isRunning ? i<cs.etapeIdx : false;
+        cumul += tMin;
+        return `
+        <div id="chrono-row-${i}" style="display:flex;gap:.7rem;align-items:stretch;padding:.35rem 0;border-radius:8px;${isCurrent?'background:#e3f2fd;':''}opacity:${isDone?0.4:1}">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:34px">
+            <div style="width:30px;height:30px;border-radius:50%;background:${isDone?'#aaa':isCurrent?'#0d47a1':COULEURS[a.cat]||'#999'};color:#fff;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center">${isDone?'✓':i+1}</div>
+            ${i<etapesSnap.length-1?`<div style="flex:1;width:2px;background:#e0e0e0;margin:4px 0;min-height:12px"></div>`:''}
+          </div>
+          <div style="flex:1;padding-bottom:${i<etapesSnap.length-1?'.6rem':'0'}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font-weight:600;font-size:.95rem">${a.nom}</div>
+                <div style="font-size:.7rem;color:var(--gris)">${a.cat}</div>
+              </div>
+              ${itemsBol[i]?`<div style="text-align:right;flex-shrink:0">
+                <div style="font-size:1rem;font-weight:700;color:var(--vert-f);font-family:monospace">${itemsBol[i].qteTotal.toFixed(0)} kg</div>
+                <div style="font-size:.62rem;color:var(--gris)">${nbTotal>0?(itemsBol[i].qteTotal/nbTotal).toFixed(2):0} kg/tête</div>
+              </div>`:''}
+            </div>
+            ${tMin>0?`<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.3rem">
+              <span style="font-size:.75rem;background:${isCurrent?'#0d47a1':'#e3f2fd'};color:${isCurrent?'#fff':'#0d47a1'};border-radius:6px;padding:2px 8px;font-weight:600">🔄 ${tMin} min</span>
+              <span style="font-size:.75rem;background:#f3e5f5;color:#6a1b9a;border-radius:6px;padding:2px 8px">à ${cumul} min → suite</span>
+            </div>`:`<div style="margin-top:.25rem;font-size:.72rem;color:#bbb">Pas de temps défini</div>`}
+          </div>
+        </div>`}).join('')}
+      ${tempsTotalMin>0?`<div style="margin-top:.5rem;padding:.65rem .9rem;background:var(--vert-f);border-radius:10px;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:#fff;font-weight:600;font-size:.9rem">⏱️ Temps total</span>
+        <span style="color:#fff;font-family:monospace;font-weight:800;font-size:1.2rem">${tempsTotalMin} min</span>
+      </div>`:''}
+    </div>`;
+
+  if(isRunning){
+    clearInterval(cs.intervalId);
+    cs.intervalId = setInterval(chronoTick, 500);
+  }
+}
+
+// PAGE DISTRIBUTION
+// ══════════════════════════════════════════════════
+// État décompte distribution
+function getDecompte(){ try{ return JSON.parse(sessionStorage.getItem('capration_decompte')||'{}'); }catch(e){ return {}; } }
+function setDecompte(obj){ sessionStorage.setItem('capration_decompte', JSON.stringify(obj)); }
+
+window.toggleLotServi = function(lotId){
+  const d = getDecompte();
+  d[lotId] = !d[lotId];
+  setDecompte(d);
+  renderDistribution();
+};
+window.resetDecompte = function(){
+  sessionStorage.removeItem('capration_decompte');
+  renderDistribution();
+};
+
+function renderDistribution(){
+  const el = document.getElementById('page-distribution');
+  const {items, nbTotal, lotsAvecRation, lotsActifs} = getConsolide();
+  if(!lotsAvecRation.length){ el.innerHTML=`<div class="empty">🪣<br>Aucune ration configurée.</div>`; return; }
+
+  const checked = getBolChecked();
+  const actifs = getLotsActifs();
+  const decompte = getDecompte();
+  const lotsDistrib = lotsAvecRation.filter(l=>actifs[l.id]!==false);
+  const nbLotsInactifs = lotsAvecRation.filter(l=>!actifs[l.id]).length;
+
+  const totalBol = items.filter(a=>checked[a.nom]).reduce((s,a)=>s+a.qteTotal,0);
+  const totalRobot = items.filter(a=>!checked[a.nom]).reduce((s,a)=>s+a.qteTotal,0);
+
+  // Calcul décompte : restant dans le bol
+  let kgServi = 0;
+  lotsDistrib.forEach(lot=>{
+    if(decompte[lot.id]){
+      kgServi += (lot.ration||[]).filter(a=>checked[a.nom]).reduce((s,a)=>s+a.qte,0) * (lot.nb||0);
+    }
+  });
+  const kgRestant = totalBol - kgServi;
+  const nbLotsServis = lotsDistrib.filter(l=>decompte[l.id]).length;
+  const nbLotsRestants = lotsDistrib.length - nbLotsServis;
+  const decompteActif = nbLotsServis > 0;
+
+  el.innerHTML = `
+    <!-- DÉCOMPTE BOL -->
+    <div class="card" style="border:2px solid ${kgRestant<=0&&decompteActif?'var(--vert-c)':'var(--bord)'}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+        <div class="card-title" style="margin-bottom:0">🪣 Décompte bol</div>
+        ${decompteActif?`<button onclick="resetDecompte()" style="font-size:.72rem;padding:3px 9px;border-radius:20px;border:1px solid #ddd;background:#f5f5f5;color:var(--gris);cursor:pointer">↺ Reset</button>`:''}
+      </div>
+
+      <!-- Jauge restant -->
+      <div style="text-align:center;margin-bottom:.8rem">
+        <div style="font-size:.75rem;color:var(--gris);margin-bottom:.2rem">${decompteActif?'Restant dans le bol':'Total bol à distribuer'}</div>
+        <div style="font-family:monospace;font-size:2.8rem;font-weight:800;color:${kgRestant<=0&&decompteActif?'var(--vert-c)':kgRestant<totalBol*0.3&&decompteActif?'#d68910':'var(--vert-f)'};line-height:1">
+          ${kgRestant<=0&&decompteActif?'✓ Vide':kgRestant.toFixed(0)+' kg'}
+        </div>
+        ${decompteActif&&kgRestant>0?`<div style="font-size:.75rem;color:var(--gris);margin-top:.2rem">${kgServi.toFixed(0)} kg distribués · ${nbLotsRestants} lot${nbLotsRestants>1?'s':''} restant${nbLotsRestants>1?'s':''}</div>`:''}
+        ${totalBol>0?`<div style="background:#eee;border-radius:20px;height:8px;margin:.6rem 0 0;overflow:hidden">
+          <div style="height:100%;background:${kgRestant<=0&&decompteActif?'var(--vert-c)':'var(--vert-f)'};border-radius:20px;width:${decompteActif?Math.max(0,(kgRestant/totalBol)*100).toFixed(1):100}%;transition:width .4s"></div>
+        </div>`:''}
+      </div>
+
+      <!-- Lots avec coche "servi" -->
+      <div style="border:1px solid var(--bord);border-radius:10px;overflow:hidden">
+        <div style="background:#f8f9fa;padding:.4rem .7rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--gris)">Cochez après avoir distribué chaque lot</div>
+        ${lotsDistrib.map((lot,i)=>{
+          const servi = !!decompte[lot.id];
+          const kgLot = (lot.ration||[]).filter(a=>checked[a.nom]).reduce((s,a)=>s+a.qte,0) * (lot.nb||0);
+          const kgRestantAvant = totalBol - lotsDistrib.slice(0,i).filter(l=>decompte[l.id]).reduce((s,l)=>{
+            return s + (l.ration||[]).filter(a=>checked[a.nom]).reduce((sq,a)=>sq+a.qte,0)*(l.nb||0);
+          },0);
+          const kgRestantApres = kgRestantAvant - kgLot;
+          return `<div onclick="toggleLotServi('${lot.id}');" style="display:flex;align-items:center;gap:.55rem;padding:.6rem .7rem;border-top:${i>0?'1px solid var(--bord)':'none'};cursor:pointer;background:${servi?'#f0fdf4':'#fff'};transition:background .2s">
+            <input type="checkbox" ${servi?'checked':''} onclick="event.stopPropagation();toggleLotServi('${lot.id}');" style="width:22px;height:22px;accent-color:var(--vert-f);flex-shrink:0;cursor:pointer">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:.9rem;font-weight:600;${servi?'text-decoration:line-through;color:var(--gris)':''}">${lot.nom}</div>
+              <div style="font-size:.68rem;color:var(--gris)">${lot.nb||0} ch. · ${kgLot.toFixed(0)} kg au bol</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              ${servi
+                ? `<div style="font-size:.75rem;color:var(--vert-c);font-weight:700">✓ Distribué</div>`
+                : `<div style="font-size:.75rem;color:var(--gris)">→ reste</div>
+                   <div style="font-family:monospace;font-size:1rem;font-weight:700;color:var(--vert-f)">${kgRestantApres.toFixed(0)} kg</div>`
+              }
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- RÉCAP PAR LOT -->
+    <div class="card">
+      <div class="card-title">📊 Détail par lot</div>
+      ${nbLotsInactifs>0?`<div style="font-size:.72rem;background:#fff3e0;color:#e65100;border-radius:6px;padding:3px 9px;margin-bottom:.6rem;display:inline-block;font-weight:600">⚠️ ${nbLotsInactifs} lot${nbLotsInactifs>1?'s':''} exclu${nbLotsInactifs>1?'s':''} (voir Chargement)</div>`:''}
+      ${lotsAvecRation.map(lot=>{
+        const isActif = actifs[lot.id] !== false;
+        const totalBolLot = (lot.ration||[]).filter(a=>checked[a.nom]).reduce((s,a)=>s+a.qte,0);
+        const totalHorsLot = (lot.ration||[]).filter(a=>!checked[a.nom]).reduce((s,a)=>s+a.qte,0);
+        const nb = lot.nb||0;
+        return `<div style="padding:.5rem 0;border-bottom:1px solid var(--bord);opacity:${isActif?1:0.4}">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:600;font-size:.9rem;${isActif?'':'text-decoration:line-through;color:var(--gris)'}">${lot.nom} <span style="font-weight:400;color:var(--gris);font-size:.75rem">${nb} ch.</span></span>
+            <span style="font-family:monospace;font-weight:700;font-size:1rem;color:${isActif?'var(--vert-f)':'#bbb'}">${isActif?(totalBolLot*nb).toFixed(0):'—'} kg</span>
+          </div>
+          ${isActif?`<div style="font-size:.72rem;color:var(--gris);margin-top:3px;display:flex;gap:.6rem;flex-wrap:wrap">
+            <span>🪣 ${totalBolLot.toFixed(2)} kg/tête</span>
+            ${totalHorsLot>0?`<span style="color:#e65100">🤖 Robot : ${totalHorsLot.toFixed(2)} kg/tête</span>`:''}
+          </div>`:`<div style="font-size:.72rem;color:#e65100;margin-top:2px">Exclu aujourd'hui</div>`}
+        </div>`;
+      }).join('')}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:.6rem;padding:.7rem .8rem;background:var(--vert-f);border-radius:10px">
+        <div style="font-weight:700;color:#fff;font-size:.95rem">🪣 Total bol</div>
+        <div style="font-family:monospace;font-weight:800;font-size:1.3rem;color:#fff">${totalBol.toFixed(0)} kg</div>
+      </div>
+      ${totalRobot>0?`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:.4rem;padding:.55rem .8rem;background:#fff3e0;border-radius:10px;border:1px solid #ffcc80">
+        <div style="font-weight:700;color:#e65100;font-size:.9rem">🤖 Hors bol</div>
+        <div style="font-family:monospace;font-weight:700;font-size:1.1rem;color:#e65100">${totalRobot.toFixed(0)} kg</div>
+      </div>`:''}
+    </div>`;
+}
+
+// ══ AJUSTER SELON REFUS (aliments cochés au bol) ══
+window.ajusterSelonRefusMobile = async function ajusterSelonRefusMobile(){
+  const CIBLE = 0.08;
+  const actifs = getLotsActifs();
+  const checked = getBolChecked();
+  const lotsActifs = lotsData.filter(function(l){ return l.ration && l.ration.length > 0 && actifs[l.id] !== false; });
+
+  // Calculer facteur par lot selon ses propres refus
+  var ajustements = []; // {lot, facteur, pct}
+  var nbLotsAvecRefus = 0;
+  var nbLotsOK = 0;
+
+  lotsActifs.forEach(function(lot){
+    const nb = lot.nb || 0;
+    const totalLot = (lot.ration || []).reduce(function(s,a){ return s + a.qte * nb; }, 0);
+    const refusLot = refusData[lot.id];
+    if(!refusLot || refusLot.kg == null || parseFloat(refusLot.kg) <= 0 || totalLot <= 0){
+      // Pas de refus pour ce lot — pas d'ajustement
+      ajustements.push({ lot: lot, facteur: null, pct: null });
+      return;
+    }
+    nbLotsAvecRefus++;
+    const pct = parseFloat(refusLot.kg) / totalLot;
+    if(pct >= 0.06 && pct <= 0.10){
+      nbLotsOK++;
+      ajustements.push({ lot: lot, facteur: null, pct: pct, ok: true });
+    } else {
+      const facteur = (1 - pct) / (1 - CIBLE);
+      ajustements.push({ lot: lot, facteur: facteur, pct: pct });
+    }
+  });
+
+  if(nbLotsAvecRefus === 0){
+    alert("Aucun refus enregistré aujourd'hui.\nAllez dans l'onglet Refus pour saisir les données.");
+    return;
+  }
+
+  // Appliquer facteur par lot aux aliments cochés
+  var lignes = [];
+  ajustements.forEach(function(aj){
+    if(!aj.facteur) return; // pas d'ajustement pour ce lot
+    aj.lot.ration.forEach(function(a){
+      if(checked[a.nom]){
+        a.qte = Math.round(a.qte * aj.facteur * 100) / 100;
+      }
+    });
+    const sens = aj.facteur > 1 ? '+' : '';
+    lignes.push(aj.lot.nom + ' : refus ' + (aj.pct*100).toFixed(1) + '% → ' + sens + Math.round((aj.facteur-1)*100) + '%');
+  });
+
+  if(lignes.length === 0){
+    alert("Tous les lots sont dans l'objectif (6-10%).\nAucun ajustement n\u00e9cessaire.");
+    return;
+  }
+
+  // Sauvegarder dans Firestore
+  if(uid){
+    try{
+      const noms = {};
+      lotsData.forEach(function(l){ noms[l.id] = l.nom; });
+      const lotsMap = {};
+      lotsData.forEach(function(l){
+        lotsMap[l.id] = { nb: l.nb || 0, ration: l.ration || [], prodReelle: l.prodReelle || null };
+      });
+      await setDoc(doc(db, 'users', uid, 'capration', 'lots'), { noms: noms, lots: lotsMap }, { merge: true });
+    } catch(e){
+      console.warn('Sauvegarde ajustement refus:', e);
+    }
+  }
+
+  alert('✅ Ajustement effectué par lot :\n' + lignes.join('\n'));
+  renderChargement();
+}
+
+// ══ PAGE PRODUCTION ══
+function todayStrProd(){ return new Date().toISOString().split('T')[0]; }
+
+function renderProduction(){
+  const el = document.getElementById('page-production');
+  if(!el) return;
+  const lotsActifs = lotsData.filter(function(l){ return l.ration && l.ration.length > 0; });
+  if(!lotsActifs.length){
+    el.innerHTML = '<div class="empty">🥛<br>Aucun lot disponible.<br><small>Synchronisez depuis CapriRation PC</small></div>';
+    return;
+  }
+
+  const today = todayStrProd();
+  const dateLabel = new Date(today + 'T12:00:00').toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+
+  el.innerHTML = `
+    <div style="padding:.75rem 1rem .4rem;font-size:.75rem;font-weight:700;color:var(--vert-f);border-left:3px solid var(--vert-c);margin:.5rem;background:#f0faf4;border-radius:0 8px 8px 0">
+      🗓 ${dateLabel}
+    </div>
+    ${lotsActifs.map(function(lot){
+      const nb = lot.nb || 0;
+      const existing = prodData.find(function(e){ return String(e.lotId)===String(lot.id) && e.date===today; });
+      const matin = existing ? existing.matin : '';
+      const soir  = existing ? existing.soir  : '';
+      const total = existing ? existing.total.toFixed(0) : '—';
+      const lch   = existing && nb>0 ? (existing.total/nb).toFixed(2) : '—';
+      const saved = !!existing;
+
+      return `<div class="card" style="margin:.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+          <div>
+            <div style="font-size:.95rem;font-weight:700;color:var(--vert-f)">${lot.nom}</div>
+            <div style="font-size:.72rem;color:var(--gris)">${nb} ch.</div>
+          </div>
+          ${saved ? '<span style="font-size:.7rem;background:#e8f5e9;color:#2d6a4f;padding:2px 8px;border-radius:20px;font-weight:600">✓ Enregistré</span>' : ''}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.6rem">
+          <div>
+            <div style="font-size:.7rem;color:var(--gris);font-weight:600;margin-bottom:3px">TRAITE MATIN (L)</div>
+            <input type="number" id="prod-matin-${lot.id}" value="${matin}" min="0" step="1" placeholder="0"
+              style="width:100%;padding:.5rem;border:1.5px solid var(--bord);border-radius:10px;font-size:1rem;font-weight:600;text-align:center;background:#fff"
+              oninput="updateProdTotal(${lot.id}, ${nb})">
+          </div>
+          <div>
+            <div style="font-size:.7rem;color:var(--gris);font-weight:600;margin-bottom:3px">TRAITE SOIR (L)</div>
+            <input type="number" id="prod-soir-${lot.id}" value="${soir}" min="0" step="1" placeholder="0"
+              style="width:100%;padding:.5rem;border:1.5px solid var(--bord);border-radius:10px;font-size:1rem;font-weight:600;text-align:center;background:#fff"
+              oninput="updateProdTotal(${lot.id}, ${nb})">
+          </div>
+        </div>
+        <div id="prod-recap-${lot.id}" style="display:flex;gap:.5rem;margin-bottom:.65rem;font-family:monospace">
+          <div style="flex:1;background:#f5f7f5;border-radius:8px;padding:.4rem;text-align:center">
+            <div style="font-size:1rem;font-weight:700;color:var(--vert-f)">${total} L</div>
+            <div style="font-size:.65rem;color:var(--gris)">Total lot/j</div>
+          </div>
+          <div style="flex:1;background:#f5f7f5;border-radius:8px;padding:.4rem;text-align:center">
+            <div style="font-size:1rem;font-weight:700;color:var(--vert-f)">${lch} L</div>
+            <div style="font-size:.65rem;color:var(--gris)">L/ch/j</div>
+          </div>
+        </div>
+        <button onclick="saveProdLot(${lot.id}, ${nb})"
+          style="width:100%;padding:.55rem;background:var(--vert-f);color:#fff;border:none;border-radius:10px;font-size:.9rem;font-weight:700;cursor:pointer">
+          💾 Enregistrer
+        </button>
+      </div>`;
+    }).join('')}
+  `;
+}
+
+window.updateProdTotal = function(lotId, nb){
+  const m = +document.getElementById('prod-matin-'+lotId).value || 0;
+  const s = +document.getElementById('prod-soir-'+lotId).value || 0;
+  const total = m + s;
+  const lch = nb > 0 ? (total/nb).toFixed(2) : '—';
+  const recap = document.getElementById('prod-recap-'+lotId);
+  if(recap){
+    recap.children[0].children[0].textContent = total.toFixed(0) + ' L';
+    recap.children[1].children[0].textContent = lch + ' L';
+  }
+};
+
+window.saveProdLot = async function(lotId, nb){
+  const matin = +document.getElementById('prod-matin-'+lotId).value || 0;
+  const soir  = +document.getElementById('prod-soir-'+lotId).value || 0;
+  const total = matin + soir;
+  const today = todayStrProd();
+
+  // Mettre à jour prodData local
+  const idx = prodData.findIndex(function(e){ return String(e.lotId)===String(lotId) && e.date===today; });
+  const entry = { lotId: String(lotId), date: today, matin, soir, total, source: 'mobile' };
+  if(idx >= 0) prodData[idx] = entry;
+  else prodData.push(entry);
+
+  // Mettre à jour prodReelle dans lotsData
+  const lot = lotsData.find(function(l){ return String(l.id)===String(lotId); });
+  if(lot && nb > 0) lot.prodReelle = +(total/nb).toFixed(2);
+
+  // Sauvegarder dans Firestore
+  if(uid){
+    try{
+      await setDoc(doc(db, 'users', uid, 'capration', 'production'), { log: prodData, updatedAt: new Date().toISOString() }, { merge: false });
+      // Mettre à jour aussi prodReelle dans lots
+      const noms = {};
+      lotsData.forEach(function(l){ noms[l.id] = l.nom; });
+      const lotsMap = {};
+      lotsData.forEach(function(l){
+        lotsMap[l.id] = { nb: l.nb||0, ration: l.ration||[], prodReelle: l.prodReelle||null };
+      });
+      await setDoc(doc(db, 'users', uid, 'capration', 'lots'), { noms, lots: lotsMap }, { merge: true });
+    } catch(e){
+      alert('Erreur sauvegarde : ' + e.message);
+      return;
+    }
+  }
+
+  renderProduction();
+};
+
+// PAGE REFUS
+// ══════════════════════════════════════════════════
+let refusMode = 'kg';
+window.setRefusMode = (mode)=>{ refusMode=mode; renderRefus(); };
+
+function renderRefus(){
+  const el = document.getElementById('page-refus');
+  const today = todayStr();
+  const lotsAvecRation = lotsData.filter(l=>l.ration?.length>0);
+  if(!lotsAvecRation.length){ el.innerHTML=`<div class="empty">📋<br>Aucune ration configurée.</div>`; return; }
+
+  el.innerHTML = `
+    <div class="sync-banner">📅 Refus du ${today}</div>
+    <div style="display:flex;gap:.4rem;margin-bottom:.75rem">
+      <div class="chip ${refusMode==='kg'?'active':''}" onclick="setRefusMode('kg')">en kg</div>
+      <div class="chip ${refusMode==='pct'?'active':''}" onclick="setRefusMode('pct')">en %</div>
+    </div>
+    ${lotsAvecRation.map(lot=>{
+      const totalRation = (lot.ration||[]).reduce((s,a)=>s+a.qte,0) * (lot.nb||0);
+      const refusLot = refusData[lot.id]||{};
+      const valSaisie = refusLot.valeur ?? '';
+      const valKg = refusLot.kg ?? 0;
+      const pct = totalRation>0 ? (valKg/totalRation*100).toFixed(1) : 0;
+
+      return `<div class="card">
+        <div class="lot-header">
+          <div class="lot-name">${lot.nom}</div>
+          <div class="lot-badge">${lot.nb||0} ch.</div>
+        </div>
+        <div class="lot-sub">Distribué : ${totalRation.toFixed(0)} kg/j</div>
+        <div class="refus-form" style="margin-top:.4rem">
+          <span class="refus-label">Refus total</span>
+          <input class="refus-input" type="number" id="refus-${lot.id}"
+            value="${valSaisie}" placeholder="0" min="0" step="${refusMode==='pct'?'0.5':'1'}">
+          <span class="refus-unit">${refusMode==='kg'?'kg':'%'}</span>
+        </div>
+        ${valKg>0 ? `<div style="display:flex;justify-content:space-between;font-size:.8rem;padding:.4rem .6rem;background:${pct>10?'#fdecea':'var(--vert-p)'};border-radius:8px;margin-top:.4rem">
+          <span style="color:var(--gris)">Enregistré</span>
+          <span style="font-weight:700;color:${pct>10?'var(--danger)':'var(--vert)'}">${valKg.toFixed(1)} kg — ${pct}%</span>
+        </div>` : ''}
+        <button class="btn-save" style="width:100%;margin-top:.6rem;padding:.7rem" onclick="sauvegarderRefusSimple(${lot.id},${totalRation.toFixed(1)})">
+          💾 Enregistrer
+        </button>
+      </div>`;
+    }).join('')}`;
+}
+
+window.sauvegarderRefusSimple = async(lotId, totalRation)=>{
+  const lot = lotsData.find(l=>l.id===lotId);
+  if(!lot) return;
+  const raw = parseFloat(document.getElementById(`refus-${lotId}`)?.value)||0;
+  const kg  = refusMode==='pct' ? totalRation*raw/100 : raw;
+  const pct = totalRation>0 ? (kg/totalRation*100).toFixed(1) : 0;
+  if(!refusData[lotId]) refusData[lotId]={};
+  refusData[lotId] = {valeur:raw, kg, pct, mode:refusMode};
+  const today = todayStr();
+  try{
+    await setDoc(doc(db,`users/${uid}/capration/refus_${today}`), refusData);
+    showToast(`✅ ${lot.nom} : ${kg.toFixed(1)} kg (${pct}%)`);
+  } catch(e){
+    localStorage.setItem('cap3_mobile_refus_'+today, JSON.stringify(refusData));
+    showToast(`💾 Sauvegardé en local`);
+  }
+  renderRefus();
+};
+
+// ══ UTILS ══
+function todayStr(){ return new Date().toISOString().split('T')[0]; }
+
+function setSyncStatus(txt, cls){
+  const el = document.getElementById('sync-status');
+  el.textContent = txt;
+  el.className = 'topbar-status'+(cls?' '+cls:'');
+  if(cls==='ok'){
+    const now = new Date();
+    const label = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})
+                + ' à ' + now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    localStorage.setItem('lastSync_mobile', label);
+    afficherDerniereSyncMobile();
+  }
+}
+
+function afficherDerniereSyncMobile(){
+  const el = document.getElementById('last-sync-mobile');
+  if(!el) return;
+  const last = localStorage.getItem('lastSync_mobile');
+  el.textContent = last ? '🔄 Dernière sync : ' + last : '';
+}
+
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2600);
+}
+
+// ══ SYNC DEPUIS PC (lecture clé localStorage partagée via URL hash) ══
+// CapriRation PC peut encoder les lots dans l'URL pour un transfert rapide
+const hash = location.hash.slice(1);
+if(hash.startsWith('lots=')){
+  try{
+    lotsData = JSON.parse(decodeURIComponent(hash.slice(5)));
+    localStorage.setItem('cap3_mobile_lots', JSON.stringify(lotsData));
+    location.hash='';
+    renderAll();
+  } catch(e){}
+}
+</script>
+<!-- OVERLAY LÉGAL MOBILE -->
+<div id="overlay-legal-mobile" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2000;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-height:85vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom)">
+    <div style="position:sticky;top:0;background:#fff;padding:1rem 1.2rem;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;border-radius:20px 20px 0 0">
+      <div id="overlay-legal-mobile-title" style="font-size:1rem;font-weight:700;color:#1a3a2a"></div>
+      <button onclick="fermerOverlayLegalMobile()" style="background:none;border:none;cursor:pointer;font-size:1.3rem;color:#6b7280;padding:4px 8px">✕</button>
+    </div>
+    <div id="overlay-legal-mobile-body" style="padding:1.2rem;font-size:.88rem;line-height:1.7;color:#374151"></div>
+  </div>
+</div>
+
+<script>
+const LEGAL_MOBILE = {
+  apropos: {
+    title: 'ℹ️ À propos',
+    body: `
+      <div style="text-align:center;margin-bottom:1.2rem">
+        <div style="font-size:1.2rem;font-weight:700;color:#1a3a2a">CapriRation Mobile</div>
+        <div style="color:#6b7280;font-size:.82rem">Distribution des rations caprines</div>
+      </div>
+      <div style="background:#e8f5e9;border-radius:10px;padding:.9rem;margin-bottom:1rem;font-size:.85rem">
+        <div><strong>Éditeur :</strong> Agrilium — Thibaut Lafon</div>
+        <div><strong>SIRET :</strong> 10595610600014</div>
+        <div><strong>Contact :</strong> <a href="mailto:contact@myagrilium.com" style="color:#2d6a4f">contact@myagrilium.com</a></div>
+        <div><strong>Site :</strong> <a href="https://www.myagrilium.com" target="_blank" style="color:#2d6a4f">www.myagrilium.com</a></div>
+      </div>
+      <p>CapriRation est un logiciel SaaS de calcul nutritionnel caprin basé sur les normes <strong>INRA 2007</strong>, conçu par un éleveur pour les éleveurs.</p>
+      <div style="margin-top:1rem;font-size:.75rem;color:#9ca3af;text-align:center">© 2026 Agrilium — Tous droits réservés</div>
+    `
+  },
+  mentions: {
+    title: '🏢 Mentions légales',
+    body: `
+      <h3 style="color:#1a3a2a;margin-bottom:.4rem;font-size:.95rem">Éditeur</h3>
+      <p><strong>Agrilium</strong> — Thibaut Lafon<br>
+      Micro-entreprise — SIRET : 10595610600014<br>
+      APE : 5829C<br>
+      <a href="mailto:contact@myagrilium.com" style="color:#2d6a4f">contact@myagrilium.com</a></p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Hébergement</h3>
+      <p><strong>GitHub Pages</strong> — GitHub Inc., San Francisco, USA</p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Base de données</h3>
+      <p><strong>Google Firebase</strong> — Google LLC<br>Données hébergées en Europe (europe-west).</p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Paiement</h3>
+      <p><strong>Stripe Inc.</strong> — San Francisco, USA<br>Certifié PCI-DSS.</p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Propriété intellectuelle</h3>
+      <p>© 2026 Agrilium — Tous droits réservés.</p>
+    `
+  },
+  cgu: {
+    title: '📄 CGU',
+    body: `
+      <h3 style="color:#1a3a2a;margin-bottom:.5rem;font-size:.95rem">Objet</h3>
+      <p>Les présentes CGU régissent l'utilisation de <strong>CapriRation</strong>, édité par <strong>Agrilium</strong> (SIRET 10595610600014).</p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Abonnement</h3>
+      <p>Après <strong>1 jour d'essai gratuit</strong>, l'accès nécessite un abonnement :</p>
+      <ul style="margin:.4rem 0 .75rem 1.2rem">
+        <li><strong>Mensuel :</strong> 24,99 € TTC / mois</li>
+        <li><strong>Annuel :</strong> 249,90 € TTC / an</li>
+      </ul>
+      <p>Résiliable à tout moment. Paiement sécurisé par Stripe.</p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Propriété intellectuelle</h3>
+      <p>CapriRation est la propriété exclusive d'Agrilium. Toute reproduction est interdite.</p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Responsabilité</h3>
+      <p>CapriRation est un outil d'aide à la décision. Les résultats ne remplacent pas l'avis d'un professionnel.</p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Droit applicable</h3>
+      <p>Droit français. Tout litige sera soumis aux tribunaux compétents du ressort du siège social d'Agrilium.</p>
+    `
+  },
+  confidentialite: {
+    title: '🔒 Confidentialité',
+    body: `
+      <p>Agrilium protège vos données conformément au <strong>RGPD</strong>.</p>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Données collectées</h3>
+      <ul style="margin:.4rem 0 .75rem 1.2rem">
+        <li>E-mail et mot de passe (Firebase Authentication)</li>
+        <li>Données d'élevage (lots, rations, production, refus)</li>
+        <li>Statut d'abonnement (Stripe)</li>
+      </ul>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Sous-traitants</h3>
+      <ul style="margin:.4rem 0 .75rem 1.2rem">
+        <li><strong>Google Firebase</strong> — authentification et base de données</li>
+        <li><strong>Stripe</strong> — paiements</li>
+        <li><strong>Google Analytics</strong> — statistiques anonymes</li>
+      </ul>
+
+      <h3 style="color:#1a3a2a;margin:.75rem 0 .4rem;font-size:.95rem">Vos droits</h3>
+      <p>Accès, rectification, effacement, portabilité. Contact : <a href="mailto:contact@myagrilium.com" style="color:#2d6a4f">contact@myagrilium.com</a></p>
+    `
+  }
+};
+
+function toggleMenuLegalMobile(e){
+  if(e) e.stopPropagation();
+  const m = document.getElementById('menu-legal-mobile');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', ()=>{
+  const m = document.getElementById('menu-legal-mobile');
+  if(m) m.style.display = 'none';
+});
+function ouvrirOverlayLegalMobile(type){
+  const c = LEGAL_MOBILE[type];
+  if(!c) return;
+  document.getElementById('overlay-legal-mobile-title').innerHTML = c.title;
+  document.getElementById('overlay-legal-mobile-body').innerHTML = c.body;
+  document.getElementById('overlay-legal-mobile').style.display = 'flex';
+}
+function fermerOverlayLegalMobile(){
+  document.getElementById('overlay-legal-mobile').style.display = 'none';
+}
+document.getElementById('overlay-legal-mobile')?.addEventListener('click', e=>{
+  if(e.target === document.getElementById('overlay-legal-mobile')) fermerOverlayLegalMobile();
+});
+</script>
+
+</body>
+</html>
