@@ -1,4 +1,4 @@
-const CACHE = 'capriration-mobile-v3';
+const CACHE = 'capriration-mobile-v3.7';
 const ASSETS = [
   '/CapriRation/',
   '/CapriRation/index.html',
